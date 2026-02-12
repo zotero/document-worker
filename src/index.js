@@ -11,7 +11,26 @@ import { XRefParseException } from '../pdf.js/build/lib-legacy/core/core_utils.j
 import { FontEmbedder } from './font/font-embedder.js';
 import { renderAnnotations } from './renderer.js';
 
+import { runInference, loadModel, initModel } from './structure/model/line-seg/model.js';
+import { getFullStructure } from './structure/structure.js';
+
+// loadModel({ modelUrl: "./model/out1.onnx",  crfUrl: "./model/out1.crf.json" });
+
 // TODO: Highlights shouldn't be allowed to be outside of page view
+
+function initHandler(pdfDocument, cmapProvider, standardFontProvider) {
+	let handler = {};
+	handler.send = function () {};
+	handler.sendWithPromise = async function (op, data) {
+		if (op === 'FetchBuiltInCMap') {
+			return cmapProvider(data.name);
+		}
+		else if (op === 'FetchStandardFontData') {
+			return standardFontProvider(data.filename);
+		}
+	};
+	pdfDocument.pdfManager._handler = handler;
+}
 
 async function getPageChars(pdfDocument, cmapProvider, standardFontProvider, pageIndex) {
 	let handler = {};
@@ -31,6 +50,26 @@ async function getPageChars(pdfDocument, cmapProvider, standardFontProvider, pag
 	};
 	pdfDocument.pdfManager._handler = handler;
 	return pdfDocument.module.getPageChars(pageIndex);
+}
+
+async function getPageCharsObjects(pdfDocument, cmapProvider, standardFontProvider, pageIndex) {
+	let handler = {};
+	handler.send = function () {};
+	handler.sendWithPromise = async function (op, data) {
+		if (op === 'FetchBinaryData') {
+			if (data.type === 'cMapReaderFactory') {
+				return cmapProvider(data.name);
+			}
+			else if (data.type === 'standardFontDataFactory') {
+				return standardFontProvider(data.filename);
+			}
+			else {
+				console.warn(`Unknown data type: ${data.type}`);
+			}
+		}
+	};
+	pdfDocument.pdfManager._handler = handler;
+	return pdfDocument.module.getPageCharsObjects(pageIndex);
 }
 
 async function getPageLabels(pdfDocument, cmapProvider, standardFontProvider) {
@@ -481,6 +520,179 @@ async function getFulltext(buf, pages, password, cmapProvider, standardFontProvi
 	};
 }
 
+/**
+ * Extracts every line of text from every page in the PDF buffer.
+ *
+ * @param {ArrayBuffer|Uint8Array} buf                         – PDF data
+ * @param {Array}                   pages                      – OUT-param, will be filled with page→lines information
+ * @param {string|undefined}        password                   – Optional password
+ * @param {Function}                cmapProvider               – (name)  => Promise<ArrayBuffer>
+ * @param {Function}                standardFontProvider       – (file)  => Promise<ArrayBuffer>
+ * @returns {Promise<Array>} The same array instance passed in `pages`
+ */
+export async function getPages(
+	buf,
+	password,
+	cmapProvider,
+	standardFontProvider
+) {
+	// Obtain a PDF manager / document instance
+	const pdfManager = await getPdfManager(buf, password);
+	const pdfDocument = pdfManager.pdfDocument;
+	const pageCount = pdfDocument.numPages;
+
+	let meta = pdfManager.pdfDocument.documentInfo;
+	// console.log(meta);
+
+	let pages = [];
+
+	for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+		const { chars, objects } = await getPageCharsObjects(
+			pdfDocument,
+			cmapProvider,
+			standardFontProvider,
+			pageIndex
+		);
+
+		const page = await pdfDocument.getPage(pageIndex);
+		const viewport = page.view;
+
+		const lines = [];
+		let textParts = [];
+		let wordRect = null;
+		let lineRect = null; // [x1, y1, x2, y2]
+		let fontCounts = {}; // Track font frequencies
+
+		let words = [];        // current-line words
+		let pageWords = [];    // all words on the page
+		let lineChars = [];    // collect chars for the current line
+
+		const pushWord = () => {
+			if (!textParts.length) {
+				return;
+			}
+
+			const w = {
+				text: textParts.join(''),
+				rect: wordRect.map(n => Math.round(n * 100) / 100)
+			};
+
+			words.push(w);      // current line
+			pageWords.push(w);  // whole page
+
+			textParts = [];
+			wordRect = null;
+		};
+
+		const pushLine = () => {
+			if (!words.length) {
+				return;
+			}
+
+			// Determine the most common font on this line
+			let mostCommonFont = '';
+			let maxCount = 0;
+			for (let font in fontCounts) {
+				if (fontCounts[font] > maxCount) {
+					maxCount = fontCounts[font];
+					mostCommonFont = font;
+				}
+			}
+
+			lines.push({
+				id: lines.length,
+				text: words.map(w => w.text).join(' '),
+				rect: lineRect.map(n => Math.round(n * 100) / 100),
+				font: mostCommonFont,
+				words: words,       // words on this line
+				chars: lineChars    // all character entries for this line
+			});
+
+			// --- RESET STATE FOR THE NEXT LINE -----------------------------------
+			words = [];
+			lineRect = null;
+			fontCounts = {};
+			lineChars = [];
+		};
+
+		for (const char of chars) {
+			// 1) Collect character(s)
+			textParts.push(char.c);
+			lineChars.push(char); // track char for current line
+
+			// Track font frequency
+			if (char.fontName) {
+				fontCounts[char.fontName] = (fontCounts[char.fontName] || 0) + 1;
+			}
+
+			// 2) Merge rectangles
+			// `char.rect` is expected to be [x1, y1, x2, y2]
+			if (!wordRect) {
+				wordRect = [...char.rect];
+			}
+			if (!lineRect) {
+				lineRect = [...char.rect];
+			}
+			wordRect[0] = Math.min(wordRect[0], char.rect[0]); // x1
+			wordRect[1] = Math.min(wordRect[1], char.rect[1]); // y1
+			wordRect[2] = Math.max(wordRect[2], char.rect[2]); // x2
+			wordRect[3] = Math.max(wordRect[3], char.rect[3]); // y2
+			lineRect[0] = Math.min(lineRect[0], char.rect[0]); // x1
+			lineRect[1] = Math.min(lineRect[1], char.rect[1]); // y1
+			lineRect[2] = Math.max(lineRect[2], char.rect[2]); // x2
+			lineRect[3] = Math.max(lineRect[3], char.rect[3]); // y2
+
+			// 3) End-of-word/line?
+			if (char.spaceAfter || char.lineBreakAfter) {
+				pushWord();
+			}
+			if (char.lineBreakAfter) {
+				pushLine();
+			}
+		}
+
+		// Flush any trailing text
+		pushWord();
+		pushLine();
+
+		for (let object of objects) {
+			lines.push({
+				type: 'object',
+				subtype: object.type,
+				rect: object.rect,
+			});
+		}
+
+		pages.push({
+			lines,
+			words: pageWords,   // return all words on the page
+			viewport
+		});
+	}
+	return pages;
+}
+
+async function getOutline(buf, password, cmapProvider, standardFontProvider) {
+	let pdfManager = await getPdfManager(buf);
+	initHandler(pdfManager.pdfDocument, cmapProvider, standardFontProvider);
+	let outline = await pdfManager.pdfDocument.module.getOutline();
+	return outline;
+}
+
+async function getProcessedData(buf, password, cmapProvider, standardFontProvider) {
+	let pdfManager = await getPdfManager(buf);
+	initHandler(pdfManager.pdfDocument, cmapProvider, standardFontProvider);
+	let outline = await pdfManager.pdfDocument.module.getProcessedData();
+	return outline;
+}
+
+async function getStructure(buf, password, cmapProvider, standardFontProvider, onnxRuntimeProvider){
+	let pdfManager = await getPdfManager(buf);
+	initHandler(pdfManager.pdfDocument, cmapProvider, standardFontProvider);
+
+	return await getFullStructure(pdfManager.pdfDocument, onnxRuntimeProvider);
+}
+
 async function getRecognizerData(buf, password, cmapProvider, standardFontProvider) {
 	let round = n => Math.round(n * 10000) / 10000;
 
@@ -790,6 +1002,10 @@ async function wasmProvider(filename) {
 	return data;
 }
 
+async function onnxRuntimeProvider() {
+	return await query('FetchONNXRuntime');
+}
+
 async function renderedAnnotationSaver(libraryID, annotationKey, buf) {
 	return await query('SaveRenderedAnnotation', { libraryID, annotationKey, buf }, [buf]);
 }
@@ -963,6 +1179,24 @@ if (typeof self !== 'undefined') {
 				}, []);
 			}
 		}
+		else if (message.action === 'getStructuredData') {
+			try {
+				let data = await getStructure(
+					message.data.buf,
+					message.data.password,
+					cmapProvider,
+					standardFontProvider,
+					onnxRuntimeProvider
+				);
+				self.postMessage({ responseID: message.id, data }, []);
+			}
+			catch (e) {
+				self.postMessage({
+					responseID: message.id,
+					error: errObject(e)
+				}, []);
+			}
+		}
 		else if (message.action === 'renderAnnotations') {
 			try {
 				let data = await renderAnnotations(
@@ -1011,6 +1245,10 @@ export {
 	rotatePages,
 	getFulltext,
 	getRecognizerData,
+	getOutline,
+	getProcessedData,
+	getStructure,
+	getPdfManager,
 	importCitaviAnnotations,
 	importMendeleyAnnotations,
 	hasAnnotations

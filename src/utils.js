@@ -45,3 +45,31 @@ export function textApproximatelyEqual(a, b) {
 	b = normalizeText(b);
 	return distance(a, b) < a.length * 0.1;
 }
+
+export function getSortIndex(pageIndex, offset, top) {
+	return [
+		pageIndex.toString().slice(0, 5).padStart(5, '0'),
+		offset.toString().slice(0, 6).padStart(6, '0'),
+		Math.max(Math.floor(top), 0).toString().slice(0, 5).padStart(5, '0')
+	].join('|');
+}
+
+export function getPositionFromRects(chars, pageIndex) {
+	let chars1 = [];
+	let chars2 = [];
+	for (let char of chars) {
+		if (char.pageIndex === pageIndex) {
+			chars1.push(char);
+		} else {
+			chars2.push(char);
+		}
+	}
+	let position = {
+		pageIndex,
+		rects: getRectsFromChars(chars1),
+	};
+	if (chars2.length) {
+		position.nextPageRects = getRectsFromChars(chars2);
+	}
+	return position;
+}
