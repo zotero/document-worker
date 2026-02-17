@@ -25,7 +25,7 @@ import { createBlockAnchor, ensureBlockPageRects } from './util.js';
 const SCHEMA_VERSION = '1.0.0-draft';
 const PROCESSOR_VERSION = '1.0.0-draft';
 
-export async function getFullStructure(pdfDocument, onnxRuntimeProvider) {
+export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelProvider) {
 	const pageCount = pdfDocument.numPages;
 
 	let structure = {
@@ -71,7 +71,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider) {
 
 		if (chars.length) {
 			let val= {};
-			blocks = await inference(pageDataList, onnxRuntimeProvider, val);
+			blocks = await inference(pageDataList, onnxRuntimeProvider, modelProvider, val);
 		}
 
 		for (let j = 0; j < blocks.length; j++) {

@@ -29,29 +29,10 @@ module.exports = {
 						compact: false,
 						retainLines: true,
 						presets: [['@babel/preset-env']],
+						plugins: [['@babel/plugin-syntax-import-attributes', { deprecatedAssertSyntax: true }]],
 					},
 				},
 			},
-			{
-				test: /\.onnx$/i,
-				type: 'asset/inline',
-				generator: {
-					dataUrl: (content) => {
-						const buf = Buffer.isBuffer(content) ? content : Buffer.from(content);
-						return `data:application/octet-stream;base64,${buf.toString('base64')}`;
-					}
-				}
-			},
-			{
-				test: /\.json$/i,
-				type: 'asset/inline',
-				generator: {
-					dataUrl: (content) => {
-						const buf = Buffer.isBuffer(content) ? content : Buffer.from(content);
-						return `data:application/json;base64,${buf.toString('base64')}`;
-					}
-				}
-			}
 		],
 	},
 	plugins: [

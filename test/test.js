@@ -38,7 +38,7 @@ const __dirname = path.dirname(__filename);
 
 describe('PDF Worker', function () {
 	it('should import annotations', async function () {
-		let buf = fs.readFileSync(__dirname + '/pdfs/1.pdf');
+		let buf = fs.readFileSync(__dirname + '/pdfs/full/1.pdf');
 		let result = await pdfWorker.importAnnotations(buf, []);
 
 		let expectedResult = {
@@ -249,7 +249,7 @@ describe('PDF Worker', function () {
 			'tags': ['tag1', 'tag2', 'tag3']
 		}];
 
-		let buf = fs.readFileSync(__dirname + '/pdfs/1.pdf');
+		let buf = fs.readFileSync(__dirname + '/pdfs/full/1.pdf');
 		buf = await pdfWorker.writeAnnotations(buf, annotations);
 		var buffer = Buffer.from(buf);
 		let md5 = crypto.createHash('md5').update(buffer).digest('hex');
@@ -258,7 +258,7 @@ describe('PDF Worker', function () {
 	});
 
 	it('should import Mendeley annotations', async function () {
-		let buf = fs.readFileSync(__dirname + '/pdfs/2.pdf');
+		let buf = fs.readFileSync(__dirname + '/pdfs/full/2.pdf');
 		let mendeleyAnnotations = [
 			{
 				id: 1,
@@ -439,7 +439,7 @@ describe('PDF Worker', function () {
 			tags: [{ name: 'red' }],
 			color: '#ff6666'
 		};
-		const buf = fs.readFileSync(path.join(__dirname, 'pdfs', '2.pdf'));
+		const buf = fs.readFileSync(path.join(__dirname, 'pdfs', 'full', '2.pdf'));
 		const [processedAnnotations] = await pdfWorker.importCitaviAnnotations(buf, [citaviAnnotation]);
 		expect(processedAnnotations.key).to.equal('B3UENNWP');
 		expect(processedAnnotations.sortIndex).to.equal('00000|000103|00206');
