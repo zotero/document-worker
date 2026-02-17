@@ -1,5 +1,5 @@
-import * as pdfjsWorker from '../pdf.js/build/lib-legacy/pdf.worker.js';
-import * as pdfjs from '../pdf.js/build/lib-legacy/pdf.js';
+import * as pdfjsWorker from '../../pdf.js/build/lib-legacy/pdf.worker.js';
+import * as pdfjs from '../../pdf.js/build/lib-legacy/pdf.js';
 
 self.pdfjsWorker = pdfjsWorker;
 
@@ -167,7 +167,7 @@ async function renderImage(pdfDocument, annotation) {
 	return canvas;
 }
 
-export async function renderAnnotations(libraryID, buf, annotations, password, cmapProvider, standardFontProvider, wasmProvider, renderedAnnotationSaver) {
+export async function renderAnnotations(libraryID, buf, annotations, password, dataProvider, renderedAnnotationSaver) {
 	let document = {
 		fonts: self.fonts,
 		createElement: (name) => {
@@ -183,13 +183,16 @@ export async function renderAnnotations(libraryID, buf, annotations, password, c
 		data: buf, ownerDocument: document,
 		password,
 		CMapReaderFactory: function () {
-			this.fetch = async ({ name }) => cmapProvider(name);
+			this.fetch = async ({ name }) => {
+				let raw = await dataProvider('cmaps/' + name + '.bcmap');
+				return { cMapData: raw, isCompressed: true };
+			};
 		},
 		StandardFontDataFactory: function () {
-			this.fetch = async ({ filename }) => standardFontProvider(filename);
+			this.fetch = async ({ filename }) => dataProvider('standard_fonts/' + filename);
 		},
 		WasmFactory: function () {
-			this.fetch = async ({ filename }) => wasmProvider(filename);
+			this.fetch = async ({ filename }) => dataProvider('wasm/' + filename);
 		},
 	}).promise;
 

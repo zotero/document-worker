@@ -10,7 +10,7 @@
 Clone the repository:
 
 ```
-git clone https://github.com/zotero/pdf-worker --recursive
+git clone https://github.com/zotero/document-worker --recursive
 ```
 
 Run `npm run build` and look the examples.

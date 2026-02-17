@@ -25,7 +25,7 @@ jobs:
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm ci
 
-      - name: Build pdf-worker
+      - name: Build document-worker
         run: npm run build
         # Currently necessary for Webpack: https://stackoverflow.com/a/69746937
         env:
@@ -39,7 +39,7 @@ jobs:
       - name: Upload pre-build ZIP
         if: |
           env.ACT != 'true'
-          && github.repository == 'zotero/pdf-worker'
+          && github.repository == 'zotero/document-worker'
           && github.event_name == 'push'
           && (github.ref == 'refs/heads/master' || endsWith(github.ref, '-hotfix') || github.ref == 'refs/heads/gh-actions-ci-test')
         env:

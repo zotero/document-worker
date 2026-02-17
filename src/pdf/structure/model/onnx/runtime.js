@@ -10,7 +10,7 @@ export async function getRuntime(onnxRuntimeProvider) {
 		ort.env.wasm.proxy = false;
 		ort.env.allowLocalModels = false;
 		ort.env.wasm.wasmBinary = await onnxRuntimeProvider();
-		ort.env.wasm.wasmPaths = null;
+		ort.env.wasm.wasmPaths = undefined;
 		return ort;
 	});
 }

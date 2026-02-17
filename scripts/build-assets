@@ -1,0 +1,10 @@
+#!/bin/bash
+# Copy binary assets to build/ for external loading
+
+# ONNX runtime (shared across models)
+mkdir -p build/onnx
+cp src/pdf/structure/model/onnx/ort-wasm-simd.wasm build/onnx/
+
+# Model binaries only (JSON is bundled in JS)
+mkdir -p build/line-seg
+cp src/pdf/structure/model/line-seg/model.onnx build/line-seg/

@@ -1,5 +1,5 @@
 const fs = require('fs');
-// const pdfWorker = require('../../build/pdf-worker');
+// const pdfWorker = require('../../build/worker');
 
 const pdfWorker = require('../../src/index');
 

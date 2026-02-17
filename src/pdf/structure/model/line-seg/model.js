@@ -1,86 +1,18 @@
 import { onnxMutex, getRuntime } from '../onnx/runtime.js';
-
-const isNode =
-	typeof process !== 'undefined' &&
-	!!process.versions?.node &&
-	typeof window === 'undefined';
+import crfData from './model.crf.json' with { type: 'json' };
 
 let ort = null;
 let model = null;
 
-async function getModelCRFJSON() {
-	if (isNode) {
-		const { readFile } = await import(/* webpackIgnore: true */ 'node:fs/promises');
-		const { fileURLToPath } = await import(/* webpackIgnore: true */ 'node:url');
-		const path = fileURLToPath(new URL('./model.crf.json', import.meta.url));
-		const text = await readFile(path, 'utf8');
-		return JSON.parse(text);
-	}
-	const url = new URL('./model.crf.json', import.meta.url).toString();
-	const res = await fetch(url, { cache: 'no-cache' });
-	if (!res.ok) {
-		throw new Error(`Failed to fetch model (${res.status} ${res.statusText})`);
-	}
-	return await res.json();
-}
-
-async function getModelBuf() {
-	if (isNode) {
-		const { readFile } = await import(/* webpackIgnore: true */ 'node:fs/promises');
-		const { fileURLToPath } = await import(/* webpackIgnore: true */ 'node:url');
-		const path = fileURLToPath(new URL('./model.onnx', import.meta.url));
-		const buf = await readFile(path);
-		// Return a standalone ArrayBuffer view over the file contents
-		return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
-	}
-	// Webpack inlines the asset into a data: URL at build time.
-	const url = new URL('./model.onnx', import.meta.url).toString();
-	// Convert using fetch() which supports data: URLs and returns ArrayBuffer efficiently
-	return fetch(url, { cache: 'no-cache' }).then((r) => {
-		if (!r.ok) throw new Error(`Failed to load embedded model (${r.status} ${r.statusText})`);
-		return r.arrayBuffer();
-	});
-}
-
-export async function initModel(onnxRuntimeProvider) {
+export async function initModel(onnxRuntimeProvider, modelProvider) {
 	ort = await getRuntime(onnxRuntimeProvider);
 	return await onnxMutex.runExclusive(async () => {
 		if (!model) {
-			const modelBuf = await getModelBuf();
-			const crfJSON = await getModelCRFJSON();
-			model = await loadModel(modelBuf, crfJSON);
+			const modelBuf = await modelProvider('line-seg');
+			model = await loadModel(modelBuf, crfData);
 		}
 		return model;
 	});
-}
-
-function formatBytes(bytes) {
-	const mb = bytes / (1024 * 1024);
-	return `${mb.toFixed(2)} MB`;
-}
-
-async function logMemory(label, extra = {}) {
-	try {
-		if (typeof performance.measureUserAgentSpecificMemory === 'function') {
-			// Most detailed (Chromium-based, gated behind a flag in some versions)
-			const report = await performance.measureUserAgentSpecificMemory();
-			const total = report.bytes ?? 0;
-			console.log(`[mem] ${label}: UA-specific total=${formatBytes(total)}`, { report, ...extra });
-			return;
-		}
-	} catch {
-		// ignore
-	}
-	const pm = performance && performance.memory;
-	if (pm && typeof pm.usedJSHeapSize === 'number') {
-		console.log(
-			`[mem] ${label}: usedJSHeap=${formatBytes(pm.usedJSHeapSize)} / totalJSHeap=${formatBytes(pm.totalJSHeapSize)} / jsHeapLimit=${formatBytes(pm.jsHeapSizeLimit)}`,
-			extra,
-		);
-		return;
-	}
-	// Fallback: no platform memory APIs; log only what we know
-	console.log(`[mem] ${label}`, extra);
 }
 
 // ------------ Config ------------

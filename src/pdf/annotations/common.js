@@ -1,4 +1,4 @@
-import { isArrayEqual, Util } from '../../pdf.js/build/lib-legacy/shared/util.js';
+import { isArrayEqual, Util } from '../../../pdf.js/build/lib-legacy/shared/util.js';
 
 function applyTransform(p, m) {
 	const xt = p[0] * m[0] + p[1] * m[2] + m[4];

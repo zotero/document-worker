@@ -616,9 +616,9 @@ export function buildBlocks(lines, results) {
   return blocks;
 }
 
-export async function inference(pageDataList, onnxRuntimeProvider, val) {
+export async function inference(pageDataList, onnxRuntimeProvider, modelProvider, val) {
 
-	let model = await initModel(onnxRuntimeProvider);
+	let model = await initModel(onnxRuntimeProvider, modelProvider);
 
 	let pageDataList2 = [];
 	for (let pageDataItem of pageDataList) {
@@ -675,23 +675,3 @@ export async function inference(pageDataList, onnxRuntimeProvider, val) {
 		return blocks;
 }
 
-let promise;
-
-export async function processPages() {
-	if (promise) {
-		return promise;
-	}
-	promise = new Promise(async (resolve, reject) => {
-
-		let pageDataList = [];
-		for (let i = 0; i < window.PDFViewerApplication.pdfDocument.numPages; i++) {
-			let pageData = await window.PDFViewerApplication.pdfDocument.getPageData({ pageIndex: i });
-			pageDataList.push(pageData);
-		}
-
-		resolve(await inference(pageDataList));
-
-	});
-
-	return promise;
-}
