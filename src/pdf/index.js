@@ -9,7 +9,7 @@ import { textApproximatelyEqual } from './utils.js';
 import { LocalPdfManager } from '../../pdf.js/build/lib-legacy/core/pdf_manager.js';
 import { XRefParseException } from '../../pdf.js/build/lib-legacy/core/core_utils.js';
 import { FontEmbedder } from './font/font-embedder.js';
-import { renderAnnotations } from './renderer.js';
+import { renderAnnotations, renderArea } from './renderer.js';
 
 import { runInference, loadModel, initModel } from './structure/model/line-seg/model.js';
 import { getFullStructure } from './structure/structure.js';
@@ -950,5 +950,6 @@ export {
 	importCitaviAnnotations,
 	importMendeleyAnnotations,
 	hasAnnotations,
-	renderAnnotations
+	renderAnnotations,
+	renderArea
 };
