@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Structure Preview</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+#toolbar {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fafafa;
+}
+#toolbar label {
+  padding: 6px 12px;
+  background: #4a90d9;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+#toolbar label:hover { background: #3a7bc8; }
+#file-input { display: none; }
+#status { color: #666; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#test-pdf-select {
+  padding: 4px 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white;
+}
+
+#main {
+  display: flex;
+  height: calc(100% - 48px);
+}
+
+#pdf-panel {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #e8e8e8;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+#divider {
+  width: 4px;
+  background: #d0d0d0;
+  cursor: col-resize;
+  flex-shrink: 0;
+}
+#divider:hover, #divider.dragging { background: #a0a0a0; }
+
+#html-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 32px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Drop zone overlay */
+#drop-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(74, 144, 217, 0.1);
+  border: 3px dashed #4a90d9;
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  color: #4a90d9;
+}
+#drop-overlay.active { display: flex; }
+
+/* PDF page rendering */
+.pdf-page {
+  position: relative;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  flex-shrink: 0;
+  max-width: 100%;
+}
+.pdf-page canvas { display: block; }
+.highlight-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.block-region {
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+  border-radius: 2px;
+  outline: 1.5px solid transparent;
+  transition: background 0.1s, outline-color 0.1s;
+}
+
+/* HTML panel block styles */
+#html-panel [data-block-id] {
+  cursor: pointer;
+  border-radius: 2px;
+  outline: 1.5px solid transparent;
+  transition: background 0.1s, outline-color 0.1s;
+}
+
+.block-region:hover, .block-region.active,
+#html-panel [data-block-id]:hover, #html-panel [data-block-id].active {
+  background: rgba(59, 130, 246, 0.12);
+  outline-color: rgba(59, 130, 246, 0.4);
+}
+
+#html-panel h2 {
+  font-size: 1.4em;
+  margin: 1.2em 0 0.4em;
+  padding: 2px 4px;
+}
+#html-panel h2:first-child { margin-top: 0; }
+
+#html-panel p {
+  margin: 0.4em 0;
+  padding: 2px 4px;
+}
+#html-panel .caption {
+  font-style: italic;
+  color: #666;
+}
+#html-panel .image-block {
+  background: #f0f0f0;
+  padding: 16px;
+  margin: 0.6em 0;
+  text-align: center;
+  color: #999;
+  border-radius: 4px;
+}
+#html-panel .table-block {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  padding: 8px;
+  margin: 0.6em 0;
+  background: #f8f8f8;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  white-space: pre-wrap;
+}
+#html-panel aside {
+  border-left: 3px solid #d0d0d0;
+  padding: 4px 12px;
+  margin: 0.6em 0;
+  font-size: 0.9em;
+  color: #555;
+}
+#html-panel .equation-block {
+  font-family: 'Times New Roman', serif;
+  text-align: center;
+  padding: 8px;
+  margin: 0.6em 0;
+}
+#html-panel ul {
+  margin: 0.4em 0;
+  padding-left: 24px;
+}
+#html-panel li {
+  margin: 0.2em 0;
+  padding: 2px 4px;
+}
+#html-panel .artifact { opacity: 0.4; }
+
+.empty-state {
+  color: #999;
+  text-align: center;
+  padding: 64px;
+  font-size: 16px;
+}
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <label for="file-input">Open PDF</label>
+  <input type="file" id="file-input" accept=".pdf">
+  <select id="test-pdf-select"><option value="">Test PDFs...</option></select>
+  <span id="status">Drop a PDF or click "Open PDF"</span>
+</div>
+
+<div id="main">
+  <div id="pdf-panel">
+    <div class="empty-state">PDF pages will appear here</div>
+  </div>
+  <div id="divider"></div>
+  <div id="html-panel">
+    <div class="empty-state">Structured text will appear here</div>
+  </div>
+</div>
+
+<div id="drop-overlay">Drop PDF here</div>
+
+<script type="module">
+import { getDocument } from '../pdf.js/build/lib-legacy/display/api.js';
+import { GlobalWorkerOptions } from '../pdf.js/build/lib-legacy/display/worker_options.js';
+import { getStructure, renderArea } from '../src/pdf/index.js';
+
+// Use same lib-legacy build as getStructure to avoid version mismatches.
+// Disable worker — run everything in main thread (fine for a dev tool).
+GlobalWorkerOptions.workerSrc = '';
+
+const fileInput = document.getElementById('file-input');
+const statusEl = document.getElementById('status');
+const pdfPanel = document.getElementById('pdf-panel');
+const htmlPanel = document.getElementById('html-panel');
+const divider = document.getElementById('divider');
+const dropOverlay = document.getElementById('drop-overlay');
+const testPdfSelect = document.getElementById('test-pdf-select');
+
+// Block map: id -> { htmlEl, regionEls: Element[], anchor }
+let blockMap = new Map();
+let activeBlockId = null;
+let currentFilePath = null;
+let currentPdfDoc = null;
+let currentPages = null;
+
+// ── URL hash helpers ──
+
+function parseHash() {
+  const params = {};
+  for (const part of location.hash.slice(1).split('&')) {
+    const eq = part.indexOf('=');
+    if (eq > 0) params[part.slice(0, eq)] = decodeURIComponent(part.slice(eq + 1));
+  }
+  return params;
+}
+
+function updateHash(updates) {
+  const params = parseHash();
+  Object.assign(params, updates);
+  // Remove keys with null/undefined values
+  for (const k of Object.keys(params)) {
+    if (params[k] == null) delete params[k];
+  }
+  const hash = Object.entries(params).map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&');
+  history.replaceState(null, '', '#' + hash);
+}
+
+function getHashFilePath() {
+  return parseHash().file || null;
+}
+
+function setHashFilePath(filePath) {
+  currentFilePath = filePath;
+  updateHash({ file: filePath, pdf: null, html: null });
+}
+
+// ── Scroll preservation (in URL hash) ──
+
+function saveScrollPositions() {
+  if (!currentFilePath) return;
+  const pdf = Math.round(pdfPanel.scrollTop);
+  const html = Math.round(htmlPanel.scrollTop);
+  updateHash({ pdf: pdf || null, html: html || null });
+}
+
+let scrollSaveTimer = null;
+function onScroll() {
+  clearTimeout(scrollSaveTimer);
+  scrollSaveTimer = setTimeout(saveScrollPositions, 300);
+}
+pdfPanel.addEventListener('scroll', onScroll);
+htmlPanel.addEventListener('scroll', onScroll);
+
+// ── Test PDF file picker ──
+
+async function populateTestPdfSelect() {
+  try {
+    const resp = await fetch('/__api/test-pdfs');
+    if (!resp.ok) return;
+    const files = await resp.json();
+    for (const name of files) {
+      const opt = document.createElement('option');
+      opt.value = 'test/pdfs/full/' + name;
+      opt.textContent = name;
+      testPdfSelect.appendChild(opt);
+    }
+  } catch {}
+}
+
+testPdfSelect.addEventListener('change', () => {
+  const path = testPdfSelect.value;
+  if (path) loadFromPath(path);
+});
+
+async function loadFromPath(filePath, savedScroll) {
+  // Capture scroll params before setHashFilePath clears them
+  if (!savedScroll) {
+    const params = parseHash();
+    savedScroll = { pdf: parseInt(params.pdf, 10) || 0, html: parseInt(params.html, 10) || 0 };
+  }
+  statusEl.textContent = `Loading ${filePath}...`;
+  blockMap = new Map();
+  activeBlockId = null;
+  pdfPanel.innerHTML = '';
+  htmlPanel.innerHTML = '';
+  setHashFilePath(filePath);
+
+  // Sync select if it has this path
+  if (testPdfSelect.querySelector(`option[value="${filePath}"]`)) {
+    testPdfSelect.value = filePath;
+  } else {
+    testPdfSelect.value = '';
+  }
+
+  try {
+    const resp = await fetch('/' + filePath);
+    if (!resp.ok) throw new Error(`Failed to fetch ${filePath}: ${resp.status}`);
+    const buf = await resp.arrayBuffer();
+
+    statusEl.textContent = 'Extracting structure...';
+    const [pdfDoc, structure] = await Promise.all([
+      getDocument({ data: buf.slice(0) }).promise,
+      extractStructure(buf.slice(0))
+    ]);
+
+    currentPdfDoc = pdfDoc;
+    currentPages = structure.pages;
+    console.log('Structure:', structure);
+    statusEl.textContent = 'Rendering...';
+
+    renderPages(pdfDoc, structure);
+    renderHtml(structure);
+    renderOverlays(structure);
+
+    const name = filePath.split('/').pop();
+    statusEl.textContent = `${name} — ${structure.pages.length} pages, ${structure.content.length} blocks`;
+
+    if (savedScroll.pdf || savedScroll.html) {
+      requestAnimationFrame(() => {
+        if (savedScroll.pdf) pdfPanel.scrollTop = savedScroll.pdf;
+        if (savedScroll.html) htmlPanel.scrollTop = savedScroll.html;
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = `Error: ${err.message}`;
+  }
+}
+
+// ── File handling ──
+
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) loadFile(e.target.files[0]);
+});
+
+let dragCounter = 0;
+document.addEventListener('dragenter', e => {
+  e.preventDefault();
+  dragCounter++;
+  dropOverlay.classList.add('active');
+});
+document.addEventListener('dragleave', e => {
+  e.preventDefault();
+  if (--dragCounter === 0) dropOverlay.classList.remove('active');
+});
+document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('drop', e => {
+  e.preventDefault();
+  dragCounter = 0;
+  dropOverlay.classList.remove('active');
+  const file = e.dataTransfer.files[0];
+  if (file && file.name.endsWith('.pdf')) loadFile(file);
+});
+
+async function loadFile(file) {
+  statusEl.textContent = `Loading ${file.name}...`;
+  blockMap = new Map();
+  activeBlockId = null;
+  pdfPanel.innerHTML = '';
+  htmlPanel.innerHTML = '';
+  setHashFilePath('dropped:' + file.name);
+  testPdfSelect.value = '';
+
+  try {
+    const buf = await file.arrayBuffer();
+
+    statusEl.textContent = 'Extracting structure...';
+    const [pdfDoc, structure] = await Promise.all([
+      getDocument({ data: buf.slice(0) }).promise,
+      extractStructure(buf.slice(0))
+    ]);
+
+    currentPdfDoc = pdfDoc;
+    currentPages = structure.pages;
+    console.log('Structure:', structure);
+    statusEl.textContent = 'Rendering...';
+
+    renderPages(pdfDoc, structure);
+    renderHtml(structure);
+    renderOverlays(structure);
+
+    statusEl.textContent = `${file.name} — ${structure.pages.length} pages, ${structure.content.length} blocks`;
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = `Error: ${err.message}`;
+  }
+}
+
+async function extractStructure(buf) {
+  async function dataProvider(path) {
+    const resp = await fetch('../build/' + path);
+    if (!resp.ok) throw new Error(`Failed to fetch ${path}: ${resp.status}`);
+    return new Uint8Array(await resp.arrayBuffer());
+  }
+  return getStructure(buf, '', dataProvider);
+}
+
+// ── Page rendering (fit-to-width, retina-aware) ──
+
+let pageContainers = [];
+
+function renderPages(pdfDoc, structure) {
+  pageContainers = [];
+  const padding = 16;
+  const availableWidth = pdfPanel.clientWidth - 2 * padding;
+  const dpr = window.devicePixelRatio || 1;
+
+  for (let i = 0; i < structure.pages.length; i++) {
+    const vr = structure.pages[i].viewRect;
+    const pageWidthPt = vr[2] - vr[0];
+    const pageHeightPt = vr[3] - vr[1];
+    const cssScale = availableWidth / pageWidthPt;
+    const cssWidth = availableWidth;
+    const cssHeight = pageHeightPt * cssScale;
+
+    const pageDiv = document.createElement('div');
+    pageDiv.className = 'pdf-page';
+    pageDiv.style.width = cssWidth + 'px';
+    pageDiv.style.height = cssHeight + 'px';
+    pageDiv.dataset.pageIndex = i;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = cssWidth * dpr;
+    canvas.height = cssHeight * dpr;
+    canvas.style.width = cssWidth + 'px';
+    canvas.style.height = cssHeight + 'px';
+    pageDiv.appendChild(canvas);
+
+    const overlay = document.createElement('div');
+    overlay.className = 'highlight-overlay';
+    pageDiv.appendChild(overlay);
+
+    pdfPanel.appendChild(pageDiv);
+    pageContainers.push({ pageDiv, canvas, overlay, rendered: false, pageIndex: i, cssScale, dpr });
+  }
+
+  // Lazy render with IntersectionObserver
+  const observer = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      const idx = Number(entry.target.dataset.pageIndex);
+      const container = pageContainers[idx];
+      if (container.rendered) continue;
+      container.rendered = true;
+      renderPage(pdfDoc, container);
+    }
+  }, { root: pdfPanel, rootMargin: '200px' });
+
+  for (const c of pageContainers) observer.observe(c.pageDiv);
+}
+
+async function renderPage(pdfDoc, container) {
+  const page = await pdfDoc.getPage(container.pageIndex + 1);
+  const viewport = page.getViewport({ scale: container.cssScale * container.dpr });
+  const ctx = container.canvas.getContext('2d');
+  await page.render({ canvasContext: ctx, viewport }).promise;
+}
+
+// ── HTML rendering ──
+
+let blockIdCounter = 0;
+
+function renderHtml(structure) {
+  blockIdCounter = 0;
+  for (const block of structure.content) {
+    const el = renderBlock(block);
+    if (el) htmlPanel.appendChild(el);
+  }
+}
+
+async function renderAreaForBlock(container, block) {
+  if (!currentPdfDoc || !block.anchor || !block.anchor.pageRects || !block.anchor.pageRects.length) return;
+  const [pageIndex, x1, y1, x2, y2] = block.anchor.pageRects[0];
+  try {
+    const canvas = await renderArea(currentPdfDoc, pageIndex, [x1, y1, x2, y2], { scale: 2 });
+    if (!canvas) return;
+    const blob = await canvas.convertToBlob({ type: 'image/png' });
+    const url = URL.createObjectURL(blob);
+    const img = document.createElement('img');
+    img.src = url;
+    img.style.maxWidth = '100%';
+    img.onload = () => URL.revokeObjectURL(url);
+    // For image blocks, replace placeholder text; for equations, prepend
+    if (block.type === 'image') {
+      container.textContent = '';
+    }
+    container.prepend(img);
+  } catch (err) {
+    console.error('renderAreaForBlock failed:', err);
+  }
+}
+
+function renderBlock(block) {
+  const id = blockIdCounter++;
+  let el;
+
+  switch (block.type) {
+    case 'heading':
+      el = document.createElement('h2');
+      renderTextContent(el, block.content);
+      break;
+    case 'paragraph':
+      el = document.createElement('p');
+      renderTextContent(el, block.content);
+      break;
+    case 'caption':
+      el = document.createElement('p');
+      el.className = 'caption';
+      renderTextContent(el, block.content);
+      break;
+    case 'image':
+      el = document.createElement('div');
+      el.className = 'image-block';
+      el.textContent = '[Image]';
+      renderAreaForBlock(el, block);
+      break;
+    case 'table':
+      el = document.createElement('div');
+      el.className = 'table-block';
+      renderTextContent(el, block.content);
+      break;
+    case 'note':
+      el = document.createElement('aside');
+      renderTextContent(el, block.content);
+      break;
+    case 'equation':
+      el = document.createElement('div');
+      el.className = 'equation-block';
+      renderAreaForBlock(el, block);
+      renderTextContent(el, block.content);
+      break;
+    case 'list':
+      el = document.createElement('ul');
+      if (block.content) {
+        for (const item of block.content) {
+          if (item.type) {
+            const li = renderBlock(item);
+            if (li) el.appendChild(li);
+          }
+        }
+      }
+      break;
+    case 'listitem':
+      el = document.createElement('li');
+      renderTextContent(el, block.content);
+      break;
+    default:
+      el = document.createElement('p');
+      renderTextContent(el, block.content);
+      break;
+  }
+
+  if (block.artifact) el.classList.add('artifact');
+  el.dataset.blockId = id;
+
+  blockMap.set(id, { htmlEl: el, regionEls: [], anchor: block.anchor });
+
+  el.addEventListener('mouseenter', () => setActive(id));
+  el.addEventListener('mouseleave', () => clearActive());
+  el.addEventListener('click', () => scrollPdfToBlock(id));
+
+  return el;
+}
+
+function renderTextContent(parent, content) {
+  if (!content) return;
+  for (const node of content) {
+    if (node.type) continue; // nested blocks handled by renderBlock
+    if (node.text == null) continue;
+
+    const style = node.style || {};
+    let el;
+
+    if (style.sup) {
+      el = document.createElement('sup');
+      el.textContent = node.text;
+    } else if (style.sub) {
+      el = document.createElement('sub');
+      el.textContent = node.text;
+    } else if (style.bold && style.italic) {
+      el = document.createElement('strong');
+      const em = document.createElement('em');
+      em.textContent = node.text;
+      el.appendChild(em);
+    } else if (style.bold) {
+      el = document.createElement('strong');
+      el.textContent = node.text;
+    } else if (style.italic) {
+      el = document.createElement('em');
+      el.textContent = node.text;
+    } else {
+      parent.appendChild(document.createTextNode(node.text));
+      continue;
+    }
+
+    parent.appendChild(el);
+  }
+}
+
+// ── Overlay regions on PDF pages ──
+
+function renderOverlays(structure) {
+  blockIdCounter = 0;
+  for (const block of structure.content) {
+    renderBlockOverlay(block, structure.pages);
+  }
+}
+
+function renderBlockOverlay(block, pages) {
+  const id = blockIdCounter++;
+
+  if (block.anchor && block.anchor.pageRects) {
+    for (const rect of block.anchor.pageRects) {
+      const [pageIndex, x1, y1, x2, y2] = rect;
+      const vr = pages[pageIndex]?.viewRect;
+      if (!vr) continue;
+
+      const container = pageContainers[pageIndex];
+      if (!container) continue;
+      const pageW = vr[2] - vr[0];
+      const pageH = vr[3] - vr[1];
+
+      const regionDiv = document.createElement('div');
+      regionDiv.className = 'block-region';
+      regionDiv.dataset.blockId = id;
+      regionDiv.style.left = ((x1 - vr[0]) / pageW * 100) + '%';
+      regionDiv.style.top = ((vr[3] - y2) / pageH * 100) + '%';
+      regionDiv.style.width = ((x2 - x1) / pageW * 100) + '%';
+      regionDiv.style.height = ((y2 - y1) / pageH * 100) + '%';
+
+      regionDiv.addEventListener('mouseenter', () => setActive(id));
+      regionDiv.addEventListener('mouseleave', () => clearActive());
+      regionDiv.addEventListener('click', () => scrollHtmlToBlock(id));
+
+      container.overlay.appendChild(regionDiv);
+
+      const entry = blockMap.get(id);
+      if (entry) entry.regionEls.push(regionDiv);
+    }
+  }
+
+  // Recurse into nested blocks (list -> listitem)
+  if (block.type === 'list' && block.content) {
+    for (const item of block.content) {
+      if (item.type) renderBlockOverlay(item, pages);
+    }
+  }
+}
+
+// ── Bidirectional highlighting ──
+
+function setActive(id) {
+  if (activeBlockId !== null) clearActive();
+  activeBlockId = id;
+  const entry = blockMap.get(id);
+  if (!entry) return;
+  entry.htmlEl.classList.add('active');
+  for (const r of entry.regionEls) r.classList.add('active');
+}
+
+function clearActive() {
+  if (activeBlockId === null) return;
+  const entry = blockMap.get(activeBlockId);
+  if (entry) {
+    entry.htmlEl.classList.remove('active');
+    for (const r of entry.regionEls) r.classList.remove('active');
+  }
+  activeBlockId = null;
+}
+
+function scrollPdfToBlock(id) {
+  const entry = blockMap.get(id);
+  if (!entry || entry.regionEls.length === 0) return;
+  entry.regionEls[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function scrollHtmlToBlock(id) {
+  const entry = blockMap.get(id);
+  if (!entry) return;
+  entry.htmlEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ── Resizable divider ──
+
+let isDragging = false;
+let splitterRatio = parseFloat(localStorage.getItem('splitter-ratio')) || 0;
+if (splitterRatio) {
+  pdfPanel.style.flex = String(splitterRatio);
+  htmlPanel.style.flex = String(1 - splitterRatio);
+}
+
+divider.addEventListener('mousedown', e => {
+  isDragging = true;
+  divider.classList.add('dragging');
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  const mainRect = document.getElementById('main').getBoundingClientRect();
+  const ratio = (e.clientX - mainRect.left) / mainRect.width;
+  splitterRatio = Math.max(0.2, Math.min(0.8, ratio));
+  pdfPanel.style.flex = String(splitterRatio);
+  htmlPanel.style.flex = String(1 - splitterRatio);
+});
+
+document.addEventListener('mouseup', () => {
+  if (isDragging) {
+    isDragging = false;
+    divider.classList.remove('dragging');
+    localStorage.setItem('splitter-ratio', String(splitterRatio));
+  }
+});
+
+// ── Responsive PDF pages on panel resize ──
+
+let resizeTimer = null;
+new ResizeObserver(() => {
+  if (!currentPdfDoc || pageContainers.length === 0) return;
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(refreshPages, 150);
+}).observe(pdfPanel);
+
+function refreshPages() {
+  const padding = 16;
+  const availableWidth = pdfPanel.clientWidth - 2 * padding;
+  const dpr = window.devicePixelRatio || 1;
+
+  for (const c of pageContainers) {
+    const vr = currentPages[c.pageIndex].viewRect;
+    const pageWidthPt = vr[2] - vr[0];
+    const pageHeightPt = vr[3] - vr[1];
+    const cssScale = availableWidth / pageWidthPt;
+    const cssWidth = availableWidth;
+    const cssHeight = pageHeightPt * cssScale;
+
+    c.cssScale = cssScale;
+    c.dpr = dpr;
+    c.pageDiv.style.width = cssWidth + 'px';
+    c.pageDiv.style.height = cssHeight + 'px';
+    c.canvas.width = cssWidth * dpr;
+    c.canvas.height = cssHeight * dpr;
+    c.canvas.style.width = cssWidth + 'px';
+    c.canvas.style.height = cssHeight + 'px';
+    c.rendered = false;
+  }
+
+  // Re-render visible pages
+  const panelRect = pdfPanel.getBoundingClientRect();
+  for (const c of pageContainers) {
+    const rect = c.pageDiv.getBoundingClientRect();
+    if (rect.bottom > panelRect.top && rect.top < panelRect.bottom) {
+      c.rendered = true;
+      renderPage(currentPdfDoc, c);
+    }
+  }
+}
+
+// ── Init: populate select, auto-load from hash ──
+
+populateTestPdfSelect().then(() => {
+  const hashPath = getHashFilePath();
+  if (hashPath && !hashPath.startsWith('dropped:')) {
+    loadFromPath(hashPath);
+  }
+});
+</script>
+</body>
+</html>

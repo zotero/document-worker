@@ -167,6 +167,41 @@ async function renderImage(pdfDocument, annotation) {
 	return canvas;
 }
 
+export async function renderArea(pdfDocument, pageIndex, rect, options = {}) {
+	let scale = options.scale || SCALE;
+
+	let page = await pdfDocument.getPage(pageIndex + 1);
+	rect = fitRectIntoRect(rect, page.view);
+
+	let width = rect[2] - rect[0];
+	let height = rect[3] - rect[1];
+	if (!width || !height) {
+		return null;
+	}
+
+	let maxScale = Math.sqrt(MAX_CANVAS_PIXELS / (width * height));
+	scale = Math.min(scale, maxScale);
+
+	let position = { pageIndex, rects: [rect] };
+	let viewport = page.getViewport({ scale });
+	position = p2v(position, viewport);
+	let vRect = position.rects[0];
+
+	let offsetViewport = page.getViewport({ scale, offsetX: -vRect[0], offsetY: -vRect[1] });
+
+	let canvasWidth = vRect[2] - vRect[0];
+	let canvasHeight = vRect[3] - vRect[1];
+	if (!canvasWidth || !canvasHeight) {
+		return null;
+	}
+
+	let canvas = new OffscreenCanvas(canvasWidth, canvasHeight);
+	let ctx = canvas.getContext('2d', { alpha: false });
+	await page.render({ canvasContext: ctx, viewport: offsetViewport }).promise;
+
+	return canvas;
+}
+
 export async function renderAnnotations(libraryID, buf, annotations, password, dataProvider, renderedAnnotationSaver) {
 	let document = {
 		fonts: self.fonts,

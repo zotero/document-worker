@@ -13,7 +13,8 @@
 		"build:pdf.js": "sh scripts/build-pdfjs",
 		"build:assets": "sh scripts/build-assets",
 		"build:worker": "webpack --mode production",
-		"devel:worker": "webpack --mode development",
+		"dev:worker": "webpack --mode development",
+		"dev:preview": "npm run dev --prefix preview",
 		"test": "npx mocha",
 		"test:jscontext": "bash test/jscontext/run-tests.sh"
 	},
