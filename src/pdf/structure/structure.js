@@ -155,12 +155,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 				}
 			}
 			else {
-				node = {
-					type: 'paragraph',
-					other: true,
-					...(anchor && { anchor }),
-					content: charsToTextNodes(i, charsRange)
-				}
+				throw new Error(`Unknown block type: ${block.type}`);
 			}
 
 			if (node) {

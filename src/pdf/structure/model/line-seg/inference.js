@@ -1,4 +1,5 @@
 import { initModel, runInference } from "./model.js";
+import { intersectRects } from '../../util.js';
 
 // Hash functions for first-3-word features
 const HASH_MOD = 32768; // produces 0..32767
@@ -398,6 +399,8 @@ function getLines(chars) {
   let wordStartOffset = null;
   let lineStartOffset = null;
   let lastCharOffset = null;
+  let lineSeqMin = null;
+  let lineSeqMax = null;
 
   const roundRect = (rect) => ([
     Math.round(rect[0] * 100) / 100,
@@ -418,6 +421,8 @@ function getLines(chars) {
     lineChars = [];
     words = [];
     lineStartOffset = null;
+    lineSeqMin = null;
+    lineSeqMax = null;
     resetWordState();
   };
 
@@ -450,6 +455,7 @@ function getLines(chars) {
       chars: lineChars.slice(),
       startOffset: lineStartOffset,
       endOffset: lastCharOffset,
+      ...(lineSeqMin !== null ? { seq: lineSeqMin, seqStart: lineSeqMin, seqEnd: lineSeqMax ?? lineSeqMin } : {}),
     };
 
     lines.push(line);
@@ -464,6 +470,10 @@ function getLines(chars) {
     if (wordStartOffset === null) wordStartOffset = idx;
     if (lineStartOffset === null) lineStartOffset = idx;
     lastCharOffset = idx;
+    if (Number.isFinite(char.seq)) {
+      lineSeqMin = lineSeqMin === null ? char.seq : Math.min(lineSeqMin, char.seq);
+      lineSeqMax = lineSeqMax === null ? char.seq : Math.max(lineSeqMax, char.seq);
+    }
 
     // 1) Collect character(s)
     if (typeof char.c === 'string') {
@@ -510,6 +520,61 @@ function getLines(chars) {
   return lines;
 }
 
+export function clusterSortLines(textLines, pageHeight) {
+  if (textLines.length <= 1) return textLines;
+
+  const GAP_THRESHOLD = Math.max(100, pageHeight * 0.12);
+  const SWAP_MIN_DIFF = 100;
+
+  // Group consecutive lines where vertical gap > threshold
+  const clusters = [[0]];
+  for (let i = 1; i < textLines.length; i++) {
+    const prevRect = textLines[i - 1].rect;
+    const currRect = textLines[i].rect;
+    const dy = Math.max(0,
+      Math.max(prevRect[1] - currRect[3], currRect[1] - prevRect[3]));
+    if (dy > GAP_THRESHOLD) {
+      clusters.push([i]);
+    } else {
+      clusters[clusters.length - 1].push(i);
+    }
+  }
+
+  if (clusters.length <= 1) return textLines;
+
+  // Centroid Y per cluster
+  const centroids = clusters.map(indices => {
+    let sum = 0;
+    for (const idx of indices) {
+      sum += (textLines[idx].rect[1] + textLines[idx].rect[3]) / 2;
+    }
+    return sum / indices.length;
+  });
+
+  // Bubble sort: only swap adjacent clusters when dramatically out of order
+  // (next cluster's centroid is much higher → should come first in reading order)
+  let swapped = true;
+  while (swapped) {
+    swapped = false;
+    for (let i = 0; i < clusters.length - 1; i++) {
+      if (centroids[i + 1] - centroids[i] > SWAP_MIN_DIFF) {
+        [clusters[i], clusters[i + 1]] = [clusters[i + 1], clusters[i]];
+        [centroids[i], centroids[i + 1]] = [centroids[i + 1], centroids[i]];
+        swapped = true;
+      }
+    }
+  }
+
+  // Reconstruct and reassign IDs to match new positions
+  const result = [];
+  for (const indices of clusters) {
+    for (const idx of indices) {
+      result.push(textLines[idx]);
+    }
+  }
+  result.forEach((line, i) => line.id = i);
+  return result;
+}
 
 export function buildBlocks(lines, results) {
   // console.log({ lines, results });
@@ -565,6 +630,15 @@ export function buildBlocks(lines, results) {
     let isFirstLine = classIndex == null ? true : classIndex < BLOCK_TYPES.length;
     if (baseType === FRAME_IDX || baseType === IGNORE_IDX) isFirstLine = true;
 
+    // Force block break for object lines that are spatially far from the current block
+    if (!isFirstLine && currentBlock && line.type === 'object') {
+      const lineRect = line.rect;
+      const gap = Math.max(0, Math.max(lineRect[1] - currentBlock.bbox[3], currentBlock.bbox[1] - lineRect[3]));
+      if (gap > 100) {
+        isFirstLine = true;
+      }
+    }
+
     const startNewBlock = () => {
       if (currentBlock) blocks.push(currentBlock);
       currentBlock = {
@@ -616,25 +690,174 @@ export function buildBlocks(lines, results) {
   return blocks;
 }
 
+export function mergeOverlappingImageBlocks(blocks, lines) {
+  if (!blocks || !blocks.length) return blocks || [];
+
+  const MERGE_TYPES = new Set(['image', 'equation']);
+
+  function overlaps(a, b) {
+    return a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+  }
+
+  // An ignore block is mergeable only if it contains an xobject line
+  function isMergeable(block) {
+    if (MERGE_TYPES.has(block.type)) return true;
+    if (block.type === 'ignore' && lines) {
+      return block.lines.some(id => {
+        let line = lines[id];
+        return line && line.type === 'object' && line.subtype === 'xobject';
+      });
+    }
+    return false;
+  }
+
+  // Union-find
+  const parent = blocks.map((_, i) => i);
+  function find(x) {
+    while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; }
+    return x;
+  }
+  function union(a, b) { parent[find(b)] = find(a); }
+
+  // Only merge pairs where at least one is 'image' and both are mergeable
+  for (let i = 0; i < blocks.length; i++) {
+    if (!isMergeable(blocks[i])) continue;
+    for (let j = i + 1; j < blocks.length; j++) {
+      if (!isMergeable(blocks[j])) continue;
+      if (blocks[i].type !== 'image' && blocks[j].type !== 'image') continue;
+      if (overlaps(blocks[i].bbox, blocks[j].bbox)) {
+        union(i, j);
+      }
+    }
+  }
+
+  // Group by root, build merged blocks
+  const groups = new Map();
+  for (let i = 0; i < blocks.length; i++) {
+    const root = find(i);
+    if (!groups.has(root)) groups.set(root, []);
+    groups.get(root).push(i);
+  }
+
+  const result = [];
+  const handled = new Set();
+  for (let i = 0; i < blocks.length; i++) {
+    const root = find(i);
+    if (handled.has(root)) continue;
+    handled.add(root);
+
+    const group = groups.get(root);
+    if (group.length === 1) {
+      result.push(blocks[group[0]]);
+      continue;
+    }
+
+    // Merge group into single image block
+    let bbox = blocks[group[0]].bbox.slice();
+    let lines = [];
+    let startOffset, endOffset;
+    for (const idx of group) {
+      const b = blocks[idx];
+      bbox = [Math.min(bbox[0], b.bbox[0]), Math.min(bbox[1], b.bbox[1]),
+              Math.max(bbox[2], b.bbox[2]), Math.max(bbox[3], b.bbox[3])];
+      lines.push(...b.lines);
+      if (Number.isInteger(b.startOffset))
+        startOffset = Number.isInteger(startOffset) ? Math.min(startOffset, b.startOffset) : b.startOffset;
+      if (Number.isInteger(b.endOffset))
+        endOffset = Number.isInteger(endOffset) ? Math.max(endOffset, b.endOffset) : b.endOffset;
+    }
+
+    result.push({ type: 'image', bbox, lines, startOffset, endOffset });
+  }
+
+  return result;
+}
+
+function mergeObjectLinesBySeq(textLines, objectLines) {
+	if (!Array.isArray(objectLines) || objectLines.length === 0) {
+		return textLines;
+	}
+
+	let lines = Array.isArray(textLines) ? textLines.slice() : [];
+	const textHasSeq = lines.some(line => Number.isFinite(line?.seq));
+
+	const withOrder = objectLines.map((line, originalIndex) => ({ line, originalIndex }));
+	withOrder.sort((a, b) => {
+		const aSeq = Number.isFinite(a.line?.seq) ? a.line.seq : Infinity;
+		const bSeq = Number.isFinite(b.line?.seq) ? b.line.seq : Infinity;
+		if (aSeq !== bSeq) return aSeq - bSeq;
+
+		const ar = Array.isArray(a.line?.rect) ? a.line.rect : [0, 0, 0, 0];
+		const br = Array.isArray(b.line?.rect) ? b.line.rect : [0, 0, 0, 0];
+		const aCy = (ar[1] + ar[3]) / 2;
+		const bCy = (br[1] + br[3]) / 2;
+		if (aCy !== bCy) return bCy - aCy;
+		if (ar[0] !== br[0]) return ar[0] - br[0];
+		return a.originalIndex - b.originalIndex;
+	});
+
+	for (const { line } of withOrder) {
+		if (textHasSeq && Number.isFinite(line?.seq)) {
+			let insertAt = lines.findIndex(candidate =>
+				Number.isFinite(candidate?.seq) && candidate.seq > line.seq
+			);
+			if (insertAt === -1) {
+				lines.push(line);
+			}
+			else {
+				lines.splice(insertAt, 0, line);
+			}
+		}
+		else {
+			lines.push(line);
+		}
+	}
+
+	lines.forEach((line, i) => {
+		line.id = i;
+	});
+	return lines;
+}
+
+function filterLargeObjects(objects, textLines, viewBox) {
+	if (!textLines.length) return objects;
+	const pageArea = (viewBox[2] - viewBox[0]) * (viewBox[3] - viewBox[1]);
+	if (pageArea <= 0) return objects;
+
+	return objects.filter(obj => {
+		const r = obj.rect;
+		const objArea = (r[2] - r[0]) * (r[3] - r[1]);
+		// Skip small objects (< 5% of page area)
+		if (objArea < pageArea * 0.05) return true;
+
+		// Count intersecting text lines; remove if >= 3
+		let count = 0;
+		for (const line of textLines) {
+			if (intersectRects(r, line.rect) && ++count >= 3) return false;
+		}
+		return true;
+	});
+}
+
 export async function inference(pageDataList, onnxRuntimeProvider, modelProvider, val) {
 
 	let model = await initModel(onnxRuntimeProvider, modelProvider);
 
 	let pageDataList2 = [];
 	for (let pageDataItem of pageDataList) {
+		let pageHeight = pageDataItem.viewBox[3] - pageDataItem.viewBox[1];
 		let lines = getLines(pageDataItem.chars);
+		lines = clusterSortLines(lines, pageHeight);
 
-		// Append objects as line entries (matching gentrain5.js format)
-		// Each object needs an `id` equal to its index in the lines array
-		if (Array.isArray(pageDataItem.objects)) {
-			for (let object of pageDataItem.objects) {
-				lines.push({
-					id: lines.length,  // IMPORTANT: id must equal index
-					type: 'object',
-					subtype: object.type,
-					rect: object.rect,
-				});
-			}
+		if (Array.isArray(pageDataItem.objects) && pageDataItem.objects.length) {
+			let objects = filterLargeObjects(pageDataItem.objects, lines, pageDataItem.viewBox);
+			const objectLines = objects.map(object => ({
+				type: 'object',
+				subtype: object.type,
+				rect: object.rect,
+				...(Number.isFinite(object.seq) ? { seq: object.seq } : {}),
+			}));
+			lines = mergeObjectLinesBySeq(lines, objectLines);
 		}
 
 		pageDataList2.push({
@@ -663,7 +886,25 @@ export async function inference(pageDataList, onnxRuntimeProvider, modelProvider
 
 
 		let result = predictions[0];
+
 		let blocks = buildBlocks(lines, result);
+		blocks = mergeOverlappingImageBlocks(blocks, lines);
+
+		// The model's "ignore" type (class 9) is trained exclusively on object lines
+		// (images, paths, xobjects) that don't cleanly belong to a single block.
+		// Object-only ignore blocks have no text content and would produce empty
+		// paragraphs — drop them. If the model mispredicts "ignore" for a text line,
+		// reclassify the block as "body" so it becomes a normal paragraph.
+		blocks = blocks.filter(block => {
+			if (block.type !== 'ignore') return true;
+			const hasText = block.lines.some(id => lines[id] && lines[id].type !== 'object');
+			if (hasText) {
+				block.type = 'body';
+				return true;
+			}
+			return false;
+		});
+
 		for (let block of blocks) {
 			block.text = block.lines
 				.map(l => lines[l])
@@ -674,4 +915,3 @@ export async function inference(pageDataList, onnxRuntimeProvider, modelProvider
 
 		return blocks;
 }
-
