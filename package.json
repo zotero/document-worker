@@ -9,13 +9,12 @@
 		"./build/*": "./build/*"
 	},
 	"scripts": {
-		"build": "npm run build:pdf.js && npm run build:assets && npm run build:worker",
-		"build:pdf.js": "sh scripts/build-pdfjs",
+		"build": "run-p build:assets build:worker",
 		"build:assets": "sh scripts/build-assets",
 		"build:worker": "webpack --mode production",
 		"dev:worker": "webpack --mode development",
 		"dev:preview": "npm run dev --prefix preview",
-		"test": "npx mocha",
+		"test": "node --import ./scripts/pdfjs-setup.js node_modules/.bin/mocha",
 		"test:jscontext": "bash test/jscontext/run-tests.sh"
 	},
 	"browserslist": [

@@ -24,26 +24,26 @@
 
 // Slightly modified version of https://github.com/DevelopingMagic/pdfassembler
 
-import { LocalPdfManager } from '../../pdf.js/build/lib-legacy/core/pdf_manager.js';
-import { Dict, Name, Ref } from '../../pdf.js/build/lib-legacy/core/primitives.js';
+import { LocalPdfManager } from '../../pdf.js/src/core/pdf_manager.js';
+import { Dict, Name, Ref } from '../../pdf.js/src/core/primitives.js';
 
-import { BaseStream } from '../../pdf.js/build/lib-legacy/core/base_stream.js';
-import { Ascii85Stream } from '../../pdf.js/build/lib-legacy/core/ascii_85_stream.js';
-import { AsciiHexStream } from '../../pdf.js/build/lib-legacy/core/ascii_hex_stream.js';
-import { CCITTFaxStream } from '../../pdf.js/build/lib-legacy/core/ccitt_stream.js';
-import { FlateStream } from '../../pdf.js/build/lib-legacy/core/flate_stream.js';
-import { Jbig2Stream } from '../../pdf.js/build/lib-legacy/core/jbig2_stream.js';
-import { JpegStream } from '../../pdf.js/build/lib-legacy/core/jpeg_stream.js';
-import { JpxStream } from '../../pdf.js/build/lib-legacy/core/jpx_stream.js';
-import { LZWStream } from '../../pdf.js/build/lib-legacy/core/lzw_stream.js';
-import { NullStream, Stream } from '../../pdf.js/build/lib-legacy/core/stream.js';
-import { PredictorStream } from '../../pdf.js/build/lib-legacy/core/predictor_stream.js';
-import { RunLengthStream } from '../../pdf.js/build/lib-legacy/core/run_length_stream.js';
-import { DecodeStream } from '../../pdf.js/build/lib-legacy/core/decode_stream.js';
-import { DecryptStream } from '../../pdf.js/build/lib-legacy/core/decrypt_stream.js';
+import { BaseStream } from '../../pdf.js/src/core/base_stream.js';
+import { Ascii85Stream } from '../../pdf.js/src/core/ascii_85_stream.js';
+import { AsciiHexStream } from '../../pdf.js/src/core/ascii_hex_stream.js';
+import { CCITTFaxStream } from '../../pdf.js/src/core/ccitt_stream.js';
+import { FlateStream } from '../../pdf.js/src/core/flate_stream.js';
+import { Jbig2Stream } from '../../pdf.js/src/core/jbig2_stream.js';
+import { JpegStream } from '../../pdf.js/src/core/jpeg_stream.js';
+import { JpxStream } from '../../pdf.js/src/core/jpx_stream.js';
+import { LZWStream } from '../../pdf.js/src/core/lzw_stream.js';
+import { NullStream, Stream } from '../../pdf.js/src/core/stream.js';
+import { PredictorStream } from '../../pdf.js/src/core/predictor_stream.js';
+import { RunLengthStream } from '../../pdf.js/src/core/run_length_stream.js';
+import { DecodeStream } from '../../pdf.js/src/core/decode_stream.js';
+import { DecryptStream } from '../../pdf.js/src/core/decrypt_stream.js';
 
-import { XRefParseException } from '../../pdf.js/build/lib-legacy/core/core_utils.js';
-import { bytesToString, stringToBytes } from '../../pdf.js/build/lib-legacy/shared/util.js';
+import { XRefParseException } from '../../pdf.js/src/core/core_utils.js';
+import { bytesToString, stringToBytes } from '../../pdf.js/src/shared/util.js';
 import { deflate } from 'pako';
 
 /**

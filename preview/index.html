@@ -208,11 +208,10 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
 <div id="drop-overlay">Drop PDF here</div>
 
 <script type="module">
-import { getDocument } from '../pdf.js/build/lib-legacy/display/api.js';
-import { GlobalWorkerOptions } from '../pdf.js/build/lib-legacy/display/worker_options.js';
+import { getDocument } from '../pdf.js/src/display/api.js';
+import { GlobalWorkerOptions } from '../pdf.js/src/display/worker_options.js';
 import { getStructure, renderArea } from '../src/pdf/index.js';
 
-// Use same lib-legacy build as getStructure to avoid version mismatches.
 // Disable worker — run everything in main thread (fine for a dev tool).
 GlobalWorkerOptions.workerSrc = '';
 

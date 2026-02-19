@@ -1,4 +1,4 @@
-import { DeviceCmykCS, DeviceGrayCS, DeviceRgbCS } from '../../pdf.js/build/lib-legacy/core/colorspace.js';
+import { DeviceCmykCS, DeviceGrayCS, DeviceRgbCS } from '../../pdf.js/src/core/colorspace.js';
 
 // The code below is extracted from pdf.js source because there was
 // no way to incorporate it directly or some modifications were necessary

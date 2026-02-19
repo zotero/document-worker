@@ -1,4 +1,4 @@
-import { stringToPDFString } from '../../../pdf.js/build/lib-legacy/shared/util.js';
+import { stringToPDFString } from '../../../pdf.js/src/shared/util.js';
 import { arrayColorToHex } from '../color.js';
 import { getRawPageView, getString, isValidNumber, getAnnotationID, isTransferable } from './common.js';
 

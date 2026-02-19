@@ -3,11 +3,11 @@ import { readRawAnnotations } from './annotations/read.js';
 import { writeRawAnnotations } from './annotations/write.js';
 import { deleteAnnotations } from './annotations/delete.js';
 import { getRangeByHighlight, getClosestOffset } from './text.js';
-import { Util } from '../../pdf.js/build/lib-legacy/shared/util.js';
+import { Util } from '../../pdf.js/src/shared/util.js';
 import { resizeAndFitRect, hasAnyAnnotations } from './annotations/read.js';
 import { textApproximatelyEqual } from './utils.js';
-import { LocalPdfManager } from '../../pdf.js/build/lib-legacy/core/pdf_manager.js';
-import { XRefParseException } from '../../pdf.js/build/lib-legacy/core/core_utils.js';
+import { LocalPdfManager } from '../../pdf.js/src/core/pdf_manager.js';
+import { XRefParseException } from '../../pdf.js/src/core/core_utils.js';
 import { FontEmbedder } from './font/font-embedder.js';
 import { renderAnnotations, renderArea } from './renderer.js';
 
