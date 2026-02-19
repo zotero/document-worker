@@ -1,5 +1,5 @@
-import * as pdfjsWorker from '../../pdf.js/build/lib-legacy/pdf.worker.js';
-import * as pdfjs from '../../pdf.js/build/lib-legacy/pdf.js';
+import * as pdfjsWorker from '../../pdf.js/src/pdf.worker.js';
+import * as pdfjs from '../../pdf.js/src/pdf.js';
 
 self.pdfjsWorker = pdfjsWorker;
 

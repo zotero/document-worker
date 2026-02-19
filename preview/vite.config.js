@@ -39,6 +39,14 @@ export default {
   }],
   resolve: {
     alias: {
+      'pdfjs/pdf.worker.js': resolve(__dirname, '../pdf.js/src/pdf.worker.js'),
+      'display-node_utils': resolve(__dirname, '../pdf.js/src/display/stubs.js'),
+      'display-node_stream': resolve(__dirname, '../pdf.js/src/display/stubs.js'),
+      'display-cmap_reader_factory': resolve(__dirname, '../pdf.js/src/display/cmap_reader_factory.js'),
+      'display-standard_fontdata_factory': resolve(__dirname, '../pdf.js/src/display/standard_fontdata_factory.js'),
+      'display-wasm_factory': resolve(__dirname, '../pdf.js/src/display/wasm_factory.js'),
+      'display-fetch_stream': resolve(__dirname, '../pdf.js/src/display/fetch_stream.js'),
+      'display-network': resolve(__dirname, '../pdf.js/src/display/network.js'),
       fs: 'data:text/javascript,export default {}',
       path: 'data:text/javascript,export default {}',
       worker_threads: 'data:text/javascript,export default {}',

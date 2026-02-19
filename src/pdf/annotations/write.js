@@ -1,5 +1,5 @@
 import { applyTransform, getBoundingBox, getCenter } from './common.js';
-import { stringToAsciiOrUTF16BE } from '../../pdf.js/build/lib-legacy/core/core_utils.js';
+import { stringToAsciiOrUTF16BE } from '../../../pdf.js/src/core/core_utils.js';
 
 const NOTE_SIZE = 22;
 
