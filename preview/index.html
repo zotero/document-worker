@@ -177,6 +177,14 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
   padding: 2px 4px;
 }
 #html-panel .artifact { opacity: 0.4; }
+#html-panel a.ref-link {
+  color: #4a90d9;
+  text-decoration: underline;
+  cursor: pointer;
+}
+#html-panel a.ref-link:hover {
+  color: #3a7bc8;
+}
 
 .empty-state {
   color: #999;
@@ -209,11 +217,9 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
 
 <script type="module">
 import { getDocument } from '../pdf.js/src/display/api.js';
-import { GlobalWorkerOptions } from '../pdf.js/src/display/worker_options.js';
+// Run pdf.js on the main thread (sets globalThis.pdfjsWorker).
+import '../pdf.js/src/pdf.worker.js';
 import { getStructure, renderArea } from '../src/pdf/index.js';
-
-// Disable worker — run everything in main thread (fine for a dev tool).
-GlobalWorkerOptions.workerSrc = '';
 
 const fileInput = document.getElementById('file-input');
 const statusEl = document.getElementById('status');
@@ -225,6 +231,7 @@ const testPdfSelect = document.getElementById('test-pdf-select');
 
 // Block map: id -> { htmlEl, regionEls: Element[], anchor }
 let blockMap = new Map();
+let refToBlockId = new Map();
 let activeBlockId = null;
 let currentFilePath = null;
 let currentPdfDoc = null;
@@ -335,12 +342,14 @@ async function loadFromPath(filePath, savedScroll) {
     console.log('Structure:', structure);
     statusEl.textContent = 'Rendering...';
 
+    refToBlockId = buildRefMap(structure);
     renderPages(pdfDoc, structure);
     renderHtml(structure);
     renderOverlays(structure);
 
     const name = filePath.split('/').pop();
-    statusEl.textContent = `${name} — ${structure.pages.length} pages, ${structure.content.length} blocks`;
+    defaultStatusText = `${name} — ${structure.pages.length} pages, ${structure.content.length} blocks`;
+    statusEl.textContent = defaultStatusText;
 
     if (savedScroll.pdf || savedScroll.html) {
       requestAnimationFrame(() => {
@@ -402,11 +411,13 @@ async function loadFile(file) {
     console.log('Structure:', structure);
     statusEl.textContent = 'Rendering...';
 
+    refToBlockId = buildRefMap(structure);
     renderPages(pdfDoc, structure);
     renderHtml(structure);
     renderOverlays(structure);
 
-    statusEl.textContent = `${file.name} — ${structure.pages.length} pages, ${structure.content.length} blocks`;
+    defaultStatusText = `${file.name} — ${structure.pages.length} pages, ${structure.content.length} blocks`;
+    statusEl.textContent = defaultStatusText;
   } catch (err) {
     console.error(err);
     statusEl.textContent = `Error: ${err.message}`;
@@ -487,10 +498,32 @@ async function renderPage(pdfDoc, container) {
 
 let blockIdCounter = 0;
 
+function buildRefMap(structure) {
+  let counter = 0;
+  const map = new Map();
+  function walk(block, ref) {
+    const id = counter++;
+    map.set(ref.join(','), id);
+    if (block.type === 'list' && block.content) {
+      let j = 0;
+      for (const item of block.content) {
+        if (item.type) {
+          walk(item, [...ref, j]);
+          j++;
+        }
+      }
+    }
+  }
+  for (let i = 0; i < structure.content.length; i++) {
+    walk(structure.content[i], [i]);
+  }
+  return map;
+}
+
 function renderHtml(structure) {
   blockIdCounter = 0;
-  for (const block of structure.content) {
-    const el = renderBlock(block);
+  for (let i = 0; i < structure.content.length; i++) {
+    const el = renderBlock(structure.content[i], [i]);
     if (el) htmlPanel.appendChild(el);
   }
 }
@@ -517,7 +550,7 @@ async function renderAreaForBlock(container, block) {
   }
 }
 
-function renderBlock(block) {
+function renderBlock(block, ref) {
   const id = blockIdCounter++;
   let el;
 
@@ -558,10 +591,12 @@ function renderBlock(block) {
     case 'list':
       el = document.createElement('ul');
       if (block.content) {
+        let j = 0;
         for (const item of block.content) {
           if (item.type) {
-            const li = renderBlock(item);
+            const li = renderBlock(item, [...ref, j]);
             if (li) el.appendChild(li);
+            j++;
           }
         }
       }
@@ -577,13 +612,17 @@ function renderBlock(block) {
   }
 
   if (block.artifact) el.classList.add('artifact');
-  el.dataset.blockId = id;
 
-  blockMap.set(id, { htmlEl: el, regionEls: [], anchor: block.anchor });
+  const isContainer = block.type === 'list';
+  if (!isContainer) {
+    el.dataset.blockId = id;
 
-  el.addEventListener('mouseenter', () => setActive(id));
-  el.addEventListener('mouseleave', () => clearActive());
-  el.addEventListener('click', () => scrollPdfToBlock(id));
+    blockMap.set(id, { htmlEl: el, regionEls: [], anchor: block.anchor, ref, type: block.type });
+
+    el.addEventListener('mouseenter', () => setActive(id));
+    el.addEventListener('mouseleave', () => clearActive());
+    el.addEventListener('click', () => scrollPdfToBlock(id));
+  }
 
   return el;
 }
@@ -615,11 +654,34 @@ function renderTextContent(parent, content) {
       el = document.createElement('em');
       el.textContent = node.text;
     } else {
-      parent.appendChild(document.createTextNode(node.text));
-      continue;
+      el = null;
     }
 
-    parent.appendChild(el);
+    if (node.refs && node.refs.length > 0) {
+      const a = document.createElement('a');
+      a.className = 'ref-link';
+      a.href = '#';
+      if (el) {
+        a.appendChild(el);
+      } else {
+        a.textContent = node.text;
+      }
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const targetId = refToBlockId.get(node.refs[0].join(','));
+        if (targetId != null) {
+          setActive(targetId);
+          scrollHtmlToBlock(targetId);
+          scrollPdfToBlock(targetId);
+        }
+      });
+      parent.appendChild(a);
+    } else if (el) {
+      parent.appendChild(el);
+    } else {
+      parent.appendChild(document.createTextNode(node.text));
+    }
   }
 }
 
@@ -635,7 +697,9 @@ function renderOverlays(structure) {
 function renderBlockOverlay(block, pages) {
   const id = blockIdCounter++;
 
-  if (block.anchor && block.anchor.pageRects) {
+  const isContainer = block.type === 'list';
+
+  if (!isContainer && block.anchor && block.anchor.pageRects) {
     for (const rect of block.anchor.pageRects) {
       const [pageIndex, x1, y1, x2, y2] = rect;
       const vr = pages[pageIndex]?.viewRect;
@@ -675,6 +739,8 @@ function renderBlockOverlay(block, pages) {
 
 // ── Bidirectional highlighting ──
 
+let defaultStatusText = statusEl.textContent;
+
 function setActive(id) {
   if (activeBlockId !== null) clearActive();
   activeBlockId = id;
@@ -682,6 +748,7 @@ function setActive(id) {
   if (!entry) return;
   entry.htmlEl.classList.add('active');
   for (const r of entry.regionEls) r.classList.add('active');
+  if (entry.ref) statusEl.textContent = 'Block [' + entry.ref.join(', ') + '] ' + (entry.type || '');
 }
 
 function clearActive() {
@@ -692,6 +759,7 @@ function clearActive() {
     for (const r of entry.regionEls) r.classList.remove('active');
   }
   activeBlockId = null;
+  statusEl.textContent = defaultStatusText;
 }
 
 function scrollPdfToBlock(id) {
