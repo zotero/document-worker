@@ -555,7 +555,6 @@ function renderBlock(block) {
       el = document.createElement('div');
       el.className = 'equation-block';
       renderAreaForBlock(el, block);
-      renderTextContent(el, block.content);
       break;
     case 'list':
       el = document.createElement('ul');
