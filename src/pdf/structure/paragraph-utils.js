@@ -10,6 +10,34 @@ export function cleanupBlockMetrics(structure) {
 	}
 }
 
+export function cleanupTextNodeStyles(structure) {
+	if (!structure || !Array.isArray(structure.content)) {
+		return;
+	}
+	for (const block of structure.content) {
+		if (!block || !Array.isArray(block.content)) {
+			continue;
+		}
+		if (block.type === 'list') {
+			for (const item of block.content) {
+				if (item && Array.isArray(item.content)) {
+					for (const node of item.content) {
+						if (node && node.style) {
+							delete node.style._fontSize;
+						}
+					}
+				}
+			}
+		} else {
+			for (const node of block.content) {
+				if (node && node.style) {
+					delete node.style._fontSize;
+				}
+			}
+		}
+	}
+}
+
 export function getHeadingMetrics(rawBlock, charsRange) {
 	if (!charsRange || charsRange.length === 0) {
 		return {
