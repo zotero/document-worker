@@ -191,24 +191,24 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 	// After this only text node transformations are allowed
 
-	// addPageLabels(structure, catalogPageLabels);
+	addPageLabels(structure, catalogPageLabels);
 
-	// let candidateGroups = new Map();
-	//
-	// let annotLinkRefs = getAnnotLinkRefs(structure, linkMap);
-	// let parsedLinkRefs = getParsedLinkRefs(structure);
-	//
-	// let referenceLists = getReferenceLists(structure, regularWordsSet);
-	// let refIndex = getReferenceIndex(referenceLists, regularWordsSet);
-	// let figures = getFigures(structure);
-	// let mathBlocks = getMathBlocks(structure);
-	// getCandidates(structure, candidateGroups, refIndex, figures, mathBlocks);
-	// let mainRefs = getRefsList(candidateGroups);
-	//
-	// addRefs(annotLinkRefs, parsedLinkRefs);
-	// addRefs(mainRefs, annotLinkRefs);
-	//
-	// applyRefs(structure, mainRefs);
+	let candidateGroups = new Map();
+
+	let annotLinkRefs = getAnnotLinkRefs(structure, linkMap);
+	let parsedLinkRefs = getParsedLinkRefs(structure);
+
+	let referenceLists = getReferenceLists(structure, regularWordsSet);
+	let refIndex = getReferenceIndex(referenceLists, regularWordsSet);
+	let figures = getFigures(structure);
+	let mathBlocks = getMathBlocks(structure);
+	getCandidates(structure, candidateGroups, refIndex, figures, mathBlocks);
+	let mainRefs = getRefsList(candidateGroups);
+
+	addRefs(annotLinkRefs, parsedLinkRefs);
+	addRefs(mainRefs, annotLinkRefs);
+
+	applyRefs(structure, mainRefs);
 
 	structure.outline = await getOutline(structure.content, [], pdfDocument);
 

@@ -226,16 +226,14 @@ export function getRefsList(candidateGroups) {
 	for (let [key, candidateGroup] of candidateGroups) {
 		if (candidateGroup[0].mathRelations) {
 			mathGroup = candidateGroup;
-			candidateGroups.delete(candidateGroup);
+			candidateGroups.delete(key);
 			break;
 		}
 	}
 
 	for (let [key, candidateGroup] of candidateGroups) {
 		if (candidateGroup[0].figureRelations) {
-			candidateGroups.delete(candidateGroup);
-			figureGroups.push(candidateGroup[0]);
-			break;
+			figureGroups.push(...candidateGroup);
 		}
 	}
 

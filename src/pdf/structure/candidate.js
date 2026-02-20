@@ -440,7 +440,7 @@ const FIGURE_LABELS = new Map([
 	['example', 'example'], ['ex', 'example'],
 ]);
 
-function normalizeLabelWord(textRaw) {
+export function normalizeLabelWord(textRaw) {
 	// Normalize like "Fig." -> "fig"
 	let text = trimNonLettersUsingCase(textRaw).toLowerCase();
 	// Remove trailing period on abbreviations (e.g., "fig.")
@@ -456,14 +456,19 @@ function parseFigureRefAt(bt, startIndex, figures, blockRef) {
 	if (!firstWord) return null;
 
 	// Normalize the label (e.g., "Fig." -> "figure")
-	const name = firstWord.text.toLowerCase();
+	const name = normalizeLabelWord(firstWord.text);
 	if (!name) return null;
 
 	// Only proceed if `figures` has this name as a key
 	if (!figures || !figures.has || !figures.has(name)) return null;
 
-	// Get the next word (the number token)
-	const secondWord = parseWord(bt, firstWord.end + 1, blockRef);
+	// Get the next word (the number token), skipping any spaces after the label.
+	let secondWordStart = firstWord.end + 1;
+	while (secondWordStart < bt.text.length && /\s/.test(bt.text[secondWordStart])) {
+		secondWordStart++;
+	}
+
+	const secondWord = parseWord(bt, secondWordStart, blockRef);
 	if (!secondWord) return null;
 
 	// Only consider the leading number in the second word

@@ -1,11 +1,14 @@
 
+import { getBlockText } from './zst/index.js';
+import { normalizeLabelWord } from './candidate.js';
+
 export function getFigures(structure) {
 	let figures = new Map();
 	for (let i = 0; i < structure.content.length; i++) {
 		const block = structure.content[i];
-		if (block?.type !== 'title') continue;
+		if (block?.type !== 'caption') continue;
 
-		const raw = block.text;
+		const raw = getBlockText(structure, [i]).text;
 		if (!raw) continue;
 
 		const text = raw.trim();
@@ -22,7 +25,8 @@ export function getFigures(structure) {
 		if (name[0].toUpperCase() !== name[0]) {
 			continue;
 		}
-		name = name.toLowerCase();
+		name = normalizeLabelWord(name);
+		if (!name) continue;
 		// Second word must start with a number; capture leading digits only
 		if (!(numberToken[0] >= '0' && numberToken[0] <= '9')) continue;
 		const number = (numberToken.match(/^\d+/) || [])[0];
