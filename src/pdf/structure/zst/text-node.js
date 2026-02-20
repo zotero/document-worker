@@ -45,6 +45,7 @@ export function canMergeTextNodes(a, b) {
 		aHasTextMap === bHasTextMap &&
 		deepEqual(a.style ?? null, b.style ?? null) &&
 		deepEqual(a.refs ?? null, b.refs ?? null) &&
+		deepEqual(a.backRefs ?? null, b.backRefs ?? null) &&
 		deepEqual(a.target ?? null, b.target ?? null)
 	);
 }

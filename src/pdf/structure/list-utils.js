@@ -93,6 +93,7 @@ export function wrapListItems(structure) {
 		}
 
 		updateRefsArray(node.refs);
+		updateRefsArray(node.backRefs);
 
 		if (Array.isArray(node.content)) {
 			for (const child of node.content) {
@@ -151,6 +152,7 @@ export function mergeLists(structure) {
 			const mergedIndex = newContent.length;
 			const mergedItems = [];
 			const mergedRefs = [];
+			const mergedBackRefs = [];
 			const listsToMerge = [];
 			let baseBlock = block;
 			let groupSize = 0;
@@ -169,6 +171,10 @@ export function mergeLists(structure) {
 					mergedRefs.push(...listBlock.refs);
 				}
 
+				if (Array.isArray(listBlock.backRefs)) {
+					mergedBackRefs.push(...listBlock.backRefs);
+				}
+
 				i++;
 			}
 
@@ -185,6 +191,10 @@ export function mergeLists(structure) {
 
 			if (mergedRefs.length > 0) {
 				mergedBlock.refs = mergedRefs;
+			}
+
+			if (mergedBackRefs.length > 0) {
+				mergedBlock.backRefs = mergedBackRefs;
 			}
 
 			newContent.push(mergedBlock);
@@ -250,6 +260,7 @@ export function mergeLists(structure) {
 		}
 
 		updateRefsArray(node.refs);
+		updateRefsArray(node.backRefs);
 
 		if (Array.isArray(node.content)) {
 			for (const child of node.content) {

@@ -2,7 +2,7 @@
 // Returns { items, nextIndex } only if a proper closing delimiter is found; otherwise returns null.
 import { getBlockText, getNextBlockRef } from './zst/index.js';
 
-function parseDelimitedRange(bt, openIndex, openCharVal, closeCharVal, type, refIndex, equations, blockRef) {
+function parseDelimitedRange(bt, openIndex, openCharVal, closeCharVal, type, refIndex, mathBlocks, blockRef) {
 	const openChar = bt.text[openIndex];
 	if (!openChar || openChar !== openCharVal) return null;
 
@@ -141,11 +141,11 @@ function parseDelimitedRange(bt, openIndex, openCharVal, closeCharVal, type, ref
 					}
 				}
 
-				const equationRelations = [];
+				const mathRelations = [];
 				for (const n of numbers) {
 					const key = n;
-					if (equations && equations.has(key)) {
-						equationRelations.push(equations.get(key));
+					if (mathBlocks && mathBlocks.has(key)) {
+						mathRelations.push(mathBlocks.get(key));
 					}
 				}
 
@@ -160,7 +160,7 @@ function parseDelimitedRange(bt, openIndex, openCharVal, closeCharVal, type, ref
 					},
 					numbers,
 					referenceRelations,
-					equationRelations,
+					mathRelations,
 					...(isRange ? { range: true } : {})
 				});
 			}
@@ -436,7 +436,7 @@ const FIGURE_LABELS = new Map([
 	['photograph', 'photograph'], ['photo', 'photograph'],
 	['illustration', 'illustration'], ['illus', 'illustration'],
 	['table', 'table'], ['tbl', 'table'],
-	['equation', 'equation'], ['eq', 'equation'],
+	['equation', 'math'], ['eq', 'math'],
 	['example', 'example'], ['ex', 'example'],
 ]);
 
@@ -537,7 +537,7 @@ function collectUrlSequence(bt, startIndex) {
 	return { from, to };
 }
 
-export function getCandidates(structure, candidateGroups, refIndex, figures, equations) {
+export function getCandidates(structure, candidateGroups, refIndex, figures, mathBlocks) {
 	// { type, blockIndex, rect, text, offsetStart, offsetEnd, char }
 
 	// write a parser
@@ -551,11 +551,11 @@ export function getCandidates(structure, candidateGroups, refIndex, figures, equ
 			let parsed;
 
 			// Try delimited ranges; parser will validate openings
-			if ((parsed = parseDelimitedRange(bt, i, '[', ']', 'brackets', refIndex, equations, blockRef))) {
+			if ((parsed = parseDelimitedRange(bt, i, '[', ']', 'brackets', refIndex, mathBlocks, blockRef))) {
 				if (parsed.items && parsed.items.length) items.push(...parsed.items);
 				i = parsed.nextIndex;
 			}
-			else if ((parsed = parseDelimitedRange(bt, i, '(', ')', 'parentheses', refIndex, equations, blockRef))) {
+			else if ((parsed = parseDelimitedRange(bt, i, '(', ')', 'parentheses', refIndex, mathBlocks, blockRef))) {
 				if (parsed.items && parsed.items.length) items.push(...parsed.items);
 				i = parsed.nextIndex;
 			}

@@ -330,7 +330,7 @@ function recoverInlineHeadings(allBlocksByPage, confirmedStyles, usedBlockIndice
 	const recoveredItems = [];
 	if (!confirmedStyles.size) return recoveredItems;
 
-	const skipTypes = new Set(['note', 'caption', 'table', 'image', 'equation']);
+	const skipTypes = new Set(['note', 'caption', 'table', 'image', 'math']);
 	for (const pageBlocks of allBlocksByPage.values()) {
 		for (const block of pageBlocks) {
 			if (usedBlockIndices.has(block._blockIndex)) continue;

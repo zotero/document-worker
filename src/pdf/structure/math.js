@@ -30,16 +30,16 @@ function getWords(blockText) {
 	return words;
 }
 
-export function getEquations(structure) {
-	let equations = new Map();
+export function getMathBlocks(structure) {
+	let mathBlocks = new Map();
 	// Ensure we work with a Map<number, Array<...>>
-	if (!(equations instanceof Map)) {
-		equations = new Map();
+	if (!(mathBlocks instanceof Map)) {
+		mathBlocks = new Map();
 	}
 
 	for (let i = 0; i < structure.content.length; i++) {
 		let block = structure.content[i];
-		if (block.type === 'equation') {
+		if (block.type === 'math') {
 			let blockText = getBlockText(structure, [i]);
 
 			const words = getWords(blockText);
@@ -79,11 +79,11 @@ export function getEquations(structure) {
 						offsetEnd: w.end
 					},
 				};
-				const arr = equations.get(numKey) || [];
+				const arr = mathBlocks.get(numKey) || [];
 				arr.push(entry);
-				equations.set(numKey, arr);
+				mathBlocks.set(numKey, arr);
 			}
 		}
 	}
-	return equations;
+	return mathBlocks;
 }
