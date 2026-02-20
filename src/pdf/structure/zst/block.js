@@ -64,6 +64,7 @@ function appendTextNodes(output, nodes) {
 			style: node.style ?? null,
 			target: node.target ?? null,
 			refs: node.refs ?? null,
+			backRefs: node.backRefs ?? null,
 		};
 		const runs = buildRunData(parseTextMap(node.anchor?.textMap));
 		const mapped = runs.length ? mapTextToRuns(text, runs) : null;
@@ -643,10 +644,6 @@ export function getTextNodesAtRange(structure, blockRef, offsetStart, offsetEnd)
  * Get content range refs from block indexes.
  */
 export function getContentRangeFromBlocks(content, startOffset, endOffset) {
-	if (!Array.isArray(content) || content.length === 0) {
-		return { start: { ref: null }, end: { ref: null } };
-	}
-
 	const isLeaf = (node) => !node || !node.content || node.content.length === 0;
 
 	const firstLeafPath = (node, path) => {
@@ -674,10 +671,6 @@ export function getContentRangeFromBlocks(content, startOffset, endOffset) {
 	const maxIndex = content.length - 1;
 	const safeStart = Number.isInteger(startOffset) ? Math.max(0, Math.min(startOffset, maxIndex)) : 0;
 	const safeEnd = Number.isInteger(endOffset) ? Math.max(0, Math.min(endOffset, maxIndex)) : maxIndex;
-
-	if (safeStart > safeEnd) {
-		return { start: { ref: null }, end: { ref: null } };
-	}
 
 	const startRef = firstLeafPath(content[safeStart], [safeStart]);
 	const endRef = lastLeafPath(content[safeEnd], [safeEnd]);
@@ -761,6 +754,7 @@ export function pushArtifactsToTheEnd(structure) {
 		}
 
 		updateRefsArray(node.refs);
+		updateRefsArray(node.backRefs);
 
 		if (Array.isArray(node.content)) {
 			for (const child of node.content) {
@@ -1185,6 +1179,7 @@ export function mergeBlocks(structure, blockIndexes) {
 		}
 
 		updateRefsArray(node.refs);
+		updateRefsArray(node.backRefs);
 
 		if (Array.isArray(node.content)) {
 			for (const child of node.content) {

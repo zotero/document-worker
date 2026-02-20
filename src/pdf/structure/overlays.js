@@ -217,15 +217,15 @@ export function getRefCit(candidateGroups) {
 }
 
 export function getRefsList(candidateGroups) {
-	let equationGroup = null;
+	let mathGroup = null;
 	let figureGroups = [];
 
 	let bestRefCit = getRefCit(candidateGroups);
 
 
 	for (let [key, candidateGroup] of candidateGroups) {
-		if (candidateGroup[0].equationRelations) {
-			equationGroup = candidateGroup;
+		if (candidateGroup[0].mathRelations) {
+			mathGroup = candidateGroup;
 			candidateGroups.delete(candidateGroup);
 			break;
 		}
@@ -276,11 +276,11 @@ export function getRefsList(candidateGroups) {
 		}
 	}
 
-	if (equationGroup) {
-		for (let equation of equationGroup) {
-			let destination = equation?.equationRelations?.[0]?.[0];
-			if (destination && !isSameBlock(equation.src, destination.src)) {
-				addRef(equation.src, destination.src, 'equation');
+	if (mathGroup) {
+		for (let mathBlock of mathGroup) {
+			let destination = mathBlock?.mathRelations?.[0]?.[0];
+			if (destination && !isSameBlock(mathBlock.src, destination.src)) {
+				addRef(mathBlock.src, destination.src, 'math');
 			}
 		}
 	}

@@ -3,7 +3,7 @@ import { getOutline } from './outline/outline.js';
 import { getReferenceLists } from './reference/reference.js';
 import { getCandidates } from './candidate.js';
 import { getFigures } from './figure.js';
-import { getEquations } from './equation.js';
+import { getMathBlocks } from './math.js';
 import { updateRegularWordsSet } from './reference/regular-words.js';
 import { getReferenceIndex } from './reference/index.js';
 // import { getLinkOverlays } from './link.js';
@@ -141,7 +141,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 			}
 			else if (block.type === 'equation') {
 				node = {
-					type: 'equation',
+					type: 'math',
 					...(anchor && { anchor }),
 					content: charsToTextNodes(i, charsRange)
 				}
@@ -201,8 +201,8 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	// let referenceLists = getReferenceLists(structure, regularWordsSet);
 	// let refIndex = getReferenceIndex(referenceLists, regularWordsSet);
 	// let figures = getFigures(structure);
-	// let equations = getEquations(structure);
-	// getCandidates(structure, candidateGroups, refIndex, figures, equations);
+	// let mathBlocks = getMathBlocks(structure);
+	// getCandidates(structure, candidateGroups, refIndex, figures, mathBlocks);
 	// let mainRefs = getRefsList(candidateGroups);
 	//
 	// addRefs(annotLinkRefs, parsedLinkRefs);

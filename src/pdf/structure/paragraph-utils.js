@@ -160,7 +160,7 @@ export function mergeParagraphs(structure, mergeBlocks) {
 	const paragraphs = [];
 	for (let i = 0; i < structure.content.length; i++) {
 		const block = structure.content[i];
-		if (block && block.type === 'paragraph' && !block.artifact && !block.other && block._metrics) {
+		if (block && block.type === 'paragraph' && !block.artifact && block._metrics) {
 			paragraphs.push({ index: i, block });
 		}
 	}
