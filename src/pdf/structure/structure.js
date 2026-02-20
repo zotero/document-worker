@@ -17,7 +17,7 @@ import {
 } from './zst/index.js';
 import { mergeLists, wrapListItems } from './list-utils.js';
 import { addRefs, getParsedLinkRefs, getAnnotLinkRefs, getLinksFromAnnotations } from './link.js';
-import { cleanupBlockMetrics, getHeadingMetrics, getParagraphMetrics, mergeParagraphs } from './paragraph-utils.js';
+import { cleanupBlockMetrics, cleanupTextNodeStyles, getHeadingMetrics, getParagraphMetrics, mergeParagraphs } from './paragraph-utils.js';
 import { createBlockAnchor, ensureBlockPageRects } from './util.js';
 // import { getNextChunk } from './structured-text-utils/chunker.js';
 // import { getContent, getRefRangesFromPageRects } from './structured-text-utils/block.js';
@@ -37,13 +37,38 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 		dateCreated: new Date().toISOString(),
 		sourceContentType: 'application/pdf',
 		sourceHash: '',
-		metadata: {
-
-		},
+		metadata: {},
 		pages: [],
 		content: []
 	};
 
+	let docInfo = pdfDocument.documentInfo;
+	let metadata = {};
+	if (docInfo.PDFFormatVersion) {
+		metadata.PDFFormatVersion = docInfo.PDFFormatVersion;
+	}
+	let infoKeys = ['Title', 'Author', 'Subject', 'Keywords', 'Creator', 'Producer', 'CreationDate', 'ModDate', 'Language'];
+	for (let key of infoKeys) {
+		if (typeof docInfo[key] === 'string') {
+			metadata[key] = docInfo[key];
+		}
+	}
+	let skipKeys = new Set([
+		'PDFFormatVersion', 'EncryptFilterName',
+		'IsLinearized', 'IsAcroFormPresent', 'IsXFAPresent',
+		'IsCollectionPresent', 'IsSignaturesPresent',
+		...infoKeys,
+	]);
+	if (docInfo.Custom) {
+		for (let key in docInfo.Custom) {
+			if (skipKeys.has(key)) continue;
+			let value = docInfo.Custom[key];
+			if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+				metadata[key] = value;
+			}
+		}
+	}
+	structure.metadata = metadata;
 
 	// internal and external links
 	let linkMap = new Map();
@@ -213,6 +238,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	structure.outline = await getOutline(structure.content, [], pdfDocument);
 
 	cleanupBlockMetrics(structure);
+	cleanupTextNodeStyles(structure);
 	ensureBlockPageRects(structure);
 
 	// let chunks = [];

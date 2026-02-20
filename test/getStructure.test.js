@@ -5,6 +5,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { getStructure } from '../src/index.js';
+import stringify from 'json-stringify-pretty-compact';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const buildDir = resolve(__dirname, '..', 'build');
@@ -14,10 +15,10 @@ function dataProvider(path) {
 	return fs.readFileSync(resolve(buildDir, path));
 }
 
-// Auto-discover test cases: each .pdf with a corresponding .zst.json snapshot
+// Auto-discover test cases: each .pdf with a corresponding .json snapshot
 let pdfFiles = fs.readdirSync(pdfsDir)
 	.filter(f => f.endsWith('.pdf'))
-	.filter(f => fs.existsSync(resolve(pdfsDir, f.replace('.pdf', '.zst.json'))));
+	.filter(f => fs.existsSync(resolve(pdfsDir, f.replace('.pdf', '.json'))));
 
 describe('getStructure snapshots', function () {
 	this.timeout(120000);
@@ -25,7 +26,7 @@ describe('getStructure snapshots', function () {
 	for (let pdfFile of pdfFiles) {
 		let name = pdfFile.replace('.pdf', '');
 		let pdfPath = resolve(pdfsDir, pdfFile);
-		let snapshotPath = resolve(pdfsDir, name + '.zst.json');
+		let snapshotPath = resolve(pdfsDir, name + '.json');
 
 		it(pdfFile, async function () {
 			let buf = fs.readFileSync(pdfPath);
@@ -34,7 +35,7 @@ describe('getStructure snapshots', function () {
 			// Strip non-deterministic field
 			delete result.dateCreated;
 
-			let json = JSON.stringify(result, null, '\t');
+			let json = stringify(result, { indent: '\t', maxLength: 100 });
 
 			if (process.env.UPDATE_SNAPSHOTS) {
 				fs.writeFileSync(snapshotPath, json + '\n', 'utf8');

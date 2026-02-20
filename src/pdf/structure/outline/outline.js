@@ -165,7 +165,6 @@ function extractHeadingItems(blocks) {
 		const item = {
 			title: getBlockPlainText(block),
 			ref: [i],
-			avgFontSize: metrics.fontSize || 0,
 			_blockIndex: i,
 			_pageIndex: pageIndex,
 			_rect: rect,
@@ -309,7 +308,6 @@ function buildNativeMatchedItems(matches) {
 		const item = {
 			title,
 			ref: [block._blockIndex],
-			avgFontSize: block._fontSize || 0,
 			_blockIndex: block._blockIndex,
 			_pageIndex: block._pageIndex,
 			_rect: block._rect,
@@ -355,7 +353,6 @@ function recoverInlineHeadings(allBlocksByPage, confirmedStyles, usedBlockIndice
 			const item = {
 				title: block.title,
 				ref: [block._blockIndex],
-				avgFontSize: firstCharFontSize,
 				_blockIndex: block._blockIndex,
 				_pageIndex: block._pageIndex,
 				_rect: block._rect,
@@ -613,7 +610,6 @@ function filterOutlineItem(item) {
 	const result = {
 		title: item.title,
 		ref: refArray,
-		avgFontSize: item.avgFontSize,
 	};
 	if (children.length > 0) {
 		result.children = children;
