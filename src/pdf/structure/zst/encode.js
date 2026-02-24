@@ -14,7 +14,7 @@ const sameStyle = (a, b) =>
 	!!a.italic === !!b.italic &&
 	!!a.sub === !!b.sub &&
 	!!a.sup === !!b.sup &&
-	!!a.code === !!b.code;
+	!!a.isMonospace === !!b.isMonospace;
 
 function styleFromChar(ch) {
 	const s = {};
@@ -22,7 +22,7 @@ function styleFromChar(ch) {
 	if (ch.italic) s.italic = true;
 	if (ch.sub) s.sub = true;
 	if (ch.sup) s.sup = true;
-	if (ch.code) s.code = true;
+	if (ch.isMonospace) s.monospace = true;
 	if (ch.sup) s._fontSize = ch.fontSize;
 	return Object.keys(s).length ? s : undefined;
 }
@@ -299,6 +299,145 @@ export function charsToTextNodes(pageIndex, chars) {
 			node.currentRun = createRun(ch, rect);
 			addGlyph(node.currentRun, rect, charLen, hasSpace, ext);
 			node.currentRun.hasTrailingSoftHyphen = false;
+		}
+	}
+
+	flushNode();
+	return nodes;
+}
+
+// ──────────────── Char → TextNode (preformatted / code blocks) ────────────────
+
+function getPreformattedMonoCharWidth(chars) {
+	const widthCounts = new Map();
+	for (const ch of chars) {
+		if (ch.isMonospace && ch.rect && ch.c && ch.c.trim()) {
+			const w = Math.round((ch.rect[2] - ch.rect[0]) * 100) / 100;
+			if (w > 0) widthCounts.set(w, (widthCounts.get(w) || 0) + 1);
+		}
+	}
+	let best = 0, bestCount = 0;
+	for (const [w, count] of widthCounts) {
+		if (count > bestCount) { best = w; bestCount = count; }
+	}
+	if (best > 0) return best;
+	// Fallback: average char rect width
+	let sum = 0, n = 0;
+	for (const ch of chars) {
+		if (ch.rect && ch.c && ch.c.trim()) {
+			const w = ch.rect[2] - ch.rect[0];
+			if (w > 0) { sum += w; n++; }
+		}
+	}
+	return n > 0 ? sum / n : 1;
+}
+
+export function charsToPreformattedTextNodes(pageIndex, chars) {
+	if (!chars?.length) return [];
+
+	const monoCharWidth = getPreformattedMonoCharWidth(chars);
+
+	// 1) Split chars into lines
+	const lines = [];
+	let lineStart = 0;
+	for (let i = 0; i < chars.length; i++) {
+		if (chars[i].lineBreakAfter || i === chars.length - 1) {
+			lines.push(chars.slice(lineStart, i + 1));
+			lineStart = i + 1;
+		}
+	}
+
+	// 2) Find columnZeroX (leftmost first-non-whitespace char across all lines)
+	let columnZeroX = Infinity;
+	for (const line of lines) {
+		for (const ch of line) {
+			if (ch.rect && ch.c && ch.c.trim()) {
+				columnZeroX = Math.min(columnZeroX, ch.rect[0]);
+				break;
+			}
+		}
+	}
+	if (!isFinite(columnZeroX)) columnZeroX = 0;
+
+	// 3) Build text nodes preserving whitespace
+	const nodes = [];
+	let currentStyle = undefined;
+	let currentStyleRef = null;
+	let textParts = [];
+
+	const flushNode = () => {
+		if (textParts.length === 0) return;
+		const text = textParts.join('');
+		if (!text) return;
+		const out = { text };
+		if (currentStyle) out.style = currentStyle;
+		nodes.push(out);
+		textParts = [];
+	};
+
+	for (let li = 0; li < lines.length; li++) {
+		const line = lines[li];
+		const isLastLine = li === lines.length - 1;
+
+		// Compute indent for this line
+		let firstCharX = null;
+		for (const ch of line) {
+			if (ch.rect && ch.c && ch.c.trim()) {
+				firstCharX = ch.rect[0];
+				break;
+			}
+		}
+
+		if (firstCharX !== null) {
+			const indentCols = Math.max(0, Math.round((firstCharX - columnZeroX) / monoCharWidth));
+			if (indentCols > 0) {
+				textParts.push(' '.repeat(indentCols));
+			}
+		}
+
+		// Emit characters
+		let prevEnd = null;
+		for (let ci = 0; ci < line.length; ci++) {
+			const ch = line[ci];
+
+			// Skip soft hyphens at line breaks
+			if ((ch.ignorable || ch.softHyphen) && ch.lineBreakAfter) {
+				continue;
+			}
+
+			// Handle style change (strip monospace — redundant inside preformatted)
+			let chStyle = styleFromChar(ch);
+			if (chStyle) {
+				delete chStyle.monospace;
+				if (!Object.keys(chStyle).length) chStyle = undefined;
+			}
+			if (!sameStyle(currentStyleRef, ch)) {
+				flushNode();
+				currentStyle = chStyle;
+				currentStyleRef = ch;
+			}
+
+			// Handle inter-character gaps (for aligned columns in code)
+			if (prevEnd !== null && ch.rect) {
+				const gap = ch.rect[0] - prevEnd;
+				if (gap > monoCharWidth * 0.5) {
+					const gapCols = Math.round(gap / monoCharWidth);
+					if (gapCols > 0) {
+						textParts.push(' '.repeat(gapCols));
+					}
+				}
+			}
+
+			textParts.push(ch.c);
+
+			if (ch.rect) {
+				prevEnd = ch.rect[2]; // right edge
+			}
+		}
+
+		// Add newline between lines (not after last)
+		if (!isLastLine) {
+			textParts.push('\n');
 		}
 	}
 

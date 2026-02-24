@@ -11,6 +11,7 @@ import { addPageLabels } from './page-label.js';
 import { applyRefs, getRefsList } from './overlays.js';
 import {
 	charsToTextNodes,
+	charsToPreformattedTextNodes,
 	getContentRangeFromBlocks,
 	mergeBlocks,
 	pushArtifactsToTheEnd,
@@ -169,6 +170,13 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 					type: 'math',
 					...(anchor && { anchor }),
 					content: charsToTextNodes(i, charsRange)
+				}
+			}
+			else if (block.type === 'preformatted') {
+				node = {
+					type: 'preformatted',
+					...(anchor && { anchor }),
+					content: charsToPreformattedTextNodes(i, charsRange)
 				}
 			}
 			else if (block.type === 'frame') {

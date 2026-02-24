@@ -366,6 +366,7 @@ export function getParsedLinkRefs(structure) {
 
 	// Walk through all top-level blocks
 	for (let i = 0; i < structure.content.length; i++) {
+		if (structure.content[i].type === 'preformatted') continue;
 		let blockRef = [i];
 		let bt = getBlockText(structure, blockRef);
 
@@ -380,6 +381,7 @@ export function getParsedLinkRefs(structure) {
 		let match;
 		let regex = new RegExp(urlRegExp.source, 'g');
 		while ((match = regex.exec(text)) !== null) {
+			if (bt.attrs[match.index]?.style?.monospace) continue;
 			let url = match[0];
 			if (url.includes('@')) {
 				continue;
@@ -398,6 +400,7 @@ export function getParsedLinkRefs(structure) {
 		// Find DOI matches
 		regex = new RegExp(doiRegExp.source, 'gi');
 		while ((match = regex.exec(text)) !== null) {
+			if (bt.attrs[match.index]?.style?.monospace) continue;
 			let doi = trimTrailingPunctuation(match[0]);
 			if (!doi) {
 				continue;
