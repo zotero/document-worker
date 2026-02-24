@@ -177,6 +177,28 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
   padding: 2px 4px;
 }
 #html-panel .artifact { opacity: 0.4; }
+#html-panel pre {
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 0.88em;
+  line-height: 1.5;
+  padding: 10px 12px;
+  margin: 0.6em 0;
+  background: #f6f6f6;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  white-space: pre;
+  overflow-x: auto;
+}
+#html-panel code {
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 0.92em;
+}
+#html-panel pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  border-radius: 0;
+}
 #html-panel a.ref-link {
   color: #4a90d9;
   text-decoration: underline;
@@ -605,6 +627,12 @@ function renderBlock(block, ref) {
       el = document.createElement('li');
       renderTextContent(el, block.content);
       break;
+    case 'preformatted':
+      el = document.createElement('pre');
+      const code = document.createElement('code');
+      renderTextContent(code, block.content);
+      el.appendChild(code);
+      break;
     default:
       el = document.createElement('p');
       renderTextContent(el, block.content);
@@ -655,6 +683,15 @@ function renderTextContent(parent, content) {
       el.textContent = node.text;
     } else {
       el = null;
+    }
+
+    if (style.monospace && el) {
+      const codeWrap = document.createElement('code');
+      codeWrap.appendChild(el);
+      el = codeWrap;
+    } else if (style.monospace) {
+      el = document.createElement('code');
+      el.textContent = node.text;
     }
 
     if (node.refs && node.refs.length > 0) {

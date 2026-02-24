@@ -1,6 +1,6 @@
 // Unified parser for delimited citation ranges like [...] and (...)
 // Returns { items, nextIndex } only if a proper closing delimiter is found; otherwise returns null.
-import { getBlockText, getNextBlockRef } from './zst/index.js';
+import { getBlockByRef, getBlockText, getNextBlockRef } from './zst/index.js';
 
 function parseDelimitedRange(bt, openIndex, openCharVal, closeCharVal, type, refIndex, mathBlocks, blockRef) {
 	const openChar = bt.text[openIndex];
@@ -551,8 +551,11 @@ export function getCandidates(structure, candidateGroups, refIndex, figures, mat
 
 	let blockRef = null;
 	while ((blockRef = getNextBlockRef(structure, blockRef))) {
+		let block = getBlockByRef(structure, blockRef);
+		if (block.type === 'preformatted') continue;
 		let bt = getBlockText(structure, blockRef);
 		for (let i = 0; i < bt.text.length; i++) {
+			if (bt.attrs[i]?.style?.monospace) continue;
 			let parsed;
 
 			// Try delimited ranges; parser will validate openings

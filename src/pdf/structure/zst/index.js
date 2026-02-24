@@ -23,7 +23,7 @@ export {
 } from './constants.js';
 
 // Encoding (char → text node)
-export { charsToTextNodes } from './encode.js';
+export { charsToTextNodes, charsToPreformattedTextNodes } from './encode.js';
 
 // Decoding (textMap → positions)
 export {

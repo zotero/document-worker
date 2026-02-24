@@ -839,6 +839,180 @@ function filterLargeObjects(objects, textLines, viewBox) {
 	});
 }
 
+// ─────────────────── Preformatted (monospace code) detection ───────────────────
+
+const MONO_LINE_THRESHOLD = 0.6;
+const MIN_PREFORMATTED_LINES = 3;
+const MAX_GAP_LINES = 0;
+const GRID_FIT_CHAR_THRESHOLD = 0.75;
+const GRID_RESIDUAL_LIMIT = 0.2;
+
+function getMonoCharWidth(chars) {
+	const widthCounts = new Map();
+	for (const ch of chars) {
+		if (ch.isMonospace && ch.rect && ch.c && ch.c.trim()) {
+			const w = Math.round((ch.rect[2] - ch.rect[0]) * 100) / 100;
+			if (w > 0) widthCounts.set(w, (widthCounts.get(w) || 0) + 1);
+		}
+	}
+	let best = 0, bestCount = 0;
+	for (const [w, count] of widthCounts) {
+		if (count > bestCount) { best = w; bestCount = count; }
+	}
+	return best;
+}
+
+function isLineMonospace(line) {
+	if (line.type === 'object') return false;
+	const chars = line.chars;
+	if (!chars || !chars.length) return false;
+	let mono = 0, total = 0;
+	for (const ch of chars) {
+		if (ch.c && ch.c.trim()) {
+			total++;
+			if (ch.isMonospace) mono++;
+		}
+	}
+	return total > 0 && mono / total >= MONO_LINE_THRESHOLD;
+}
+
+function getFirstNonWsCharX(line) {
+	if (!line.chars) return null;
+	for (const ch of line.chars) {
+		if (ch.rect && ch.c && ch.c.trim()) return ch.rect[0];
+	}
+	return null;
+}
+
+function computeBBoxFromLineIds(lineIds, lines) {
+	let bbox = null;
+	for (const id of lineIds) {
+		const line = lines[id];
+		if (!line || !line.rect) continue;
+		if (!bbox) {
+			bbox = line.rect.slice(0, 4);
+		} else {
+			bbox[0] = Math.min(bbox[0], line.rect[0]);
+			bbox[1] = Math.min(bbox[1], line.rect[1]);
+			bbox[2] = Math.max(bbox[2], line.rect[2]);
+			bbox[3] = Math.max(bbox[3], line.rect[3]);
+		}
+	}
+	return bbox || [0, 0, 0, 0];
+}
+
+// Phase 1: Find candidate regions of consecutive monospace lines
+function findMonospaceRegions(lines) {
+	let regions = [];
+	let startLi = -1, lastMonoLi = -1, monoCount = 0, gap = 0;
+
+	const flush = () => {
+		if (startLi !== -1 && monoCount >= MIN_PREFORMATTED_LINES) {
+			regions.push({ startLi, endLi: lastMonoLi });
+		}
+		startLi = -1; lastMonoLi = -1; monoCount = 0; gap = 0;
+	};
+
+	for (let li = 0; li < lines.length; li++) {
+		if (lines[li].type === 'object') continue;
+
+		if (isLineMonospace(lines[li])) {
+			if (startLi === -1) startLi = li;
+			lastMonoLi = li;
+			monoCount++;
+			gap = 0;
+		} else if (startLi !== -1) {
+			if (++gap > MAX_GAP_LINES) flush();
+		}
+	}
+	flush();
+	return regions;
+}
+
+// Phase 2: Validate a candidate region with holistic grid-fit analysis
+function validateWithGrid(candidate, lines) {
+	let { startLi, endLi } = candidate;
+
+	let textLineIndices = [];
+	let allChars = [];
+	for (let li = startLi; li <= endLi; li++) {
+		if (lines[li].type === 'object' || !lines[li].chars?.length) continue;
+		textLineIndices.push(li);
+		for (let ch of lines[li].chars) allChars.push(ch);
+	}
+
+	let monoCharWidth = getMonoCharWidth(allChars);
+	if (monoCharWidth <= 0) return null;
+
+	let columnZeroX = Infinity;
+	for (let li of textLineIndices) {
+		let x = getFirstNonWsCharX(lines[li]);
+		if (x !== null && x < columnZeroX) columnZeroX = x;
+	}
+	if (!isFinite(columnZeroX)) return null;
+
+	let onGrid = 0, total = 0;
+	for (let ch of allChars) {
+		if (!ch.rect || !ch.c || !ch.c.trim() || !ch.isMonospace) continue;
+		total++;
+		let col = (ch.rect[0] - columnZeroX) / monoCharWidth;
+		if (Math.abs(col - Math.round(col)) < GRID_RESIDUAL_LIMIT) onGrid++;
+	}
+	if (total > 0 && onGrid / total < GRID_FIT_CHAR_THRESHOLD) return null;
+
+	let lineIds = textLineIndices.map(li => lines[li].id);
+	return {
+		startOffset: lines[startLi].startOffset,
+		endOffset: lines[endLi].endOffset,
+		lineIds,
+		bbox: computeBBoxFromLineIds(lineIds, lines),
+	};
+}
+
+// Phase 3: Overlay validated regions onto ML blocks
+function overlayRegions(blocks, regions) {
+	let result = [];
+	let ri = 0;
+
+	for (let block of blocks) {
+		while (ri < regions.length && regions[ri].endOffset < block.startOffset) ri++;
+
+		if (ri >= regions.length || regions[ri].startOffset > block.endOffset) {
+			result.push(block);
+			continue;
+		}
+
+		let region = regions[ri];
+
+		if (block.startOffset < region.startOffset) {
+			result.push({ ...block, endOffset: region.startOffset - 1, bbox: block.bbox.slice() });
+		}
+
+		if (!region._emitted) {
+			result.push({
+				type: 'preformatted',
+				startOffset: region.startOffset,
+				endOffset: region.endOffset,
+				bbox: region.bbox,
+				lines: region.lineIds,
+			});
+			region._emitted = true;
+		}
+
+		if (block.endOffset > region.endOffset) {
+			result.push({ ...block, startOffset: region.endOffset + 1, bbox: block.bbox.slice() });
+		}
+	}
+	return result;
+}
+
+function detectPreformattedBlocks(blocks, lines) {
+	let candidates = findMonospaceRegions(lines);
+	let regions = candidates.map(c => validateWithGrid(c, lines)).filter(Boolean);
+	if (!regions.length) return blocks;
+	return overlayRegions(blocks, regions);
+}
+
 export async function inference(pageDataList, onnxRuntimeProvider, modelProvider, val) {
 
 	let model = await initModel(onnxRuntimeProvider, modelProvider);
@@ -904,6 +1078,8 @@ export async function inference(pageDataList, onnxRuntimeProvider, modelProvider
 			}
 			return false;
 		});
+
+		blocks = detectPreformattedBlocks(blocks, lines);
 
 		for (let block of blocks) {
 			block.text = block.lines
