@@ -13,7 +13,7 @@ import { renderAnnotations, renderArea } from './renderer.js';
 
 import { runInference, loadModel, initModel } from './structure/model/line-seg/model.js';
 import { getFullStructure } from './structure/structure.js';
-import { getFulltextFromStructuredText } from './structure/structured-text-utils/fulltext.js';
+import { getFulltextFromStructuredText } from '../../zotero-structured-text/src/fulltext.js';
 
 // loadModel({ modelUrl: "./model/out1.onnx",  crfUrl: "./model/out1.crf.json" });
 
@@ -486,12 +486,8 @@ async function getFulltext(buf, pages, password, dataProvider, options = {}) {
 					}
 				}
 				if (char.paragraphBreakAfter) {
-					parts.push('\n');
+					parts.push('\n\n');
 				}
-			}
-			parts.push('\n\n');
-			if (i !== pageIndexes.length - 1) {
-				parts.push('\f');
 			}
 		}
 

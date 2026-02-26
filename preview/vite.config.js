@@ -1,8 +1,49 @@
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
-import { readdirSync } from 'fs';
+import { existsSync, readdirSync, statSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const TEST_PDF_DIRS = ['test/pdfs/full', 'test/pdfs/extra'];
+
+function isDirectory(path) {
+  try {
+    return statSync(path).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+function collectPdfEntries(relativeDir) {
+  const dir = resolve(__dirname, '..', relativeDir);
+  if (!existsSync(dir) || !isDirectory(dir)) {
+    return [];
+  }
+
+  return readdirSync(dir)
+    .filter(name => name.endsWith('.pdf'))
+    .sort((a, b) => {
+      const na = parseInt(a, 10);
+      const nb = parseInt(b, 10);
+      if (!Number.isNaN(na) && !Number.isNaN(nb) && na !== nb) {
+        return na - nb;
+      }
+      return a.localeCompare(b);
+    })
+    .map(name => ({
+      name,
+      path: `${relativeDir}/${name}`,
+      label: relativeDir.includes('/extra') ? `${name} (extra)` : name
+    }));
+}
+
+function comparePdfEntries(a, b) {
+  const na = parseInt(a.name, 10);
+  const nb = parseInt(b.name, 10);
+  if (!Number.isNaN(na) && !Number.isNaN(nb) && na !== nb) {
+    return na - nb;
+  }
+  return a.name.localeCompare(b.name) || a.path.localeCompare(b.path);
+}
 
 export default {
   root: resolve(__dirname, '..'),
@@ -14,17 +55,9 @@ export default {
     name: 'test-pdf-list',
     configureServer(server) {
       server.middlewares.use('/__api/test-pdfs', (_req, res) => {
-        const dir = resolve(__dirname, '..', 'test/pdfs/full');
-        let files = [];
-        try {
-          files = readdirSync(dir).filter(f => f.endsWith('.pdf')).sort((a, b) => {
-            const na = parseInt(a, 10), nb = parseInt(b, 10);
-            if (!isNaN(na) && !isNaN(nb)) return na - nb;
-            return a.localeCompare(b);
-          });
-        } catch {}
+        const entries = TEST_PDF_DIRS.flatMap(collectPdfEntries).sort(comparePdfEntries);
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify(files));
+        res.end(JSON.stringify(entries));
       });
     }
   }, {

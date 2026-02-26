@@ -1,3 +1,6 @@
 [submodule "pdf.js"]
 	path = pdf.js
 	url = https://github.com/zotero/pdf.js.git
+[submodule "zotero-structured-text"]
+	path = zotero-structured-text
+	url = https://github.com/zotero/zotero-structured-text

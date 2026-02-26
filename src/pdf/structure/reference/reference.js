@@ -1,7 +1,7 @@
 import { titles } from './titles.js';
 import { getSortIndex } from '../util.js';
 import { tokenizeReferenceText } from './utils.js';
-import { getBlockPlainText } from '../zst/index.js';
+import { getBlockPlainText } from '../../../../zotero-structured-text/src/pdf/index.js';
 
 
 

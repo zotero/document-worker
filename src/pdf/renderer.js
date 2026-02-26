@@ -1,7 +1,12 @@
-import * as pdfjsWorker from '../../pdf.js/src/pdf.worker.js';
-import * as pdfjs from '../../pdf.js/src/pdf.js';
+let pdfjsWorker, pdfjs;
 
-self.pdfjsWorker = pdfjsWorker;
+async function ensurePdfjs() {
+	if (!pdfjs) {
+		pdfjsWorker = await import('../../pdf.js/src/pdf.worker.js');
+		pdfjs = await import('../../pdf.js/src/pdf.js');
+		self.pdfjsWorker = pdfjsWorker;
+	}
+}
 
 const SCALE = 4;
 const PATH_BOX_PADDING = 10; // pt
@@ -203,6 +208,7 @@ export async function renderArea(pdfDocument, pageIndex, rect, options = {}) {
 }
 
 export async function renderAnnotations(libraryID, buf, annotations, password, dataProvider, renderedAnnotationSaver) {
+	await ensurePdfjs();
 	let document = {
 		fonts: self.fonts,
 		createElement: (name) => {

@@ -1,6 +1,6 @@
-/* eslint-env mocha, node */
-
-import { expect } from 'chai';
+import '../scripts/pdfjs-setup.js';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
@@ -20,15 +20,13 @@ let pdfFiles = fs.readdirSync(pdfsDir)
 	.filter(f => f.endsWith('.pdf'))
 	.filter(f => fs.existsSync(resolve(pdfsDir, f.replace('.pdf', '.json'))));
 
-describe('getStructure snapshots', function () {
-	this.timeout(120000);
-
+describe('getStructure snapshots', { timeout: 120000 }, () => {
 	for (let pdfFile of pdfFiles) {
 		let name = pdfFile.replace('.pdf', '');
 		let pdfPath = resolve(pdfsDir, pdfFile);
 		let snapshotPath = resolve(pdfsDir, name + '.json');
 
-		it(pdfFile, async function () {
+		it(pdfFile, async (t) => {
 			let buf = fs.readFileSync(pdfPath);
 			let result = await getStructure(buf, '', dataProvider);
 
@@ -39,11 +37,11 @@ describe('getStructure snapshots', function () {
 
 			if (process.env.UPDATE_SNAPSHOTS) {
 				fs.writeFileSync(snapshotPath, json + '\n', 'utf8');
-				this.skip();
+				t.skip();
 			}
 			else {
 				let expected = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
-				expect(result).to.deep.equal(expected);
+				assert.deepEqual(result, expected);
 			}
 		});
 	}
