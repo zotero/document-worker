@@ -1,4 +1,4 @@
-import { getBlockPlainText } from '../zst/index.js';
+import { getBlockPlainText } from '../../../../zotero-structured-text/src/pdf/index.js';
 import { resolveDestination } from '../util.js';
 
 const FORCE_TOP_TITLES = [
@@ -602,18 +602,16 @@ function filterOutlineItem(item) {
 	const children = Array.isArray(item.children)
 		? item.children.map(filterOutlineItem).filter(Boolean)
 		: [];
+	const url = item._url || null;
 
-	if (refArray.length === 0 && children.length === 0) {
+	if (refArray.length === 0 && !url && children.length === 0) {
 		return null;
 	}
 
-	const result = {
-		title: item.title,
-		ref: refArray,
-	};
-	if (children.length > 0) {
-		result.children = children;
-	}
+	const result = { title: item.title };
+	if (refArray.length > 0) result.ref = refArray;
+	if (url) result.target = { url };
+	if (children.length > 0) result.children = children;
 	return result;
 }
 

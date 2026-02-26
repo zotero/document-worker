@@ -314,10 +314,13 @@ async function populateTestPdfSelect() {
     const resp = await fetch('/__api/test-pdfs');
     if (!resp.ok) return;
     const files = await resp.json();
-    for (const name of files) {
+    for (const file of files) {
+      const name = typeof file === 'string' ? file : (file.name || file.path);
+      const path = typeof file === 'string' ? `test/pdfs/full/${file}` : file.path;
+      const label = typeof file === 'string' ? file : (file.label || file.name);
       const opt = document.createElement('option');
-      opt.value = 'test/pdfs/full/' + name;
-      opt.textContent = name;
+      opt.value = path;
+      opt.textContent = label;
       testPdfSelect.appendChild(opt);
     }
   } catch {}

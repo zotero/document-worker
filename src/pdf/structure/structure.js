@@ -1,27 +1,27 @@
 import { inference } from './model/line-seg/inference.js';
 import { getOutline } from './outline/outline.js';
 import { getReferenceLists } from './reference/reference.js';
-import { getCandidates } from './candidate.js';
+import { getCandidates } from './citations.js';
 import { getFigures } from './figure.js';
 import { getMathBlocks } from './math.js';
 import { updateRegularWordsSet } from './reference/regular-words.js';
 import { getReferenceIndex } from './reference/index.js';
 // import { getLinkOverlays } from './link.js';
 import { addPageLabels } from './page-label.js';
-import { applyRefs, getRefsList } from './overlays.js';
+import { applyRefs, getRefsList } from './apply-refs.js';
 import {
 	charsToTextNodes,
 	charsToPreformattedTextNodes,
 	getContentRangeFromBlocks,
 	mergeBlocks,
 	pushArtifactsToTheEnd,
-} from './zst/index.js';
+} from '../../../zotero-structured-text/src/pdf/index.js';
 import { mergeLists, wrapListItems } from './list-utils.js';
 import { addRefs, getParsedLinkRefs, getAnnotLinkRefs, getLinksFromAnnotations } from './link.js';
-import { cleanupBlockMetrics, cleanupTextNodeStyles, getHeadingMetrics, getParagraphMetrics, mergeParagraphs } from './paragraph-utils.js';
+import { cleanupBlockMetrics, cleanupTextNodeStyles, getHeadingMetrics, getParagraphMetrics, mergeListItemContinuations, mergeParagraphs } from './block-cleanup.js';
 import { createBlockAnchor, ensureBlockPageRects } from './util.js';
-// import { getNextChunk } from './structured-text-utils/chunker.js';
-// import { getContent, getRefRangesFromPageRects } from './structured-text-utils/block.js';
+// import { getNextChunk } from '../../../zotero-structured-text/src/chunker.js';
+// import { getContent, getRefRangesFromPageRects } from '../../../zotero-structured-text/src/pdf/content.js';
 
 const SCHEMA_VERSION = '1.0.0-draft';
 const PROCESSOR_VERSION = '1.0.0-draft';
@@ -162,7 +162,8 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 				node = {
 					type: 'listitem',
 					...(anchor && { anchor }),
-					content: charsToTextNodes(i, charsRange)
+					content: charsToTextNodes(i, charsRange),
+					_metrics: getParagraphMetrics(block, charsRange)
 				}
 			}
 			else if (block.type === 'equation') {
@@ -217,6 +218,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	}
 
 	// Block transformations
+	mergeListItemContinuations(structure, mergeBlocks);
 	wrapListItems(structure);
 	pushArtifactsToTheEnd(structure);
 	mergeLists(structure);
@@ -232,6 +234,15 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	let parsedLinkRefs = getParsedLinkRefs(structure);
 
 	let referenceLists = getReferenceLists(structure, regularWordsSet);
+	for (let refList of referenceLists) {
+		for (let ref of refList.references) {
+			let node = structure.content[ref.src.blockRef[0]]
+				?.content?.[ref.src.blockRef[1]];
+			if (node) {
+				node.reference = true;
+			}
+		}
+	}
 	let refIndex = getReferenceIndex(referenceLists, regularWordsSet);
 	let figures = getFigures(structure);
 	let mathBlocks = getMathBlocks(structure);
@@ -243,7 +254,10 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 	applyRefs(structure, mainRefs);
 
-	structure.outline = await getOutline(structure.content, [], pdfDocument);
+	let outline = await getOutline(structure.content, [], pdfDocument);
+	if (outline.length) {
+		structure.outline = outline;
+	}
 
 	cleanupBlockMetrics(structure);
 	cleanupTextNodeStyles(structure);

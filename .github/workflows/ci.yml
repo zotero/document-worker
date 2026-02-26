@@ -5,31 +5,21 @@ jobs:
     name: Build, Upload, Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Install Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
-
-      - name: Cache Node modules
-        id: node-cache
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: node-modules-${{ hashFiles('package-lock.json') }}
+          node-version: 22
+          cache: 'npm'
 
       - name: Install Node modules
-        if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm ci
 
       - name: Build document-worker
         run: npm run build
-        # Currently necessary for Webpack: https://stackoverflow.com/a/69746937
-        env:
-          NODE_OPTIONS: --openssl-legacy-provider
 
       - uses: ruby/setup-ruby@v1
         with:

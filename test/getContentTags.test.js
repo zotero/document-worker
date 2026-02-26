@@ -1,7 +1,6 @@
-/* eslint-env mocha */
-
-import { expect } from 'chai';
-import { getContent } from '../src/pdf/structure/structured-text-utils/block.js';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { getContent } from '../zotero-structured-text/src/pdf/content.js';
 
 describe('getContent JSON format', () => {
 	it('returns block JSON with refs and sentence entries', () => {
@@ -24,7 +23,7 @@ describe('getContent JSON format', () => {
 			{ start: { ref: [0] }, end: { ref: [1] } },
 		]);
 
-		expect(actual).to.deep.equal([
+		assert.deepEqual(actual,[
 			{
 				type: 'paragraph',
 				ref: '0',
@@ -67,7 +66,7 @@ describe('getContent JSON format', () => {
 			{ start: { ref: [0] }, end: { ref: [0] } },
 		]);
 
-		expect(actual).to.deep.equal([
+		assert.deepEqual(actual,[
 			{
 				type: 'paragraph',
 				ref: '0',
@@ -77,8 +76,8 @@ describe('getContent JSON format', () => {
 	});
 
 	it('returns empty array for empty structure', () => {
-		expect(getContent(null, [])).to.deep.equal([]);
-		expect(getContent({ content: [] }, [])).to.deep.equal([]);
+		assert.deepEqual(getContent(null, []), []);
+		assert.deepEqual(getContent({ content: [] }, []), []);
 	});
 
 	it('trims leading and trailing whitespace in block and sentence text', () => {
@@ -99,7 +98,7 @@ describe('getContent JSON format', () => {
 			{ start: { ref: [0] }, end: { ref: [1] } },
 		]);
 
-		expect(actual).to.deep.equal([
+		assert.deepEqual(actual,[
 			{
 				type: 'title',
 				ref: '0',
@@ -128,7 +127,7 @@ describe('getContent JSON format', () => {
 
 		const actual = getContent(structure, []);
 
-		expect(actual).to.deep.equal([
+		assert.deepEqual(actual,[
 			{ type: 'paragraph', ref: '0', content: [{ sid: 0, text: 'First.' }] },
 			{ type: 'paragraph', ref: '1', content: [{ sid: 0, text: 'Other node.' }] },
 		]);

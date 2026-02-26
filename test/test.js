@@ -22,13 +22,11 @@
 
  ***** END LICENSE BLOCK *****
  */
-/* eslint-env mocha, node */
-
-import 'core-js/stable/index.js';
-
+import '../scripts/pdfjs-setup.js';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { expect } from 'chai';
 import fs from 'fs';
 import crypto from 'crypto';
 import * as pdfWorker from '../src/index.js';
@@ -208,7 +206,7 @@ describe('PDF Worker', function () {
 			}], deleted: []
 		};
 
-		expect(result).to.deep.equal(expectedResult);
+		assert.deepEqual(result, expectedResult);
 	});
 
 	it('should write annotations', async function () {
@@ -407,7 +405,7 @@ describe('PDF Worker', function () {
 			type: 'highlight'
 		}];
 
-		expect(annotations).to.deep.equal(result);
+		assert.deepEqual(annotations, result);
 	});
 
 	it('should process Citavi annotations', async () => {
@@ -441,10 +439,10 @@ describe('PDF Worker', function () {
 		};
 		const buf = fs.readFileSync(path.join(__dirname, 'pdfs', 'full', '2.pdf'));
 		const [processedAnnotations] = await pdfWorker.importCitaviAnnotations(buf, [citaviAnnotation]);
-		expect(processedAnnotations.key).to.equal('B3UENNWP');
-		expect(processedAnnotations.sortIndex).to.equal('00000|000103|00206');
-		expect(processedAnnotations.text).to.equal('peer-to-peer');
-		expect(processedAnnotations.pageLabel).to.equal('1');
-		expect(processedAnnotations.position.rects[0]).to.deep.equal([230.202, 578.879, 275.478, 585.817]);
+		assert.equal(processedAnnotations.key, 'B3UENNWP');
+		assert.equal(processedAnnotations.sortIndex, '00000|000103|00206');
+		assert.equal(processedAnnotations.text, 'peer-to-peer');
+		assert.equal(processedAnnotations.pageLabel, '1');
+		assert.deepEqual(processedAnnotations.position.rects[0], [230.202, 578.879, 275.478, 585.817]);
 	});
 });

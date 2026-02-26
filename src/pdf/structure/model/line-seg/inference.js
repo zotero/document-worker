@@ -809,7 +809,18 @@ function mergeObjectLinesBySeq(textLines, objectLines) {
 			}
 		}
 		else {
-			lines.push(line);
+			// No seq available — insert by Y-position (before the first line visually below this object)
+			const objCy = (line.rect[1] + line.rect[3]) / 2;
+			let insertAt = lines.findIndex(candidate => {
+				const cy = (candidate.rect[1] + candidate.rect[3]) / 2;
+				return cy < objCy;
+			});
+			if (insertAt === -1) {
+				lines.push(line);
+			}
+			else {
+				lines.splice(insertAt, 0, line);
+			}
 		}
 	}
 
@@ -850,7 +861,7 @@ const GRID_RESIDUAL_LIMIT = 0.2;
 function getMonoCharWidth(chars) {
 	const widthCounts = new Map();
 	for (const ch of chars) {
-		if (ch.isMonospace && ch.rect && ch.c && ch.c.trim()) {
+		if (ch.monospace && ch.rect && ch.c && ch.c.trim()) {
 			const w = Math.round((ch.rect[2] - ch.rect[0]) * 100) / 100;
 			if (w > 0) widthCounts.set(w, (widthCounts.get(w) || 0) + 1);
 		}
@@ -870,7 +881,7 @@ function isLineMonospace(line) {
 	for (const ch of chars) {
 		if (ch.c && ch.c.trim()) {
 			total++;
-			if (ch.isMonospace) mono++;
+			if (ch.monospace) mono++;
 		}
 	}
 	return total > 0 && mono / total >= MONO_LINE_THRESHOLD;
@@ -953,7 +964,7 @@ function validateWithGrid(candidate, lines) {
 
 	let onGrid = 0, total = 0;
 	for (let ch of allChars) {
-		if (!ch.rect || !ch.c || !ch.c.trim() || !ch.isMonospace) continue;
+		if (!ch.rect || !ch.c || !ch.c.trim() || !ch.monospace) continue;
 		total++;
 		let col = (ch.rect[0] - columnZeroX) / monoCharWidth;
 		if (Math.abs(col - Math.round(col)) < GRID_RESIDUAL_LIMIT) onGrid++;
@@ -1021,7 +1032,6 @@ export async function inference(pageDataList, onnxRuntimeProvider, modelProvider
 	for (let pageDataItem of pageDataList) {
 		let pageHeight = pageDataItem.viewBox[3] - pageDataItem.viewBox[1];
 		let lines = getLines(pageDataItem.chars);
-		lines = clusterSortLines(lines, pageHeight);
 
 		if (Array.isArray(pageDataItem.objects) && pageDataItem.objects.length) {
 			let objects = filterLargeObjects(pageDataItem.objects, lines, pageDataItem.viewBox);

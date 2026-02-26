@@ -1,6 +1,6 @@
 
-import { getBlockText } from './zst/index.js';
-import { normalizeLabelWord } from './candidate.js';
+import { getBlockText } from '../../../zotero-structured-text/src/pdf/index.js';
+import { normalizeLabelWord } from './citations.js';
 
 export function getFigures(structure) {
 	let figures = new Map();
