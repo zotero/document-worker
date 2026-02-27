@@ -18,7 +18,7 @@ import {
 } from '../../../zotero-structured-text/src/pdf/index.js';
 import { mergeLists, wrapListItems } from './list-utils.js';
 import { addRefs, getParsedLinkRefs, getAnnotLinkRefs, getLinksFromAnnotations } from './link.js';
-import { cleanupBlockMetrics, cleanupTextNodeStyles, getHeadingMetrics, getParagraphMetrics, mergeParagraphs } from './block-cleanup.js';
+import { cleanupBlockMetrics, cleanupTextNodeStyles, getHeadingMetrics, getParagraphMetrics, mergeListItemContinuations, mergeParagraphs } from './block-cleanup.js';
 import { createBlockAnchor, ensureBlockPageRects } from './util.js';
 // import { getNextChunk } from '../../../zotero-structured-text/src/chunker.js';
 // import { getContent, getRefRangesFromPageRects } from '../../../zotero-structured-text/src/pdf/content.js';
@@ -162,7 +162,8 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 				node = {
 					type: 'listitem',
 					...(anchor && { anchor }),
-					content: charsToTextNodes(i, charsRange)
+					content: charsToTextNodes(i, charsRange),
+					_metrics: getParagraphMetrics(block, charsRange)
 				}
 			}
 			else if (block.type === 'equation') {
@@ -217,6 +218,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	}
 
 	// Block transformations
+	mergeListItemContinuations(structure, mergeBlocks);
 	wrapListItems(structure);
 	pushArtifactsToTheEnd(structure);
 	mergeLists(structure);

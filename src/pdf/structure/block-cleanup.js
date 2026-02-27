@@ -6,6 +6,14 @@ export function cleanupBlockMetrics(structure) {
 	for (const block of structure.content) {
 		if (block) {
 			delete block._metrics;
+			// Also clean up nested items (e.g., listitems inside list blocks)
+			if (Array.isArray(block.content)) {
+				for (const child of block.content) {
+					if (child) {
+						delete child._metrics;
+					}
+				}
+			}
 		}
 	}
 }
@@ -107,6 +115,83 @@ export function getParagraphMetrics(rawBlock, charsRange) {
 		lastCharFontSize: lastChar.fontSize,
 		lastCharFontName: lastChar.fontName,
 	};
+}
+
+export function mergeListItemContinuations(structure, mergeBlocks) {
+	if (!structure || !Array.isArray(structure.content) || structure.content.length === 0) {
+		return structure;
+	}
+
+	const canMerge = (first, second) => {
+		const m1 = first._metrics;
+		const m2 = second._metrics;
+
+		if (!m1 || !m2) {
+			return false;
+		}
+
+		// Check page proximity (same page or next page)
+		if (m2.pageIndex !== m1.pageIndex && m2.pageIndex !== m1.pageIndex + 1) {
+			return false;
+		}
+
+		// First list item must end with a hyphen (word break across columns/pages)
+		if (m1.lastChar !== '-') {
+			return false;
+		}
+
+		// Second list item must start with lowercase letter (continuation of hyphenated word)
+		const c = m2.firstChar?.charAt(0);
+		if (!c || c < 'a' || c > 'z') {
+			return false;
+		}
+
+		return true;
+	};
+
+	// Find all listitem blocks with their indices
+	const listItems = [];
+	for (let i = 0; i < structure.content.length; i++) {
+		const block = structure.content[i];
+		if (block && block.type === 'listitem' && block._metrics) {
+			listItems.push({ index: i, block });
+		}
+	}
+
+	if (listItems.length < 2) {
+		return structure;
+	}
+
+	// Find groups of list items to merge
+	const mergeGroups = [];
+	let currentGroup = null;
+
+	for (let i = 0; i < listItems.length - 1; i++) {
+		const current = listItems[i];
+		const next = listItems[i + 1];
+
+		if (canMerge(current.block, next.block)) {
+			if (!currentGroup) {
+				currentGroup = [current.index];
+			}
+			currentGroup.push(next.index);
+		} else {
+			if (currentGroup) {
+				mergeGroups.push(currentGroup);
+				currentGroup = null;
+			}
+		}
+	}
+
+	if (currentGroup) {
+		mergeGroups.push(currentGroup);
+	}
+
+	if (mergeGroups.length === 0) {
+		return structure;
+	}
+
+	return mergeBlocks(structure, mergeGroups);
 }
 
 export function mergeParagraphs(structure, mergeBlocks) {
