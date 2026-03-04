@@ -1,22 +1,26 @@
 // Integration test: dataProvider resolves CMap data for CJK fonts
 (async function () {
   try {
-    var buf = loadPDF('test/pdfs/issue3521.pdf');
-    console.log('Loaded PDF: ' + buf.length + ' bytes');
+    var buf = loadPDF('test/pdfs/special/cjk-cmap.pdf');
 
-    var result = await worker.getFulltext(buf, 1, '', dataProvider);
+    var fetched = [];
+    function trackingProvider(path) {
+      fetched.push(path);
+      return dataProvider(path);
+    }
+
+    var result = await worker.getFulltext(buf, 1, '', trackingProvider);
 
     assert(result, 'getFulltext should return a result');
     assert(typeof result.text === 'string', 'result.text should be a string');
-    assert(result.text.length > 0, 'result.text should not be empty');
 
-    console.log('Fulltext length: ' + result.text.length);
-    console.log('Total pages: ' + result.totalPages);
+    // Verify CMap data was requested and loaded
+    var cmapPaths = fetched.filter(function (p) { return p.indexOf('cmaps/') === 0; });
+    assert(cmapPaths.length > 0, 'should have fetched CMap data, fetched: ' + fetched.join(', '));
 
     reportPass();
   }
   catch (e) {
-    console.error('CMap test failed: ' + e);
     reportFail(e);
   }
 })();

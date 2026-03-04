@@ -1,7 +1,7 @@
 // Integration test: dataProvider resolves standard font data
 (async function () {
   try {
-    var buf = loadPDF('test/pdfs/TAMReview.pdf');
+    var buf = loadPDF('pdf.js/test/pdfs/TAMReview.pdf');
     console.log('Loaded PDF: ' + buf.length + ' bytes');
 
     var result = await worker.getFulltext(buf, 1, '', dataProvider);

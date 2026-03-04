@@ -1,6 +1,6 @@
 (async function () {
   try {
-    var buf = loadPDF('test/pdfs/1.pdf');
+    var buf = loadPDF('test/pdfs/full/1.pdf');
     var result = await worker.getStructure(buf, '', dataProvider);
 
     assert(result, 'should return a result');

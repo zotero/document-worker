@@ -15,6 +15,10 @@ module.exports = {
 		},
 	},
 	target: 'webworker',
+	node: {
+		__filename: false,
+		__dirname: false,
+	},
 	cache: {
 		type: 'filesystem',
 	},

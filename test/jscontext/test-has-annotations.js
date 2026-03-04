@@ -1,7 +1,7 @@
 // Integration test: hasAnnotations via JSContext
 (async function () {
   try {
-    var buf = loadPDF('test/pdfs/1.pdf');
+    var buf = loadPDF('test/pdfs/full/1.pdf');
     console.log('Loaded PDF: ' + buf.length + ' bytes');
 
     var result = await worker.hasAnnotations(buf, '');
