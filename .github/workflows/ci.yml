@@ -18,7 +18,7 @@ jobs:
       - name: Install Node modules
         run: npm ci
 
-      - name: Build pdf-worker
+      - name: Build document-worker
         run: npm run build
 
       - uses: ruby/setup-ruby@v1
@@ -29,7 +29,7 @@ jobs:
       - name: Upload pre-build ZIP
         if: |
           env.ACT != 'true'
-          && github.repository == 'zotero/pdf-worker'
+          && github.repository == 'zotero/document-worker'
           && github.event_name == 'push'
           && (github.ref == 'refs/heads/master' || endsWith(github.ref, '-hotfix') || github.ref == 'refs/heads/gh-actions-ci-test')
         env:

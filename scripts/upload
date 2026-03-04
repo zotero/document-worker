@@ -1,11 +1,11 @@
 #!/bin/bash
-S3_URI=s3://zotero-download/ci/client-pdf-worker/
+S3_URI=s3://zotero-download/ci/client-document-worker/
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $SCRIPT_DIR/../build
 HASH=$(git rev-parse HEAD)
 FILENAME=$HASH.zip
 mkdir -p zotero
-cp pdf-worker.js zotero/worker.js
+cp worker.js zotero/worker.js
 cd zotero
 zip -r ../$FILENAME .
 cd ..

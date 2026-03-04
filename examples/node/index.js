@@ -4,7 +4,7 @@ import fs from 'fs';
 
 // Define __dirname
 const __dirname = dirname(fileURLToPath(import.meta.url));
-// const pdfWorker = require('../../build/pdf-worker');
+// const pdfWorker = require('../../build/worker');
 
 import * as pdfWorker from '../../src/index.js';
 
