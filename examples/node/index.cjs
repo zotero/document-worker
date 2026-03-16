@@ -17,7 +17,7 @@ async function main() {
   let annotations = await pdfWorker.importAnnotations(buf, [], '', cmapProvider);
   console.log(annotations);
 
-  let fulltext = await pdfWorker.extractFulltext(buf, '', 1, cmapProvider);
+  let fulltext = await pdfWorker.getFulltext(buf, 1, '', cmapProvider);
   console.log(fulltext);
 
   annotations = [{
@@ -30,7 +30,8 @@ async function main() {
     color: '#FF0000',
     comment: 'A test note',
     authorName: 'John',
-    dateModified: '2019-04-19T08:21:13.011Z'
+    dateModified: '2019-04-19T08:21:13.011Z',
+    tags: []
   }];
 
   try {
