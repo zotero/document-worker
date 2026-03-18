@@ -1,0 +1,315 @@
+{
+	"schemaVersion": "1.0.0-draft",
+	"processor": {"type": "snapshot", "version": "1.0.0-draft"},
+	"sourceContentType": "text/html",
+	"sourceHash": "",
+	"metadata": {
+		"title": "Test Snapshot",
+		"author": "Test Author",
+		"description": "A test HTML snapshot"
+	},
+	"pages": [{"contentRanges": [{"start": {"ref": [0, 0]}, "end": {"ref": [16, 0]}}]}],
+	"content": [
+		{
+			"type": "heading",
+			"content": [{"text": "Main Title", "anchor": {"type": "CssSelector", "value": "h1"}}],
+			"anchor": {"type": "CssSelector", "value": "h1"}
+		},
+		{
+			"type": "paragraph",
+			"content": [
+				{
+					"text": "First paragraph with ",
+					"anchor": {
+						"type": "CssSelector",
+						"value": "p:first-of-type",
+						"refinedBy": {"type": "TextPositionSelector", "start": 0, "end": 21}
+					}
+				},
+				{
+					"text": "bold",
+					"style": {"bold": true},
+					"anchor": {"type": "CssSelector", "value": "p:first-of-type > strong"}
+				},
+				{
+					"text": " and ",
+					"anchor": {
+						"type": "CssSelector",
+						"value": "p:first-of-type",
+						"refinedBy": {"type": "TextPositionSelector", "start": 25, "end": 30}
+					}
+				},
+				{
+					"text": "italic",
+					"style": {"italic": true},
+					"anchor": {"type": "CssSelector", "value": "p:first-of-type > em"}
+				},
+				{
+					"text": " text.",
+					"anchor": {
+						"type": "CssSelector",
+						"value": "p:first-of-type",
+						"refinedBy": {"type": "TextPositionSelector", "start": 36, "end": 42}
+					}
+				}
+			],
+			"anchor": {"type": "CssSelector", "value": "p:first-of-type"}
+		},
+		{
+			"type": "heading",
+			"content": [
+				{"text": "Section One", "anchor": {"type": "CssSelector", "value": "h2:first-of-type"}}
+			],
+			"anchor": {"type": "CssSelector", "value": "h2:first-of-type"}
+		},
+		{
+			"type": "paragraph",
+			"content": [
+				{
+					"text": "Some content in section one.",
+					"anchor": {"type": "CssSelector", "value": "p:nth-child(4)"}
+				}
+			],
+			"anchor": {"type": "CssSelector", "value": "p:nth-child(4)"}
+		},
+		{
+			"type": "list",
+			"content": [
+				{
+					"type": "listitem",
+					"content": [
+						{"text": "Item one", "anchor": {"type": "CssSelector", "value": "ul > li:first-child"}}
+					],
+					"anchor": {"type": "CssSelector", "value": "ul > li:first-child"}
+				},
+				{
+					"type": "listitem",
+					"content": [
+						{"text": "Item two", "anchor": {"type": "CssSelector", "value": "ul > li:nth-child(2)"}}
+					],
+					"anchor": {"type": "CssSelector", "value": "ul > li:nth-child(2)"}
+				},
+				{
+					"type": "listitem",
+					"content": [
+						{"text": "Item three", "anchor": {"type": "CssSelector", "value": "ul > li:last-child"}}
+					],
+					"anchor": {"type": "CssSelector", "value": "ul > li:last-child"}
+				}
+			],
+			"anchor": {"type": "CssSelector", "value": "ul"}
+		},
+		{
+			"type": "heading",
+			"content": [
+				{"text": "Section Two", "anchor": {"type": "CssSelector", "value": "h2:last-of-type"}}
+			],
+			"anchor": {"type": "CssSelector", "value": "h2:last-of-type"}
+		},
+		{
+			"type": "paragraph",
+			"content": [
+				{
+					"text": "Content with a ",
+					"anchor": {
+						"type": "CssSelector",
+						"value": "p:nth-child(7)",
+						"refinedBy": {"type": "TextPositionSelector", "start": 0, "end": 15}
+					}
+				},
+				{
+					"text": "link",
+					"anchor": {"type": "CssSelector", "value": "p:nth-child(7) > a"},
+					"target": {"url": "https://example.com"}
+				},
+				{
+					"text": ".",
+					"anchor": {
+						"type": "CssSelector",
+						"value": "p:nth-child(7)",
+						"refinedBy": {"type": "TextPositionSelector", "start": 19, "end": 20}
+					}
+				}
+			],
+			"anchor": {"type": "CssSelector", "value": "p:nth-child(7)"}
+		},
+		{
+			"type": "heading",
+			"content": [{"text": "Subsection", "anchor": {"type": "CssSelector", "value": "h3"}}],
+			"anchor": {"type": "CssSelector", "value": "h3"}
+		},
+		{
+			"type": "paragraph",
+			"content": [
+				{"text": "Deeper content.", "anchor": {"type": "CssSelector", "value": "p:last-of-type"}}
+			],
+			"anchor": {"type": "CssSelector", "value": "p:last-of-type"}
+		},
+		{
+			"type": "blockquote",
+			"content": [
+				{
+					"type": "paragraph",
+					"content": [
+						{"text": "A quoted passage.", "anchor": {"type": "CssSelector", "value": "blockquote > p"}}
+					],
+					"anchor": {"type": "CssSelector", "value": "blockquote > p"}
+				}
+			],
+			"anchor": {"type": "CssSelector", "value": "blockquote"}
+		},
+		{
+			"type": "table",
+			"content": [
+				{
+					"type": "tablerow",
+					"content": [
+						{
+							"type": "tablecell",
+							"content": [
+								{
+									"type": "paragraph",
+									"content": [
+										{
+											"text": "Header 1",
+											"anchor": {"type": "CssSelector", "value": "table > tr:first-child > th:first-child"}
+										}
+									],
+									"anchor": {"type": "CssSelector", "value": "table > tr:first-child > th:first-child"}
+								}
+							],
+							"anchor": {"type": "CssSelector", "value": "table > tr:first-child > th:first-child"},
+							"header": true
+						},
+						{
+							"type": "tablecell",
+							"content": [
+								{
+									"type": "paragraph",
+									"content": [
+										{
+											"text": "Header 2",
+											"anchor": {"type": "CssSelector", "value": "table > tr:first-child > th:last-child"}
+										}
+									],
+									"anchor": {"type": "CssSelector", "value": "table > tr:first-child > th:last-child"}
+								}
+							],
+							"anchor": {"type": "CssSelector", "value": "table > tr:first-child > th:last-child"},
+							"header": true
+						}
+					],
+					"anchor": {"type": "CssSelector", "value": "table > tr:first-child"}
+				},
+				{
+					"type": "tablerow",
+					"content": [
+						{
+							"type": "tablecell",
+							"content": [
+								{
+									"type": "paragraph",
+									"content": [
+										{
+											"text": "Cell 1",
+											"anchor": {"type": "CssSelector", "value": "table > tr:last-child > td:first-child"}
+										}
+									],
+									"anchor": {"type": "CssSelector", "value": "table > tr:last-child > td:first-child"}
+								}
+							],
+							"anchor": {"type": "CssSelector", "value": "table > tr:last-child > td:first-child"}
+						},
+						{
+							"type": "tablecell",
+							"content": [
+								{
+									"type": "paragraph",
+									"content": [
+										{
+											"text": "Cell 2",
+											"anchor": {"type": "CssSelector", "value": "table > tr:last-child > td:last-child"}
+										}
+									],
+									"anchor": {"type": "CssSelector", "value": "table > tr:last-child > td:last-child"}
+								}
+							],
+							"anchor": {"type": "CssSelector", "value": "table > tr:last-child > td:last-child"}
+						}
+					],
+					"anchor": {"type": "CssSelector", "value": "table > tr:last-child"}
+				}
+			],
+			"anchor": {"type": "CssSelector", "value": "table"}
+		},
+		{
+			"type": "heading",
+			"content": [
+				{"text": "Navigation Heading", "anchor": {"type": "CssSelector", "value": "nav > h2"}}
+			],
+			"anchor": {"type": "CssSelector", "value": "nav > h2"}
+		},
+		{
+			"type": "paragraph",
+			"content": [
+				{
+					"text": "This should be excluded from outline.",
+					"anchor": {"type": "CssSelector", "value": "nav > p"}
+				}
+			],
+			"anchor": {"type": "CssSelector", "value": "nav > p"}
+		},
+		{
+			"type": "heading",
+			"content": [
+				{"text": "Sidebar Heading", "anchor": {"type": "CssSelector", "value": "aside > h3"}}
+			],
+			"anchor": {"type": "CssSelector", "value": "aside > h3"}
+		},
+		{
+			"type": "paragraph",
+			"content": [
+				{
+					"text": "This should also be excluded from outline.",
+					"anchor": {"type": "CssSelector", "value": "aside > p"}
+				}
+			],
+			"anchor": {"type": "CssSelector", "value": "aside > p"}
+		},
+		{
+			"type": "heading",
+			"content": [
+				{"text": "Footer Heading", "anchor": {"type": "CssSelector", "value": "footer > h4"}}
+			],
+			"anchor": {"type": "CssSelector", "value": "footer > h4"}
+		},
+		{
+			"type": "preformatted",
+			"content": [
+				{
+					"text": "Code block\nwith preserved whitespace",
+					"anchor": {"type": "CssSelector", "value": "pre"}
+				}
+			],
+			"anchor": {"type": "CssSelector", "value": "pre"}
+		}
+	],
+	"outline": [
+		{
+			"title": "Main Title",
+			"ref": [0],
+			"level": 1,
+			"children": [
+				{"title": "Section One", "ref": [2], "level": 2},
+				{
+					"title": "Section Two",
+					"ref": [5],
+					"level": 2,
+					"children": [{"title": "Subsection", "ref": [7], "level": 3}]
+				}
+			]
+		}
+	],
+	"characterCount": 385,
+	"fileSize": 1013
+}
