@@ -3,33 +3,49 @@ import {
 	importAnnotations,
 	deletePages,
 	rotatePages,
-	getFulltext,
+	getFulltext as getPdfFulltext,
 	getRecognizerData,
 	getOutline,
 	getProcessedData,
-	getStructure,
+	getStructure as getPdfStructure,
 	getPdfManager,
 	importCitaviAnnotations,
 	importMendeleyAnnotations,
 	hasAnnotations,
 	renderAnnotations
 } from './pdf/index.js';
+import { getEpubStructure, getEpubFulltext } from './dom/epub/index';
+import { getSnapshotStructure, getSnapshotFulltext } from './dom/snapshot/index';
+
+const EPUB_CONTENT_TYPE = 'application/epub+zip';
+
+function isEpub(contentType) {
+	return contentType === EPUB_CONTENT_TYPE;
+}
+
+function isSnapshot(contentType) {
+	return contentType && contentType.endsWith('html');
+}
 
 export {
 	writeAnnotations,
 	importAnnotations,
 	deletePages,
 	rotatePages,
-	getFulltext,
+	getPdfFulltext,
 	getRecognizerData,
 	getOutline,
 	getProcessedData,
-	getStructure,
+	getPdfStructure,
 	getPdfManager,
 	importCitaviAnnotations,
 	importMendeleyAnnotations,
 	hasAnnotations,
-	renderAnnotations
+	renderAnnotations,
+	getEpubStructure,
+	getEpubFulltext,
+	getSnapshotStructure,
+	getSnapshotFulltext,
 };
 
 // Re-export getPages (exported inline in pdf/index.js)
@@ -185,13 +201,29 @@ if (typeof self !== 'undefined') {
 		}
 		else if (message.action === 'getFulltext') {
 			try {
-				let data = await getFulltext(
-					message.data.buf,
-					message.data.maxPages || message.data.pageIndexes,
-					message.data.password,
-					fetchData,
-					{ structure: message.data.structure }
-				);
+				let data;
+				if (isEpub(message.data.contentType)) {
+					data = getEpubFulltext(
+						message.data.buf,
+						{ structure: message.data.structure }
+					);
+				}
+				else if (isSnapshot(message.data.contentType)) {
+					data = getSnapshotFulltext(
+						message.data.buf,
+						message.data.contentType,
+						{ structure: message.data.structure }
+					);
+				}
+				else {
+					data = await getPdfFulltext(
+						message.data.buf,
+						message.data.maxPages || message.data.pageIndexes,
+						message.data.password,
+						fetchData,
+						{ structure: message.data.structure }
+					);
+				}
 				self.postMessage({ responseID: message.id, data }, []);
 			}
 			catch (e) {
@@ -219,11 +251,20 @@ if (typeof self !== 'undefined') {
 		}
 		else if (message.action === 'getStructuredData') {
 			try {
-				let data = await getStructure(
-					message.data.buf,
-					message.data.password,
-					fetchData
-				);
+				let data;
+				if (isEpub(message.data.contentType)) {
+					data = getEpubStructure(message.data.buf);
+				}
+				else if (isSnapshot(message.data.contentType)) {
+					data = getSnapshotStructure(message.data.buf, message.data.contentType);
+				}
+				else {
+					data = await getPdfStructure(
+						message.data.buf,
+						message.data.password,
+						fetchData
+					);
+				}
 				self.postMessage({ responseID: message.id, data }, []);
 			}
 			catch (e) {

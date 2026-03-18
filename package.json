@@ -13,7 +13,10 @@
 		"build:worker": "webpack --mode production",
 		"dev:worker": "webpack --mode development",
 		"dev:preview": "npm run dev --prefix preview",
-		"test": "node --test test/*.js",
+		"test": "node --import tsx --test test/*.js",
+		"build:ts": "tsc",
+		"test:epub": "node --import tsx --test test/epub.test.js",
+		"test:snapshot": "node --import tsx --test test/snapshot.test.js",
 		"test:jscontext": "bash test/jscontext/run-tests.sh",
 		"test:update-structured": "UPDATE_SNAPSHOTS=1 node --test test/getStructure.test.js"
 	},
@@ -22,6 +25,8 @@
 	"license": "AGPL-3.0",
 	"dependencies": {
 		"fastest-levenshtein": "^1.0.16",
+		"fflate": "^0.8.2",
+		"htmlparser2": "^9.1.0",
 		"pako": "2.1.0"
 	},
 	"devDependencies": {
@@ -31,6 +36,9 @@
 		"canvas": "^3.2.1",
 		"eslint": "^10.0.2",
 		"json-stringify-pretty-compact": "^4.0.0",
+		"ts-loader": "^9.5.4",
+		"tsx": "^4.21.0",
+		"typescript": "^5.9.3",
 		"webpack": "^5.105.3",
 		"webpack-cli": "^6.0.1"
 	}

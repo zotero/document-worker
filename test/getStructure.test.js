@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
-import { getStructure } from '../src/index.js';
+import { getStructure } from '../src/pdf/index.js';
 import stringify from 'json-stringify-pretty-compact';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

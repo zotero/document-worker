@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"target": "ES2020",
+		"module": "ES2020",
+		"moduleResolution": "bundler",
+		"strict": true,
+		"esModuleInterop": true,
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"outDir": "build",
+		"rootDir": "src",
+		"skipLibCheck": true
+	},
+	"include": ["src/**/*.ts", "zotero-structured-text/schema.d.ts", "zotero-structured-text/src/**/*.d.ts"]
+}
