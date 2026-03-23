@@ -39,12 +39,15 @@ export function getSnapshotStructure(
 		return emptyStructure(contentType, buf.byteLength);
 	}
 
+	let currentBlockSelector = '';
+
 	let hooks: ConvertHooks = {
 		blockAnchor(node) {
 			if (!('attribs' in node)) return undefined;
 			let value = getUniqueSelector(node as Element, body);
 			if (!value) return undefined;
-			return { type: 'CssSelector', value };
+			currentBlockSelector = value;
+			return { selectorMap: value };
 		},
 		textAnchor(node) {
 			let el = node.parent;
@@ -52,19 +55,30 @@ export function getSnapshotStructure(
 			let parent = el as Element;
 			let value = getUniqueSelector(parent, body);
 			if (!value) return undefined;
-			let selector: Record<string, any> = { type: 'CssSelector', value };
-			// If the parent has other children, refine with text position
+
+			// Compute relative textMap — suffix after block's CSS selector.
+			// Text parent selector always starts with the block selector
+			// (since it walks up through the same ancestors), UNLESS an
+			// inline element or intermediate ancestor has an id attribute
+			// which short-circuits getUniqueSelector. In that case, fall
+			// back to the absolute selector.
 			let children = parent.children || [];
-			if (children.length > 1) {
-				let start = getTextOffset(parent, node);
-				let textData = (node as any).data || '';
-				selector.refinedBy = {
-					type: 'TextPositionSelector',
-					start,
-					end: start + textData.length,
-				};
+			let hasOffset = children.length > 1;
+			let offset = hasOffset ? getTextOffset(parent, node) : 0;
+
+			if (value === currentBlockSelector) {
+				// Same element as block — just the offset (or empty)
+				return { selectorMap: hasOffset ? String(offset) : '' };
 			}
-			return selector;
+
+			if (value.startsWith(currentBlockSelector + ' > ')) {
+				// Child of block — store the ' > ...' suffix
+				let suffix = value.substring(currentBlockSelector.length);
+				return { selectorMap: hasOffset ? suffix + ' ' + offset : suffix };
+			}
+
+			// Absolute fallback (inline element has its own id)
+			return { selectorMap: hasOffset ? value + ' ' + offset : value };
 		},
 	};
 	let { blocks } = convertBody(body, hooks);

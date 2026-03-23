@@ -7,7 +7,7 @@ import type { IdInfo, LinkRecord, PageMarker } from './epub-xhtml-to-blocks';
 import { buildPageMappings, findPageForBlock } from './page-mapping';
 import { resolveLinks, computeSectionOffsets, splitHref } from './cross-references';
 import { getFulltextFromStructuredText } from '../../../zotero-structured-text/src/fulltext.js';
-import { getNestedBlockPlainText } from '../../../zotero-structured-text/src/text.js';
+import { getNestedBlockPlainText, mergeNodesWithSelectorMap } from '../../../zotero-structured-text/src/text.js';
 import type { ZoteroStructuredText, OutlineItem, PageInfo, ContentBlockNode } from '../../../zotero-structured-text/schema';
 
 const SCHEMA_VERSION = '1.0.0-draft';
@@ -123,11 +123,16 @@ export function getEpubStructure(arrayBuffer: ArrayBuffer): ZoteroStructuredText
 	// 8. Resolve cross-references
 	resolveLinks(allLinks, globalIdMap, blocksBySection, hrefToSpineIndex, sectionOffsets);
 
-	// 9. Assemble content
+	// 9. Assemble content and merge adjacent text nodes with same style/refs
 	for (let i = 0; i < spine.length; i++) {
 		let blocks = blocksBySection[i] || [];
 		for (let block of blocks) {
 			structure.content.push(block);
+		}
+	}
+	for (let block of structure.content) {
+		if (Array.isArray(block.content)) {
+			mergeNodesWithSelectorMap(block.content);
 		}
 	}
 

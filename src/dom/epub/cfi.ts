@@ -73,21 +73,3 @@ export function elementPath(node: TreeNode): string {
 	}
 	return steps.join('');
 }
-
-/**
- * Build a full CFI for a block-level element.
- */
-export function buildBlockCFI(cfiBase: string, elementNode: TreeNode): string {
-	let path = elementPath(elementNode);
-	return `epubcfi(${cfiBase}!${path})`;
-}
-
-/**
- * Build a full CFI pointing to a text node (no character offset).
- * The odd-numbered step identifies the text node itself, so a reader
- * can highlight the whole node without needing a range.
- */
-export function buildTextNodeCFI(cfiBase: string, textNode: TreeNode): string {
-	let path = elementPath(textNode);
-	return `epubcfi(${cfiBase}!${path})`;
-}

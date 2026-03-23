@@ -7,7 +7,7 @@ import {
 	getAttributeNS,
 	getElementChildren,
 } from './xml';
-import { generateCFIBase, buildBlockCFI, buildTextNodeCFI } from './cfi';
+import { generateCFIBase, elementPath } from './cfi';
 import { convertBody } from '../html-to-blocks';
 import type { ConvertHooks, Block } from '../html-to-blocks';
 import type { ContentBlockNode, TextNode } from '../../../zotero-structured-text/schema';
@@ -72,20 +72,21 @@ export function convertSection(doc: Document, spineStep: number, spineIndex: num
 	// which is fine for idMap (overwrites same key) but would duplicate page markers.
 	let markerSeen = new Set<Element>();
 
+	let currentBlockPath = '';
+
 	let hooks: ConvertHooks = {
 		blockAnchor(node) {
-			return {
-				type: 'FragmentSelector',
-				conformsTo: 'http://www.idpf.org/epub/linking/cfi/epub-cfi.html',
-				value: buildBlockCFI(cfiBase, node),
-			};
+			currentBlockPath = cfiBase + '!' + elementPath(node);
+			return { selectorMap: currentBlockPath };
 		},
 		textAnchor(node) {
 			if (node && node.parent) {
+				let fullPath = cfiBase + '!' + elementPath(node);
+				// Text nodes are always descendants of the block element,
+				// so their CFI path always starts with the block's path.
+				// Store only the relative suffix.
 				return {
-					type: 'FragmentSelector',
-					conformsTo: 'http://www.idpf.org/epub/linking/cfi/epub-cfi.html',
-					value: buildTextNodeCFI(cfiBase, node),
+					selectorMap: fullPath.substring(currentBlockPath.length),
 				};
 			}
 			return undefined;
