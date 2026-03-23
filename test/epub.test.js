@@ -250,9 +250,9 @@ describe('EPUB compatible vs advanced produce consistent results', { timeout: 30
 });
 
 describe('EPUB-specific content checks', { timeout: 30000 }, () => {
-	describe('Lazarillo de Tormes', () => {
+	describe('1 - Lazarillo de Tormes', () => {
 		let structure;
-		let file = epubFiles.find(f => f.includes('lazarillo') && !f.includes('advanced'));
+		let file = epubFiles.find(f => f === '1.epub');
 
 		it('has expected metadata', { skip: !file }, () => {
 			structure = getEpubStructure(loadEpub(file));
@@ -262,6 +262,50 @@ describe('EPUB-specific content checks', { timeout: 30000 }, () => {
 		it('has headings', { skip: !file }, () => {
 			let headings = structure.content.filter(b => b.type === 'heading');
 			assert.ok(headings.length > 0, 'should have heading blocks');
+		});
+
+		it('noteref text nodes have refs pointing to individual note blocks', { skip: !file }, () => {
+			// Find the "Well! your Honour..." paragraph with noterefs 9 and 10
+			let block = structure.content.find(b =>
+				b.content?.[0]?.text?.startsWith('Well! your Honour'));
+			assert.ok(block, 'should find the paragraph with noterefs');
+
+			// Block itself should not have refs (they belong on text nodes)
+			assert.equal(block.refs, undefined, 'block-level refs should be absent when text nodes carry them');
+
+			// Find text nodes with refs
+			let refsNodes = block.content.filter(n => n.refs);
+			assert.equal(refsNodes.length, 2, 'should have 2 noteref text nodes');
+			assert.equal(refsNodes[0].text, '9');
+			assert.equal(refsNodes[1].text, '10');
+
+			// Each ref should point to a distinct note block
+			for (let tn of refsNodes) {
+				assert.equal(tn.refs.length, 1, 'each noteref should have one ref');
+				let targetIdx = tn.refs[0][0];
+				let targetBlock = structure.content[targetIdx];
+				assert.ok(targetBlock, `ref target block ${targetIdx} should exist`);
+				assert.equal(targetBlock.type, 'note', `ref target block ${targetIdx} should be a note`);
+			}
+			// The two noterefs should point to different notes
+			assert.notEqual(refsNodes[0].refs[0][0], refsNodes[1].refs[0][0],
+				'noterefs 9 and 10 should point to different note blocks');
+		});
+
+		it('note blocks have backRefs pointing to valid blocks', { skip: !file }, () => {
+			let notes = structure.content.filter(b => b.type === 'note');
+			assert.ok(notes.length > 0, 'should have note blocks');
+
+			let withBackRefs = notes.filter(n => n.backRefs && n.backRefs.length > 0);
+			assert.ok(withBackRefs.length > 0, 'some notes should have backRefs');
+
+			for (let note of withBackRefs) {
+				for (let backRef of note.backRefs) {
+					let sourceIdx = backRef[0];
+					let sourceBlock = structure.content[sourceIdx];
+					assert.ok(sourceBlock, `backRef source block ${sourceIdx} should exist`);
+				}
+			}
 		});
 
 		it('outline sub-items resolve to blocks within sections', { skip: !file }, () => {
@@ -279,9 +323,9 @@ describe('EPUB-specific content checks', { timeout: 30000 }, () => {
 		});
 	});
 
-	describe('The Portent', () => {
+	describe('2 - The Portent', () => {
 		let structure;
-		let file = epubFiles.find(f => f.includes('portent') && !f.includes('advanced'));
+		let file = epubFiles.find(f => f === '2.epub');
 
 		it('has expected metadata', { skip: !file }, () => {
 			structure = getEpubStructure(loadEpub(file));

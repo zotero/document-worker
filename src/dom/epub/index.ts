@@ -7,7 +7,7 @@ import type { IdInfo, LinkRecord, PageMarker } from './epub-xhtml-to-blocks';
 import { buildPageMappings, findPageForBlock } from './page-mapping';
 import { resolveLinks, computeSectionOffsets, splitHref } from './cross-references';
 import { getFulltextFromStructuredText } from '../../../zotero-structured-text/src/fulltext.js';
-import { getNestedBlockPlainText } from '../../../zotero-structured-text/src/pdf/text-node.js';
+import { getNestedBlockPlainText } from '../../../zotero-structured-text/src/text.js';
 import type { ZoteroStructuredText, OutlineItem, PageInfo, ContentBlockNode } from '../../../zotero-structured-text/schema';
 
 const SCHEMA_VERSION = '1.0.0-draft';

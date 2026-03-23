@@ -15,7 +15,7 @@
 		"rights": "The source text and artwork in this ebook are believed to be in the United States public domain; that is, they are believed to be free of copyright restrictions in the United States. They may still be copyrighted in other countries, so users located outside of the United States must check their local laws before using this ebook. The creators of, and contributors to, this ebook dedicate their contributions to the worldwide public domain via the terms in the [CC0 1.0 Universal Public Domain Dedication](https://creativecommons.org/publicdomain/zero/1.0/)."
 	},
 	"pages": [
-		{"label": "1", "contentRanges": [{"start": {"ref": [0, 0]}, "end": {"ref": [13, 0]}}]},
+		{"label": "1", "contentRanges": [{"start": {"ref": [0, 0]}, "end": {"ref": [13, 2]}}]},
 		{"label": "2", "contentRanges": [{"start": {"ref": [14, 0]}, "end": {"ref": [23, 0]}}]},
 		{"label": "3", "contentRanges": [{"start": {"ref": [24, 0]}, "end": {"ref": [24, 0]}}]},
 		{"label": "4", "contentRanges": [{"start": {"ref": [25, 0]}, "end": {"ref": [26, 0]}}]},
@@ -37,12 +37,12 @@
 		{"label": "20", "contentRanges": [{"start": {"ref": [87, 0]}, "end": {"ref": [90, 0]}}]},
 		{"label": "21", "contentRanges": [{"start": {"ref": [91, 0]}, "end": {"ref": [92, 0]}}]},
 		{"label": "22", "contentRanges": [{"start": {"ref": [93, 0]}, "end": {"ref": [96, 0]}}]},
-		{"label": "23", "contentRanges": [{"start": {"ref": [97, 0]}, "end": {"ref": [99, 0]}}]},
+		{"label": "23", "contentRanges": [{"start": {"ref": [97, 0]}, "end": {"ref": [99, 4]}}]},
 		{"label": "24", "contentRanges": [{"start": {"ref": [100, 0]}, "end": {"ref": [101, 0]}}]},
 		{"label": "25", "contentRanges": [{"start": {"ref": [102, 0]}, "end": {"ref": [106, 0]}}]},
 		{"label": "26", "contentRanges": [{"start": {"ref": [107, 0]}, "end": {"ref": [110, 0]}}]},
 		{"label": "27", "contentRanges": [{"start": {"ref": [111, 0]}, "end": {"ref": [116, 0]}}]},
-		{"label": "28", "contentRanges": [{"start": {"ref": [117, 0]}, "end": {"ref": [120, 0]}}]},
+		{"label": "28", "contentRanges": [{"start": {"ref": [117, 0]}, "end": {"ref": [120, 2]}}]},
 		{"label": "29", "contentRanges": [{"start": {"ref": [121, 0]}, "end": {"ref": [125, 0]}}]},
 		{"label": "30", "contentRanges": [{"start": {"ref": [126, 0]}, "end": {"ref": [127, 0]}}]},
 		{"label": "31", "contentRanges": [{"start": {"ref": [128, 0]}, "end": {"ref": [132, 0]}}]},
@@ -52,12 +52,12 @@
 		{"label": "35", "contentRanges": [{"start": {"ref": [174, 0]}, "end": {"ref": [177, 0]}}]},
 		{"label": "36", "contentRanges": [{"start": {"ref": [178, 0]}, "end": {"ref": [181, 0]}}]},
 		{"label": "37", "contentRanges": [{"start": {"ref": [182, 0]}, "end": {"ref": [184, 0]}}]},
-		{"label": "38", "contentRanges": [{"start": {"ref": [185, 0]}, "end": {"ref": [194, 0]}}]},
+		{"label": "38", "contentRanges": [{"start": {"ref": [185, 0]}, "end": {"ref": [194, 2]}}]},
 		{"label": "39", "contentRanges": [{"start": {"ref": [195, 0]}, "end": {"ref": [197, 0]}}]},
 		{"label": "40", "contentRanges": [{"start": {"ref": [198, 0]}, "end": {"ref": [209, 0]}}]},
 		{"label": "41", "contentRanges": [{"start": {"ref": [210, 0]}, "end": {"ref": [212, 0]}}]},
-		{"label": "42", "contentRanges": [{"start": {"ref": [213, 0]}, "end": {"ref": [224, 1, 0]}}]},
-		{"label": "43", "contentRanges": [{"start": {"ref": [225, 0]}, "end": {"ref": [240, 2]}}]},
+		{"label": "42", "contentRanges": [{"start": {"ref": [213, 0]}, "end": {"ref": [224, 1, 14]}}]},
+		{"label": "43", "contentRanges": [{"start": {"ref": [225, 0]}, "end": {"ref": [240, 4]}}]},
 		{"label": "44", "contentRanges": [{"start": {"ref": [241, 0, 0]}, "end": {"ref": [243, 2]}}]},
 		{"label": "45", "contentRanges": [{"start": {"ref": [244, 0]}, "end": {"ref": [247, 0]}}]},
 		{"label": "46", "contentRanges": [{"start": {"ref": [248, 0]}, "end": {"ref": [257, 0]}}]},
@@ -68,13 +68,13 @@
 		{"label": "51", "contentRanges": [{"start": {"ref": [285, 0]}, "end": {"ref": [285, 0]}}]},
 		{"label": "52", "contentRanges": [{"start": {"ref": [286, 0]}, "end": {"ref": [294, 0]}}]},
 		{"label": "53", "contentRanges": [{"start": {"ref": [295, 0]}, "end": {"ref": [307, 0]}}]},
-		{"label": "54", "contentRanges": [{"start": {"ref": [308, 0]}, "end": {"ref": [320, 0]}}]},
+		{"label": "54", "contentRanges": [{"start": {"ref": [308, 0]}, "end": {"ref": [320, 2]}}]},
 		{"label": "55", "contentRanges": [{"start": {"ref": [321, 0]}, "end": {"ref": [332, 0]}}]},
 		{"label": "56", "contentRanges": [{"start": {"ref": [333, 0]}, "end": {"ref": [345, 0]}}]},
 		{"label": "57", "contentRanges": [{"start": {"ref": [346, 0]}, "end": {"ref": [350, 0]}}]},
-		{"label": "58", "contentRanges": [{"start": {"ref": [351, 0]}, "end": {"ref": [354, 0]}}]},
+		{"label": "58", "contentRanges": [{"start": {"ref": [351, 0]}, "end": {"ref": [354, 2]}}]},
 		{"label": "59", "contentRanges": [{"start": {"ref": [355, 0]}, "end": {"ref": [358, 0]}}]},
-		{"label": "60", "contentRanges": [{"start": {"ref": [359, 0]}, "end": {"ref": [362, 0]}}]},
+		{"label": "60", "contentRanges": [{"start": {"ref": [359, 0]}, "end": {"ref": [362, 2]}}]},
 		{"label": "61", "contentRanges": [{"start": {"ref": [363, 0]}, "end": {"ref": [371, 0]}}]},
 		{"label": "62", "contentRanges": [{"start": {"ref": [372, 0]}, "end": {"ref": [374, 2]}}]},
 		{"label": "63", "contentRanges": [{"start": {"ref": [375, 0]}, "end": {"ref": [381, 0]}}]},
@@ -91,27 +91,27 @@
 		{"label": "74", "contentRanges": [{"start": {"ref": [484, 0]}, "end": {"ref": [490, 0]}}]},
 		{"label": "75", "contentRanges": [{"start": {"ref": [491, 0]}, "end": {"ref": [504, 0]}}]},
 		{"label": "76", "contentRanges": [{"start": {"ref": [505, 0]}, "end": {"ref": [511, 0]}}]},
-		{"label": "77", "contentRanges": [{"start": {"ref": [512, 0]}, "end": {"ref": [524, 0]}}]},
+		{"label": "77", "contentRanges": [{"start": {"ref": [512, 0]}, "end": {"ref": [524, 2]}}]},
 		{"label": "78", "contentRanges": [{"start": {"ref": [525, 0]}, "end": {"ref": [534, 4]}}]},
-		{"label": "79", "contentRanges": [{"start": {"ref": [535, 0, 0]}, "end": {"ref": [541, 2]}}]},
+		{"label": "79", "contentRanges": [{"start": {"ref": [535, 0, 0]}, "end": {"ref": [541, 4]}}]},
 		{"label": "80", "contentRanges": [{"start": {"ref": [542, 0]}, "end": {"ref": [559, 0]}}]},
-		{"label": "81", "contentRanges": [{"start": {"ref": [560, 0]}, "end": {"ref": [571, 0]}}]},
+		{"label": "81", "contentRanges": [{"start": {"ref": [560, 0]}, "end": {"ref": [571, 2]}}]},
 		{"label": "82", "contentRanges": [{"start": {"ref": [572, 0]}, "end": {"ref": [582, 0]}}]},
 		{"label": "83", "contentRanges": [{"start": {"ref": [583, 0]}, "end": {"ref": [587, 4]}}]},
 		{"label": "84", "contentRanges": [{"start": {"ref": [588, 0]}, "end": {"ref": [590, 0]}}]},
 		{"label": "85", "contentRanges": [{"start": {"ref": [591, 0]}, "end": {"ref": [599, 0]}}]},
-		{"label": "86", "contentRanges": [{"start": {"ref": [600, 0]}, "end": {"ref": [608, 0]}}]},
+		{"label": "86", "contentRanges": [{"start": {"ref": [600, 0]}, "end": {"ref": [608, 2]}}]},
 		{"label": "87", "contentRanges": [{"start": {"ref": [609, 0]}, "end": {"ref": [610, 0]}}]},
 		{"label": "88", "contentRanges": [{"start": {"ref": [611, 0]}, "end": {"ref": [626, 2]}}]},
 		{"label": "89", "contentRanges": [{"start": {"ref": [627, 0]}, "end": {"ref": [644, 0]}}]},
 		{"label": "90", "contentRanges": [{"start": {"ref": [645, 0]}, "end": {"ref": [652, 0]}}]},
-		{"label": "91", "contentRanges": [{"start": {"ref": [653, 0]}, "end": {"ref": [662, 0]}}]},
+		{"label": "91", "contentRanges": [{"start": {"ref": [653, 0]}, "end": {"ref": [662, 2]}}]},
 		{"label": "92", "contentRanges": [{"start": {"ref": [663, 0]}, "end": {"ref": [668, 2]}}]},
 		{"label": "93", "contentRanges": [{"start": {"ref": [669, 0]}, "end": {"ref": [674, 0]}}]},
 		{"label": "94", "contentRanges": [{"start": {"ref": [675, 0]}, "end": {"ref": [685, 0]}}]},
 		{"label": "95", "contentRanges": [{"start": {"ref": [686, 0]}, "end": {"ref": [689, 0]}}]},
 		{"label": "96", "contentRanges": [{"start": {"ref": [690, 0]}, "end": {"ref": [693, 0]}}]},
-		{"label": "97", "contentRanges": [{"start": {"ref": [694, 0]}, "end": {"ref": [700, 0]}}]},
+		{"label": "97", "contentRanges": [{"start": {"ref": [694, 0]}, "end": {"ref": [700, 2]}}]},
 		{"label": "98", "contentRanges": [{"start": {"ref": [701, 0]}, "end": {"ref": [711, 2]}}]},
 		{"label": "99", "contentRanges": [{"start": {"ref": [712, 0]}, "end": {"ref": [713, 2]}}]}
 	],
@@ -313,11 +313,27 @@
 					"target": {"url": "https://creativecommons.org/publicdomain/zero/1.0/"}
 				},
 				{
-					"text": ". For full license information, see the Uncopyright at the end of this ebook.",
+					"text": ". For full license information, see the ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/4[imprint.xhtml]!/2[imprint]/8/3)"
+					}
+				},
+				{
+					"text": "Uncopyright",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/4[imprint.xhtml]!/2[imprint]/8/4/1)"
+					}
+				},
+				{
+					"text": " at the end of this ebook.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/4[imprint.xhtml]!/2[imprint]/8/5)"
 					}
 				}
 			],
@@ -393,11 +409,27 @@
 					}
 				},
 				{
-					"text": ", May, 1864.",
+					"text": ", ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/6[dedication.xhtml]!/2[dedication]/2/4/3)"
+					}
+				},
+				{
+					"text": "May, 1864",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/6[dedication.xhtml]!/2[dedication]/2/4/4/1)"
+					}
+				},
+				{
+					"text": ".",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/6[dedication.xhtml]!/2[dedication]/2/4/5)"
 					}
 				}
 			],
@@ -447,11 +479,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "And permit me to say a few words about the story. —It is a Romance. I am well aware that, with many readers, this epithet will be enough to ensure condemnation. But there ought to be a place for any story, which, although founded in the marvellous, is true to human nature and to itself. Truth to Humanity, and harmony within itself, are almost the sole unvarying essentials of a work of art. Even “The Rime of the Ancient Mariner” —than which what more marvellous? —is true in these respects. And Shakespeare himself will allow any amount of the marvellous, provided this truth is observed. I hope my story is thus true; and therefore, while it claims some place, undeserving of being classed with what are commonly called “sensational novels.”",
+					"text": "And permit me to say a few words about the story. —It is a Romance. I am well aware that, with many readers, this epithet will be enough to ensure condemnation. But there ought to be a place for any story, which, although founded in the marvellous, is true to human nature and to itself. Truth to Humanity, and harmony within itself, are almost the sole unvarying essentials of a work of art. Even “",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/6[dedication.xhtml]!/2[dedication]/8/1)"
+					}
+				},
+				{
+					"text": "The Rime of the Ancient Mariner",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/6[dedication.xhtml]!/2[dedication]/8/2/1)"
+					}
+				},
+				{
+					"text": "” —than which what more marvellous? —is true in these respects. And Shakespeare himself will allow any amount of the marvellous, provided this truth is observed. I hope my story is thus true; and therefore, while it claims some place, undeserving of being classed with what are commonly called “sensational novels.”",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/6[dedication.xhtml]!/2[dedication]/8/3)"
 					}
 				}
 			],
@@ -589,11 +637,43 @@
 					}
 				},
 				{
-					"text": ", Esq., R.N.,",
+					"text": ", ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/6[dedication.xhtml]!/2[dedication]/14/6/5)"
+					}
+				},
+				{
+					"text": "Esq.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/6[dedication.xhtml]!/2[dedication]/14/6/6/1)"
+					}
+				},
+				{
+					"text": ", ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/6[dedication.xhtml]!/2[dedication]/14/6/7)"
+					}
+				},
+				{
+					"text": "R.N.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/6[dedication.xhtml]!/2[dedication]/14/6/8/1)"
+					}
+				},
+				{
+					"text": ",",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/6[dedication.xhtml]!/2[dedication]/14/6/9)"
 					}
 				}
 			],
@@ -625,11 +705,43 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "     ",
+					"text": " ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/8[halftitlepage.xhtml]!/2[halftitlepage]/1)"
+					}
+				},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/8[halftitlepage.xhtml]!/2[halftitlepage]/2/1)"
+					}
+				},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/8[halftitlepage.xhtml]!/2[halftitlepage]/2/3)"
+					}
+				},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/8[halftitlepage.xhtml]!/2[halftitlepage]/2/5)"
+					}
+				},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/8[halftitlepage.xhtml]!/2[halftitlepage]/3)"
 					}
 				}
 			],
@@ -2115,11 +2227,43 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "Although she was in many respects kindly treated by her stepmother, certain peculiarities tended to her isolation from the family pursuits and pleasures. Lady Alice had no accomplishments. She could neither spell her own language, nor even read it aloud. Yet she delighted in reading to herself, though, for the most part, books which Mrs. Wilson characterised as very odd. Her voice, when she spoke, had a quite indescribable music in it; yet she neither sang nor played. Her habitual motion was more like a rhythmical gliding than an ordinary walk, yet she could not dance. Mrs. Wilson hinted at other and more serious peculiarities, which she either could not, or would not describe; always shaking her head gravely and sadly, and becoming quite silent, when I pressed for further explanation; so that, at last, I gave up all attempts to arrive at an understanding of the mystery by her means. Not the less, however, I speculated on the subject.",
+					"text": "Although she was in many respects kindly treated by her stepmother, certain peculiarities tended to her isolation from the family pursuits and pleasures. Lady Alice had no accomplishments. She could neither spell her own language, nor even read it aloud. Yet she delighted in reading to herself, though, for the most part, books which ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/18[chapter-5.xhtml]!/2[chapter-5]/10/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/18[chapter-5.xhtml]!/2[chapter-5]/10/2/1)"
+					}
+				},
+				{
+					"text": " Wilson characterised as very odd. Her voice, when she spoke, had a quite indescribable music in it; yet she neither sang nor played. Her habitual motion was more like a rhythmical gliding than an ordinary walk, yet she could not dance. ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/18[chapter-5.xhtml]!/2[chapter-5]/10/3)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/18[chapter-5.xhtml]!/2[chapter-5]/10/4/1)"
+					}
+				},
+				{
+					"text": " Wilson hinted at other and more serious peculiarities, which she either could not, or would not describe; always shaking her head gravely and sadly, and becoming quite silent, when I pressed for further explanation; so that, at last, I gave up all attempts to arrive at an understanding of the mystery by her means. Not the less, however, I speculated on the subject.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/18[chapter-5.xhtml]!/2[chapter-5]/10/5)"
 					}
 				}
 			],
@@ -2492,11 +2636,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“Do anything you like with them, Mr. Campbell, except destroy them.”",
+					"text": "“Do anything you like with them, ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/22[chapter-7.xhtml]!/2[chapter-7]/10/1)"
+					}
+				},
+				{
+					"text": "Mr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/22[chapter-7.xhtml]!/2[chapter-7]/10/2/1)"
+					}
+				},
+				{
+					"text": " Campbell, except destroy them.”",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/22[chapter-7.xhtml]!/2[chapter-7]/10/3)"
 					}
 				}
 			],
@@ -2510,11 +2670,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "Now I was in my element. I never had been by any means a bookworm; but the very outside of a book had a charm to me. It was a kind of sacrament —an outward and visible sign of an inward and spiritual grace; as, indeed, what on God’s earth is not? So I set to work amongst the books, and soon became familiar with many titles at least, which had been perfectly unknown to me before. I found a perfect set of our poets-perfect according to the notion of the editor and the issue of the publisher, although it omitted both Chaucer and George Herbert. I began to nibble at that portion of the collection which belonged to the sixteenth century; but with little success. I found nothing, to my idea, but love poems without any love in them, and so I soon became weary. But I found in the library what I liked far better —many romances of a very marvellous sort, and plentiful interruption they gave to the formation of the catalogue. I likewise came upon a whole nest of the German classics which seemed to have kept their places undisturbed, in virtue of their unintelligibility. There must have been some well-read scholar in the family, and that not long before, to judge by the near approach of the line of this literature; happening to be a tolerable reader of German, I found in these volumes a mine of wealth inexhaustible. I learned from Mrs. Wilson that this scholar was a younger brother of Lord Hilton, who had died about twenty years before. He had led a retired, rather lonely life, was of a melancholy and brooding disposition, and was reported to have had an unfortunate love-story. This was one of many histories which she gave me. For the library being dusty as a catacomb, the private room of Old Time himself, I had often to betake myself to her for assistance. The good lady had far more regard than the owners of it for the library, and was delighted with the pains I was taking to rearrange and clean it. She would allow no one to help me but herself; and to many a long-winded story, most of which I forgot as soon as I heard them, did I listen, or seem to listen, while she dusted the shelves and I the books.",
+					"text": "Now I was in my element. I never had been by any means a bookworm; but the very outside of a book had a charm to me. It was a kind of sacrament —an outward and visible sign of an inward and spiritual grace; as, indeed, what on God’s earth is not? So I set to work amongst the books, and soon became familiar with many titles at least, which had been perfectly unknown to me before. I found a perfect set of our poets-perfect according to the notion of the editor and the issue of the publisher, although it omitted both Chaucer and George Herbert. I began to nibble at that portion of the collection which belonged to the sixteenth century; but with little success. I found nothing, to my idea, but love poems without any love in them, and so I soon became weary. But I found in the library what I liked far better —many romances of a very marvellous sort, and plentiful interruption they gave to the formation of the catalogue. I likewise came upon a whole nest of the German classics which seemed to have kept their places undisturbed, in virtue of their unintelligibility. There must have been some well-read scholar in the family, and that not long before, to judge by the near approach of the line of this literature; happening to be a tolerable reader of German, I found in these volumes a mine of wealth inexhaustible. I learned from ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/22[chapter-7.xhtml]!/2[chapter-7]/12/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/22[chapter-7.xhtml]!/2[chapter-7]/12/2/1)"
+					}
+				},
+				{
+					"text": " Wilson that this scholar was a younger brother of Lord Hilton, who had died about twenty years before. He had led a retired, rather lonely life, was of a melancholy and brooding disposition, and was reported to have had an unfortunate love-story. This was one of many histories which she gave me. For the library being dusty as a catacomb, the private room of Old Time himself, I had often to betake myself to her for assistance. The good lady had far more regard than the owners of it for the library, and was delighted with the pains I was taking to rearrange and clean it. She would allow no one to help me but herself; and to many a long-winded story, most of which I forgot as soon as I heard them, did I listen, or seem to listen, while she dusted the shelves and I the books.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/22[chapter-7.xhtml]!/2[chapter-7]/12/3)"
 					}
 				}
 			],
@@ -2528,11 +2704,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "One day I had sent a servant to ask Mrs. Wilson to come to me. I had taken down all the books from a hitherto undisturbed corner, and had seated myself on a heap of them, no doubt a very impersonation of the genius of the place; for while I waited for the housekeeper, I was consuming a morsel of an ancient metrical romance. After waiting for some time, I glanced towards the door, for I had begun to get impatient for the entrance of my helper. To my surprise, there stood Lady Alice, her eyes fixed upon me with an expression I could not comprehend. Her face instantly altered to its usual look of indifference, dashed with the least possible degree of scorn, as she turned and walked slowly away. I rose involuntarily. An old cavalry sword, which I had just taken down from the wall, and had placed leaning against the books from which I now rose, fell with a clash to the floor. I started; for it was a sound that always startled me; and stooping I lifted the weapon. But what was my surprise when I raised my head, to see once more the face of Lady Alice staring in at the door! yet not the same face, for it had changed in the moment that had passed. It was pale with fear —not fright; and her great black eyes were staring beyond me as if she saw something through the wall of the room. Once more her face altered to the former scornful indifference, and she vanished. Keen of hearing as I was, I had never yet heard the footstep of Lady Alice.",
+					"text": "One day I had sent a servant to ask ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/22[chapter-7.xhtml]!/2[chapter-7]/14/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/22[chapter-7.xhtml]!/2[chapter-7]/14/2/1)"
+					}
+				},
+				{
+					"text": " Wilson to come to me. I had taken down all the books from a hitherto undisturbed corner, and had seated myself on a heap of them, no doubt a very impersonation of the genius of the place; for while I waited for the housekeeper, I was consuming a morsel of an ancient metrical romance. After waiting for some time, I glanced towards the door, for I had begun to get impatient for the entrance of my helper. To my surprise, there stood Lady Alice, her eyes fixed upon me with an expression I could not comprehend. Her face instantly altered to its usual look of indifference, dashed with the least possible degree of scorn, as she turned and walked slowly away. I rose involuntarily. An old cavalry sword, which I had just taken down from the wall, and had placed leaning against the books from which I now rose, fell with a clash to the floor. I started; for it was a sound that always startled me; and stooping I lifted the weapon. But what was my surprise when I raised my head, to see once more the face of Lady Alice staring in at the door! yet not the same face, for it had changed in the moment that had passed. It was pale with fear —not fright; and her great black eyes were staring beyond me as if she saw something through the wall of the room. Once more her face altered to the former scornful indifference, and she vanished. Keen of hearing as I was, I had never yet heard the footstep of Lady Alice.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/22[chapter-7.xhtml]!/2[chapter-7]/14/3)"
 					}
 				}
 			],
@@ -3533,11 +3725,43 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "At breakfast there was no Lady Alice —nor at dinner. I grew uneasy, but what could I do? I soon learned that she was ill; and a weary fortnight passed before I saw her again. Mrs. Wilson told me that she had caught cold, and was confined to her room. So I was ill at ease, not from love alone, but from anxiety as well. Every night I crept up through the deserted house to the stair where she had vanished, and there sat in the darkness or groped and peered about for some sign. But I saw no light even, and did not know where her room was. It might be far beyond this extremity of my knowledge; for I discovered no indication of the proximity of the inhabited portion of the house. Mrs. Wilson said there was nothing serious the matter; but this did not satisfy me, for I imagined something mysterious in the way in which she spoke.",
+					"text": "At breakfast there was no Lady Alice —nor at dinner. I grew uneasy, but what could I do? I soon learned that she was ill; and a weary fortnight passed before I saw her again. ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/28[chapter-10.xhtml]!/2[chapter-10]/6/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/28[chapter-10.xhtml]!/2[chapter-10]/6/2/1)"
+					}
+				},
+				{
+					"text": " Wilson told me that she had caught cold, and was confined to her room. So I was ill at ease, not from love alone, but from anxiety as well. Every night I crept up through the deserted house to the stair where she had vanished, and there sat in the darkness or groped and peered about for some sign. But I saw no light even, and did not know where her room was. It might be far beyond this extremity of my knowledge; for I discovered no indication of the proximity of the inhabited portion of the house. ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/28[chapter-10.xhtml]!/2[chapter-10]/6/3)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/28[chapter-10.xhtml]!/2[chapter-10]/6/4/1)"
+					}
+				},
+				{
+					"text": " Wilson said there was nothing serious the matter; but this did not satisfy me, for I imagined something mysterious in the way in which she spoke.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/28[chapter-10.xhtml]!/2[chapter-10]/6/5)"
 					}
 				}
 			],
@@ -3658,11 +3882,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "That same day, I remember well, Mrs. Wilson told me that Lady Alice was much better. But as days passed, and still she did not make her appearance, my anxiety only changed its object, and I feared that it was from aversion to me that she did not join the family. But her name was never mentioned in my hearing by any of the other members of it; and her absence appeared to be to them a matter of no moment or interest.",
+					"text": "That same day, I remember well, ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/28[chapter-10.xhtml]!/2[chapter-10]/18/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/28[chapter-10.xhtml]!/2[chapter-10]/18/2/1)"
+					}
+				},
+				{
+					"text": " Wilson told me that Lady Alice was much better. But as days passed, and still she did not make her appearance, my anxiety only changed its object, and I feared that it was from aversion to me that she did not join the family. But her name was never mentioned in my hearing by any of the other members of it; and her absence appeared to be to them a matter of no moment or interest.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/28[chapter-10.xhtml]!/2[chapter-10]/18/3)"
 					}
 				}
 			],
@@ -3910,11 +4150,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“Don’t speak to her, Mr. Campbell —it distresses her. She is very peculiar, you know.”",
+					"text": "“Don’t speak to her, ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/28[chapter-10.xhtml]!/2[chapter-10]/46/1)"
+					}
+				},
+				{
+					"text": "Mr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/28[chapter-10.xhtml]!/2[chapter-10]/46/2/1)"
+					}
+				},
+				{
+					"text": " Campbell —it distresses her. She is very peculiar, you know.”",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/28[chapter-10.xhtml]!/2[chapter-10]/46/3)"
 					}
 				}
 			],
@@ -4053,11 +4309,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“Mr. Campbell, I cannot spell. How am I to learn?”",
+					"text": "“",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/6/1)"
+					}
+				},
+				{
+					"text": "Mr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/6/2/1)"
+					}
+				},
+				{
+					"text": " Campbell, I cannot spell. How am I to learn?”",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/6/3)"
 					}
 				}
 			],
@@ -4089,11 +4361,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“Thank you, Mr. Campbell, I will; but I am afraid you will despise me, when you find how badly I spell.”",
+					"text": "“Thank you, ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/10/1)"
+					}
+				},
+				{
+					"text": "Mr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/10/2/1)"
+					}
+				},
+				{
+					"text": " Campbell, I will; but I am afraid you will despise me, when you find how badly I spell.”",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/10/3)"
 					}
 				}
 			],
@@ -4340,11 +4628,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“Can I help you, Mr. Campbell?” she said.",
+					"text": "“Can I help you, ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/36/1)"
+					}
+				},
+				{
+					"text": "Mr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/36/2/1)"
+					}
+				},
+				{
+					"text": " Campbell?” she said.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/36/3)"
 					}
 				}
 			],
@@ -4487,11 +4791,102 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " Annie was dowie, an’ Willie was wae: \n What can be the matter wi’ siccan a twae? \n For Annie was bonnie’s the first o’ the day, \n And Willie was strang an’ honest an’ gay. ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/2/1)"
+							}
+						},
+						{
+							"text": "Annie was dowie, an’ Willie was wae:",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/2/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/2/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/2/5)"
+							}
+						},
+						{
+							"text": "What can be the matter wi’ siccan a twae?",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/2/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/2/7)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/2/9)"
+							}
+						},
+						{
+							"text": "For Annie was bonnie’s the first o’ the day,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/2/10/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/2/11)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/2/13)"
+							}
+						},
+						{
+							"text": "And Willie was strang an’ honest an’ gay.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/2/14/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/2/15)"
 							}
 						}
 					],
@@ -4505,11 +4900,102 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " Oh! the tane had a daddy was poor an’ was proud; \n An’ the tither a minnie that cared for the gowd. \n They lo’ed are anither, an’ said their say — \n But the daddy an’ minnie hae pairtit the twae. ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/4/1)"
+							}
+						},
+						{
+							"text": "Oh! the tane had a daddy was poor an’ was proud;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/4/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/4/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/4/5)"
+							}
+						},
+						{
+							"text": "An’ the tither a minnie that cared for the gowd.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/4/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/4/7)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/4/9)"
+							}
+						},
+						{
+							"text": "They lo’ed are anither, an’ said their say —",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/4/10/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/4/11)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/4/13)"
+							}
+						},
+						{
+							"text": "But the daddy an’ minnie hae pairtit the twae.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/4/14/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/30[chapter-11.xhtml]!/2[chapter-11]/52/4/15)"
 							}
 						}
 					],
@@ -4817,11 +5303,27 @@
 					}
 				},
 				{
-					"text": ", and the waves fell with a threatful tone upon the beach, muttering many maledictions as they rushed up, and whispering cruel portents as they drew back, hissing and gurgling, through the million narrow ways of the pebbly ramparts; and I knew that a maiden in white was standing in the cold wind, by the angry sea, singing. I had a kind of dreamy belief in my dream; but, overpowered by the spell of the music, I still lay and listened. Keener and stronger, under the impulses of my will, grew the power of my hearing. At last I could distinguish the words. The ballad was Annie of Lochroyan; and Lady Alice was singing it. The words I heard were these: —",
+					"text": ", and the waves fell with a threatful tone upon the beach, muttering many maledictions as they rushed up, and whispering cruel portents as they drew back, hissing and gurgling, through the million narrow ways of the pebbly ramparts; and I knew that a maiden in white was standing in the cold wind, by the angry sea, singing. I had a kind of dreamy belief in my dream; but, overpowered by the spell of the music, I still lay and listened. Keener and stronger, under the impulses of my will, grew the power of my hearing. At last I could distinguish the words. The ballad was ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/8/3)"
+					}
+				},
+				{
+					"text": "Annie of Lochroyan",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/8/4/1)"
+					}
+				},
+				{
+					"text": "; and Lady Alice was singing it. The words I heard were these: —",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/8/5)"
 					}
 				}
 			],
@@ -4838,11 +5340,102 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " Oh, gin I had a bonnie ship, \n And men to sail wi’ me, \n It’s I wad gang to my true love, \n Sin’ he winna come to me. ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/2/1)"
+							}
+						},
+						{
+							"text": "Oh, gin I had a bonnie ship,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/2/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/2/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/2/5)"
+							}
+						},
+						{
+							"text": "And men to sail wi’ me,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/2/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/2/7)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/2/9)"
+							}
+						},
+						{
+							"text": "It’s I wad gang to my true love,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/2/10/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/2/11)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/2/13)"
+							}
+						},
+						{
+							"text": "Sin’ he winna come to me.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/2/14/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/2/15)"
 							}
 						}
 					],
@@ -4856,11 +5449,102 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " Lang stood she at her true love’s door, \n And lang tirled at the pin; \n At length up gat his fause mother, \n Says, “Wha’s that wad be in?” ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/4/1)"
+							}
+						},
+						{
+							"text": "Lang stood she at her true love’s door,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/4/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/4/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/4/5)"
+							}
+						},
+						{
+							"text": "And lang tirled at the pin;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/4/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/4/7)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/4/9)"
+							}
+						},
+						{
+							"text": "At length up gat his fause mother,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/4/10/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/4/11)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/4/13)"
+							}
+						},
+						{
+							"text": "Says, “Wha’s that wad be in?”",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/4/14/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/4/15)"
 							}
 						}
 					],
@@ -4874,11 +5558,102 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " Love Gregory started frae his sleep, \n And to his mother did say: \n “I dreamed a dream this night, mither, \n That maks my heart right wae. ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/8/1)"
+							}
+						},
+						{
+							"text": "Love Gregory started frae his sleep,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/8/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/8/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/8/5)"
+							}
+						},
+						{
+							"text": "And to his mother did say:",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/8/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/8/7)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/8/9)"
+							}
+						},
+						{
+							"text": "“I dreamed a dream this night, mither,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/8/10/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/8/11)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/8/13)"
+							}
+						},
+						{
+							"text": "That maks my heart right wae.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/8/14/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/8/15)"
 							}
 						}
 					],
@@ -4892,11 +5667,102 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " “I dreamed that Annie of Lochroyan, \n The flower of a’ her kin, \n Was standing mournin’ at my door, \n But nane wad let her in.” ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/10/1)"
+							}
+						},
+						{
+							"text": "“I dreamed that Annie of Lochroyan,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/10/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/10/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/10/5)"
+							}
+						},
+						{
+							"text": "The flower of a’ her kin,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/10/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/10/7)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/10/9)"
+							}
+						},
+						{
+							"text": "Was standing mournin’ at my door,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/10/10/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/10/11)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/10/13)"
+							}
+						},
+						{
+							"text": "But nane wad let her in.”",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/10/14/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/32[chapter-12.xhtml]!/2[chapter-12]/10/10/15)"
 							}
 						}
 					],
@@ -6389,11 +7255,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“I found it as you see it, in that book. It belonged to Lord Hilton’s brother. The verses are a translation of part of the poem beside which they lie —one by Von Salis, who died shortly before that date at the bottom. I will read them to you, and then show you something else that is strange about them. The poem is called ‘Psyche’s Sorrow.’ Psyche means the soul, Alice.”",
+					"text": "“I found it as you see it, in that book. It belonged to Lord Hilton’s brother. The verses are a translation of part of the poem beside which they lie —one by Von Salis, who died shortly before that date at the bottom. I will read them to you, and then show you something else that is strange about them. The poem is called ‘",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/22/1)"
+					}
+				},
+				{
+					"text": "Psyche’s Sorrow",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/22/2/1)"
+					}
+				},
+				{
+					"text": ".’ Psyche means the soul, Alice.”",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/22/3)"
 					}
 				}
 			],
@@ -6428,11 +7310,102 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " “Psyche’s sighing all her prison darkens; \n She is moaning for the far-off stars; \n Fearing, hoping, every sound she hearkens — \n Fate may now be breaking at her bars. ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/2/1)"
+							}
+						},
+						{
+							"text": "“Psyche’s sighing all her prison darkens;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/2/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/2/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/2/5)"
+							}
+						},
+						{
+							"text": "She is moaning for the far-off stars;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/2/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/2/7)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/2/9)"
+							}
+						},
+						{
+							"text": "Fearing, hoping, every sound she hearkens —",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/2/10/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/2/11)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/2/13)"
+							}
+						},
+						{
+							"text": "Fate may now be breaking at her bars.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/2/14/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/2/15)"
 							}
 						}
 					],
@@ -6446,11 +7419,102 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " Bound, fast bound, are Psyche’s airy pinions: \n High her heart, her mourning soft and low — \n Knowing that in sultry pain’s dominions \n Grow the palms that crown the victor’s brow; ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/4/1)"
+							}
+						},
+						{
+							"text": "Bound, fast bound, are Psyche’s airy pinions:",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/4/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/4/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/4/5)"
+							}
+						},
+						{
+							"text": "High her heart, her mourning soft and low —",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/4/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/4/7)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/4/9)"
+							}
+						},
+						{
+							"text": "Knowing that in sultry pain’s dominions",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/4/10/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/4/11)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/4/13)"
+							}
+						},
+						{
+							"text": "Grow the palms that crown the victor’s brow;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/4/14/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/4/15)"
 							}
 						}
 					],
@@ -6464,11 +7528,102 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " That the empty hand the wreath encloses; \n Earth’s cold winds but make the spirit brave; \n Knowing that the briars bear the roses, \n Golden flowers the waste deserted grave. ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/6/1)"
+							}
+						},
+						{
+							"text": "That the empty hand the wreath encloses;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/6/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/6/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/6/5)"
+							}
+						},
+						{
+							"text": "Earth’s cold winds but make the spirit brave;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/6/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/6/7)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/6/9)"
+							}
+						},
+						{
+							"text": "Knowing that the briars bear the roses,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/6/10/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/6/11)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/6/13)"
+							}
+						},
+						{
+							"text": "Golden flowers the waste deserted grave.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/6/14/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/6/15)"
 							}
 						}
 					],
@@ -6482,11 +7637,102 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " In the cypress-shade her myrtle groweth; \n Much she loves, because she much hath borne; \n Love-led, through the darksome way she goeth — \n On to meet him in the breaking morn. ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/8/1)"
+							}
+						},
+						{
+							"text": "In the cypress-shade her myrtle groweth;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/8/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/8/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/8/5)"
+							}
+						},
+						{
+							"text": "Much she loves, because she much hath borne;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/8/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/8/7)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/8/9)"
+							}
+						},
+						{
+							"text": "Love-led, through the darksome way she goeth —",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/8/10/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/8/11)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/8/13)"
+							}
+						},
+						{
+							"text": "On to meet him in the breaking morn.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/8/14/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/8/15)"
 							}
 						}
 					],
@@ -6500,11 +7746,27 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " She can bear —” ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/10/1)"
+							}
+						},
+						{
+							"text": "She can bear —”",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/10/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/26/10/3)"
 							}
 						}
 					],
@@ -7029,11 +8291,19 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "Mrs. Blakesley offered me the loan of some of her savings to get me to London. I received it with gratitude, and as soon as I was fit to travel, made my way thither. Afraid for my reason, if I had no employment to keep my thoughts from brooding on my helplessness, and so increasing my despair, and determined likewise that my failure should not make me burdensome to anyone else, I enlisted in the Scotch Greys, before letting any of my friends know where I was. Through the help of one already mentioned in my story, I soon obtained a commission. From the field of Waterloo, I rode into Brussels with a broken arm and a sabre-cut in the head.",
+					"text": "Mrs.",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/84/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley offered me the loan of some of her savings to get me to London. I received it with gratitude, and as soon as I was fit to travel, made my way thither. Afraid for my reason, if I had no employment to keep my thoughts from brooding on my helplessness, and so increasing my despair, and determined likewise that my failure should not make me burdensome to anyone else, I enlisted in the Scotch Greys, before letting any of my friends know where I was. Through the help of one already mentioned in my story, I soon obtained a commission. From the field of Waterloo, I rode into Brussels with a broken arm and a sabre-cut in the head.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/84/3)"
 					}
 				}
 			],
@@ -7083,11 +8353,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "Once I visited Hilton Hall. I found it all but deserted. I learned that Mrs. Wilson was dead, and that there were only two or three servants in the place. I managed to get into the house unseen, and made my way to the haunted chamber. My feelings were not so keen as I had anticipated, for they had been dulled by long suffering. But again I saw the moon shine through those windows of stained glass. Again her beams were crowded with ghosts. She was not amongst them. “My lost love!” I cried; and then, rebuking myself, “No; she is not lost. They say that Time and Space exist not, save in our thoughts. If so, then that which has been, is, and the Past can never cease. She is mine, and I shall find her —what matters it where, or when, or how? Till then, my soul is but a moonlighted chamber of ghosts; and I sit within, the dreariest of them all. When she enters, it will be a home of love. And I wait —I wait.”",
+					"text": "Once I visited Hilton Hall. I found it all but deserted. I learned that ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/90/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/90/2/1)"
+					}
+				},
+				{
+					"text": " Wilson was dead, and that there were only two or three servants in the place. I managed to get into the house unseen, and made my way to the haunted chamber. My feelings were not so keen as I had anticipated, for they had been dulled by long suffering. But again I saw the moon shine through those windows of stained glass. Again her beams were crowded with ghosts. She was not amongst them. “My lost love!” I cried; and then, rebuking myself, “No; she is not lost. They say that Time and Space exist not, save in our thoughts. If so, then that which has been, is, and the Past can never cease. She is mine, and I shall find her —what matters it where, or when, or how? Till then, my soul is but a moonlighted chamber of ghosts; and I sit within, the dreariest of them all. When she enters, it will be a home of love. And I wait —I wait.”",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/90/3)"
 					}
 				}
 			],
@@ -7101,11 +8387,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "I sat and brooded over the Past, till I fell asleep in the phantom-peopled night. And all the night long they were about me —the men and women of the long past. And I was one of them. I wandered in my dreams over the whole house, habited in a long old-fashioned gown, searching for one who was Alice, and yet would be someone else. From room to room I wandered till weary, and could not find her. At last, I gave up the search, and, retreating to the library, shut myself in. There, taking down from the shelf the volume of Von Salis, I tried hard to go on with the translation of “Psyche’s Sorrow,” from the point where the student had left it, thinking it, all the time, my own unfinished work.",
+					"text": "I sat and brooded over the Past, till I fell asleep in the phantom-peopled night. And all the night long they were about me —the men and women of the long past. And I was one of them. I wandered in my dreams over the whole house, habited in a long old-fashioned gown, searching for one who was Alice, and yet would be someone else. From room to room I wandered till weary, and could not find her. At last, I gave up the search, and, retreating to the library, shut myself in. There, taking down from the shelf the volume of Von Salis, I tried hard to go on with the translation of “",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/92/1)"
+					}
+				},
+				{
+					"text": "Psyche’s Sorrow",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/92/2/1)"
+					}
+				},
+				{
+					"text": ",” from the point where the student had left it, thinking it, all the time, my own unfinished work.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/92/3)"
 					}
 				}
 			],
@@ -7119,11 +8421,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "When I woke in the morning, the chamber of ghosts, in which I had fallen asleep, had vanished. The sun shone in through the windows of the library; and on its dusty table lay Von Salis, open at “Psyche’s Trauer.” The sheet of paper with the translation on it, was not there. I hastened to leave the house, and effected my escape before the servants were astir.",
+					"text": "When I woke in the morning, the chamber of ghosts, in which I had fallen asleep, had vanished. The sun shone in through the windows of the library; and on its dusty table lay Von Salis, open at “",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/94/1)"
+					}
+				},
+				{
+					"text": "Psyche’s Trauer",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/94/2/1)"
+					}
+				},
+				{
+					"text": ".” The sheet of paper with the translation on it, was not there. I hastened to leave the house, and effected my escape before the servants were astir.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/40[chapter-16.xhtml]!/2[chapter-16]/94/3)"
 					}
 				}
 			],
@@ -7227,11 +8545,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "I had spent a week in a small town on the borders of Wales, and intended remaining a fortnight longer, when I was suddenly seized with a violent illness, in which I lay insensible for three weeks. When I recovered consciousness, I found that my head had been shaved, and that the cicatrice of my old wound was occasionally very painful. Of late I have suspected that I had some operation performed upon my skull during my illness; but Dr. Ruthwell never dropped a hint to that effect. This was the friend whom, when first I opened my seeing eyes, I beheld sitting by my bedside, watching the effect of his last prescription. He was one of the few in the profession, whose love of science and love of their fellows combined, would be enough to chain them to the art of healing, irrespective of its emoluments. He was one of the few, also, who see the marvellous in all science, and, therefore, reject nothing merely because the marvellous may seem to predominate in it. Yet neither would he accept anything of the sort as fact, without the strictest use of every experiment within his power, even then remaining often in doubt. This man conferred honour by his friendship; and I am happy to think that before many days of recovery had passed, we were friends indeed. But I lay for months under his care before I was able to leave my bed.",
+					"text": "I had spent a week in a small town on the borders of Wales, and intended remaining a fortnight longer, when I was suddenly seized with a violent illness, in which I lay insensible for three weeks. When I recovered consciousness, I found that my head had been shaved, and that the cicatrice of my old wound was occasionally very painful. Of late I have suspected that I had some operation performed upon my skull during my illness; but ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/42[chapter-17.xhtml]!/2[chapter-17]/6/1)"
+					}
+				},
+				{
+					"text": "Dr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/42[chapter-17.xhtml]!/2[chapter-17]/6/2/1)"
+					}
+				},
+				{
+					"text": " Ruthwell never dropped a hint to that effect. This was the friend whom, when first I opened my seeing eyes, I beheld sitting by my bedside, watching the effect of his last prescription. He was one of the few in the profession, whose love of science and love of their fellows combined, would be enough to chain them to the art of healing, irrespective of its emoluments. He was one of the few, also, who see the marvellous in all science, and, therefore, reject nothing merely because the marvellous may seem to predominate in it. Yet neither would he accept anything of the sort as fact, without the strictest use of every experiment within his power, even then remaining often in doubt. This man conferred honour by his friendship; and I am happy to think that before many days of recovery had passed, we were friends indeed. But I lay for months under his care before I was able to leave my bed.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/42[chapter-17.xhtml]!/2[chapter-17]/6/3)"
 					}
 				}
 			],
@@ -7424,11 +8758,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "I had loved a lady —loved her still. I did not know where she was, and had reason to fear that her mind had given way under the suffering of our separation. Between us there existed, as well, the bond of a distant blood relationship; so distant, that but for its probable share in the production of another relationship of a very marvellous nature, it would scarcely have been worth alluding to. This was a kind of psychological attraction, which, when justified and strengthened by the spiritual energies of love, rendered the immediate communication of certain feelings, both mental and bodily, so rapid, that almost the consciousness of the one existed for the time in the mental circumstances of the other. Nay, so complete at times was the communication, that I even doubted her testimony as to some strange correspondence in our past history on this very ground, suspecting that, my memory being open to her retrospection, she saw my story, and took it for her own. It was, therefore, easy for me to account for Dr. Ruthwell’s scientific bewilderment at the symptoms I manifested.",
+					"text": "I had loved a lady —loved her still. I did not know where she was, and had reason to fear that her mind had given way under the suffering of our separation. Between us there existed, as well, the bond of a distant blood relationship; so distant, that but for its probable share in the production of another relationship of a very marvellous nature, it would scarcely have been worth alluding to. This was a kind of psychological attraction, which, when justified and strengthened by the spiritual energies of love, rendered the immediate communication of certain feelings, both mental and bodily, so rapid, that almost the consciousness of the one existed for the time in the mental circumstances of the other. Nay, so complete at times was the communication, that I even doubted her testimony as to some strange correspondence in our past history on this very ground, suspecting that, my memory being open to her retrospection, she saw my story, and took it for her own. It was, therefore, easy for me to account for ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/42[chapter-17.xhtml]!/2[chapter-17]/26/1)"
+					}
+				},
+				{
+					"text": "Dr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/42[chapter-17.xhtml]!/2[chapter-17]/26/2/1)"
+					}
+				},
+				{
+					"text": " Ruthwell’s scientific bewilderment at the symptoms I manifested.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/42[chapter-17.xhtml]!/2[chapter-17]/26/3)"
 					}
 				}
 			],
@@ -8200,11 +9550,152 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " The autumn winds are sighing \n Over land and sea; \n The autumn woods are dying \n Over hill and lea; \n And my heart is sighing, dying, \n Maiden, for thee. ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/1)"
+							}
+						},
+						{
+							"text": "The autumn winds are sighing",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/5)"
+							}
+						},
+						{
+							"text": "Over land and sea;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/7)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/9)"
+							}
+						},
+						{
+							"text": "The autumn woods are dying",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/10/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/11)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/13)"
+							}
+						},
+						{
+							"text": "Over hill and lea;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/14/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/15)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/17)"
+							}
+						},
+						{
+							"text": "And my heart is sighing, dying,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/18/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/19)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/21)"
+							}
+						},
+						{
+							"text": "Maiden, for thee.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/22/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/2/23)"
 							}
 						}
 					],
@@ -8218,11 +9709,152 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " The autumn clouds are flying \n Homeless over me; \n The homeless birds are crying \n In the naked tree; \n And my heart is flying, crying, \n Maiden, to thee. ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/1)"
+							}
+						},
+						{
+							"text": "The autumn clouds are flying",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/5)"
+							}
+						},
+						{
+							"text": "Homeless over me;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/7)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/9)"
+							}
+						},
+						{
+							"text": "The homeless birds are crying",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/10/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/11)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/13)"
+							}
+						},
+						{
+							"text": "In the naked tree;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/14/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/15)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/17)"
+							}
+						},
+						{
+							"text": "And my heart is flying, crying,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/18/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/19)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/21)"
+							}
+						},
+						{
+							"text": "Maiden, to thee.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/22/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/4/23)"
 							}
 						}
 					],
@@ -8236,11 +9868,152 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " My cries may turn to gladness, \n And my flying flee; \n My sighs may lose the sadness, \n Yet sigh on in me; \n All my sadness, all my gladness, \n Maiden, lost in thee. ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/1)"
+							}
+						},
+						{
+							"text": "My cries may turn to gladness,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/5)"
+							}
+						},
+						{
+							"text": "And my flying flee;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/7)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/9)"
+							}
+						},
+						{
+							"text": "My sighs may lose the sadness,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/10/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/11)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/13)"
+							}
+						},
+						{
+							"text": "Yet sigh on in me;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/14/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/15)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/17)"
+							}
+						},
+						{
+							"text": "All my sadness, all my gladness,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/18/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/19)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/21)"
+							}
+						},
+						{
+							"text": "Maiden, lost in thee.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/22/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/46[chapter-19.xhtml]!/2[chapter-19]/10/6/23)"
 							}
 						}
 					],
@@ -8871,11 +10644,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“I will send Janet away. Janet, I want to talk to Mr. Campbell alone.”",
+					"text": "“I will send Janet away. Janet, I want to talk to ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/48[chapter-20.xhtml]!/2[chapter-20]/58/1)"
+					}
+				},
+				{
+					"text": "Mr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/48[chapter-20.xhtml]!/2[chapter-20]/58/2/1)"
+					}
+				},
+				{
+					"text": " Campbell alone.”",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/48[chapter-20.xhtml]!/2[chapter-20]/58/3)"
 					}
 				}
 			],
@@ -9033,11 +10822,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“Now, Janet, you can leave us; and on no account come into the room till Mr. Campbell calls you. Take the lamp with you.”",
+					"text": "“Now, Janet, you can leave us; and on no account come into the room till ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/48[chapter-20.xhtml]!/2[chapter-20]/76/1)"
+					}
+				},
+				{
+					"text": "Mr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/48[chapter-20.xhtml]!/2[chapter-20]/76/2/1)"
+					}
+				},
+				{
+					"text": " Campbell calls you. Take the lamp with you.”",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/48[chapter-20.xhtml]!/2[chapter-20]/76/3)"
 					}
 				}
 			],
@@ -10342,11 +12147,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“I don’t know what you call dull,” replied the old man, as if half offended at the suggestion. “I don’t believe a soul missed his lordship when he died; and there’s always Mrs. Blakesley and me, as is the best friends in the world, besides the three maids and the stableman, who helps me in the garden, now there’s no horses. And then there’s Jacob and —”",
+					"text": "“I don’t know what you call dull,” replied the old man, as if half offended at the suggestion. “I don’t believe a soul missed his lordship when he died; and there’s always ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/50[chapter-21.xhtml]!/2[chapter-21]/32/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/50[chapter-21.xhtml]!/2[chapter-21]/32/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley and me, as is the best friends in the world, besides the three maids and the stableman, who helps me in the garden, now there’s no horses. And then there’s Jacob and —”",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/50[chapter-21.xhtml]!/2[chapter-21]/32/3)"
 					}
 				}
 			],
@@ -10628,11 +12449,52 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " “What fine chisel \n Could ever yet cut breath?” ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/50[chapter-21.xhtml]!/2[chapter-21]/54/2/1)"
+							}
+						},
+						{
+							"text": "“What fine chisel",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/50[chapter-21.xhtml]!/2[chapter-21]/54/2/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/50[chapter-21.xhtml]!/2[chapter-21]/54/2/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/50[chapter-21.xhtml]!/2[chapter-21]/54/2/5)"
+							}
+						},
+						{
+							"text": "Could ever yet cut breath?”",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/50[chapter-21.xhtml]!/2[chapter-21]/54/2/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/50[chapter-21.xhtml]!/2[chapter-21]/54/2/7)"
 							}
 						}
 					],
@@ -10671,11 +12533,19 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "Mrs. Blakesley was still at the lodge, then: I would call upon her tomorrow. I went to bed, and dreamed all night that Alice was sitting somewhere in a land “full of dark mountains,” and that I was wandering about in the darkness, alternately calling and listening; sometimes fancying I heard a faint reply, which might be her voice or an echo of my own; but never finding her. I woke in an outburst of despairing tears, and my despair was not comforted by my waking.",
+					"text": "Mrs.",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/50[chapter-21.xhtml]!/2[chapter-21]/58/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley was still at the lodge, then: I would call upon her tomorrow. I went to bed, and dreamed all night that Alice was sitting somewhere in a land “full of dark mountains,” and that I was wandering about in the darkness, alternately calling and listening; sometimes fancying I heard a faint reply, which might be her voice or an echo of my own; but never finding her. I woke in an outburst of despairing tears, and my despair was not comforted by my waking.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/50[chapter-21.xhtml]!/2[chapter-21]/58/3)"
 					}
 				}
 			],
@@ -10725,11 +12595,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "It was a lovely morning in autumn. I walked to the Hall. I entered at the same gate by which I had entered first, so many years before. But it was not Mrs. Blakesley that opened it. I inquired after her, and the woman told me that she lived at the Hall now, and took care of Lady Alice. So far, this was hopeful news.",
+					"text": "It was a lovely morning in autumn. I walked to the Hall. I entered at the same gate by which I had entered first, so many years before. But it was not ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/4/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/4/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley that opened it. I inquired after her, and the woman told me that she lived at the Hall now, and took care of Lady Alice. So far, this was hopeful news.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/4/3)"
 					}
 				}
 			],
@@ -10760,11 +12646,27 @@
 					}
 				},
 				{
-					"text": ", when the lady was dead. I was amazed and troubled at the stolidity with which I walked up to the door, and, having rung the bell, waited. No sweet memories of the past arose in my mind; not one of the well-known objects around looked at me as claiming a recognition. Yet, when the door was opened, my heart beat so violently at the thought that I might see her, that I could hardly stammer out my inquiry after Mrs. Blakesley.",
+					"text": ", when the lady was dead. I was amazed and troubled at the stolidity with which I walked up to the door, and, having rung the bell, waited. No sweet memories of the past arose in my mind; not one of the well-known objects around looked at me as claiming a recognition. Yet, when the door was opened, my heart beat so violently at the thought that I might see her, that I could hardly stammer out my inquiry after ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/6/3)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/6/4/1)"
+					}
+				},
+				{
+					"text": " Blakesley.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/6/5)"
 					}
 				}
 			],
@@ -10778,11 +12680,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "I was shown to a room. None of the sensations I had had on first crossing the threshold were revived. I remembered them all; I felt none of them. Mrs. Blakesley came. She did not recognise me. I told her who I was. She stared at me for a moment, seemed to see the same face she had known still glimmering through all the changes that had crowded upon it, held out both her hands, and burst into tears.",
+					"text": "I was shown to a room. None of the sensations I had had on first crossing the threshold were revived. I remembered them all; I felt none of them. ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/8/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/8/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley came. She did not recognise me. I told her who I was. She stared at me for a moment, seemed to see the same face she had known still glimmering through all the changes that had crowded upon it, held out both her hands, and burst into tears.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/8/3)"
 					}
 				}
 			],
@@ -10796,11 +12714,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“Mr. Campbell,” she said, “you ",
+					"text": "“",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/10/1)"
+					}
+				},
+				{
+					"text": "Mr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/10/2/1)"
+					}
+				},
+				{
+					"text": " Campbell,” she said, “you ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/10/3)"
 					}
 				},
 				{
@@ -10867,11 +12801,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "I followed her to the room Mrs. Wilson used to occupy. She put wine on the table. I told her my story. My labours, and my wounds, and my illness, slightly touched as I trust they were in the course of the tale, yet moved all her womanly sympathies.",
+					"text": "I followed her to the room ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/16/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/16/2/1)"
+					}
+				},
+				{
+					"text": " Wilson used to occupy. She put wine on the table. I told her my story. My labours, and my wounds, and my illness, slightly touched as I trust they were in the course of the tale, yet moved all her womanly sympathies.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/16/3)"
 					}
 				}
 			],
@@ -10885,11 +12835,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“What can I do for you, Mr. Campbell?” she said.",
+					"text": "“What can I do for you, ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/18/1)"
+					}
+				},
+				{
+					"text": "Mr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/18/2/1)"
+					}
+				},
+				{
+					"text": " Campbell?” she said.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/18/3)"
 					}
 				}
 			],
@@ -11011,11 +12977,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“I am very sorry for you, Mr. Campbell.”",
+					"text": "“I am very sorry for you, ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/32/1)"
+					}
+				},
+				{
+					"text": "Mr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/32/2/1)"
+					}
+				},
+				{
+					"text": " Campbell.”",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/32/3)"
 					}
 				}
 			],
@@ -11281,11 +13263,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "As ten struck on the tower-clock, I entered Mrs. Blakesley’s room. She was not there. I sat down. In a few minutes she came.",
+					"text": "As ten struck on the tower-clock, I entered ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/62/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/62/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley’s room. She was not there. I sat down. In a few minutes she came.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/62/3)"
 					}
 				}
 			],
@@ -11317,11 +13315,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "I followed, trembling. She led me to the same room Lady Alice used to occupy. The door was a little open. She pushed it gently, and I followed her in. The curtains towards the door were drawn. Mrs. Blakesley took me round to the other side. —There lay the lovely head, so phantom-like for years, coming only in my dreams; filling now, with a real presence, the eyes that had longed for it, as if in them dwelt an appetite of sight. It calmed my heart at once, which had been almost choking me with the violence of its palpitation. “That is not the face of insanity,” I said to myself. “It is clear as the morning light.” As I stood gazing, I made no comparisons between the past and the present, although I was aware of some difference —of some measure of the unknown fronting me; I was filled with the delight of beholding the face I loved —full, as it seemed to me, of mind and womanhood; sleeping —nothing more. I murmured a fervent “Thank God!” and was turning away with a feeling of satisfaction for all the future, and a strange great hope beginning to throb in my heart, when, after a little restless motion of her head on the pillow, her patient lips began to tremble. My soul rushed into my ears.",
+					"text": "I followed, trembling. She led me to the same room Lady Alice used to occupy. The door was a little open. She pushed it gently, and I followed her in. The curtains towards the door were drawn. ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/66/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/66/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley took me round to the other side. —There lay the lovely head, so phantom-like for years, coming only in my dreams; filling now, with a real presence, the eyes that had longed for it, as if in them dwelt an appetite of sight. It calmed my heart at once, which had been almost choking me with the violence of its palpitation. “That is not the face of insanity,” I said to myself. “It is clear as the morning light.” As I stood gazing, I made no comparisons between the past and the present, although I was aware of some difference —of some measure of the unknown fronting me; I was filled with the delight of beholding the face I loved —full, as it seemed to me, of mind and womanhood; sleeping —nothing more. I murmured a fervent “Thank God!” and was turning away with a feeling of satisfaction for all the future, and a strange great hope beginning to throb in my heart, when, after a little restless motion of her head on the pillow, her patient lips began to tremble. My soul rushed into my ears.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/66/3)"
 					}
 				}
 			],
@@ -11335,11 +13349,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“Mr. Campbell,” she murmured, “I cannot spell; what am I to do to learn?”",
+					"text": "“",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/68/1)"
+					}
+				},
+				{
+					"text": "Mr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/68/2/1)"
+					}
+				},
+				{
+					"text": " Campbell,” she murmured, “I cannot spell; what am I to do to learn?”",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/68/3)"
 					}
 				}
 			],
@@ -11353,11 +13383,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "The unexpected voice, naming my name, sounded in my ears like a voice from the far-off regions where sighing is over. Then a smile gleamed up from the depths unseen, and broke and melted away all over her face. But her nurse had heard her speak, and now approached in alarm. She laid hold of my arm, and drew me towards the door. I yielded at once, but heard a moan from the bed as I went. I looked back —the curtains hid her from my view. Outside the door, Mrs. Blakesley stood listening for a moment, and then led the way downstairs.",
+					"text": "The unexpected voice, naming my name, sounded in my ears like a voice from the far-off regions where sighing is over. Then a smile gleamed up from the depths unseen, and broke and melted away all over her face. But her nurse had heard her speak, and now approached in alarm. She laid hold of my arm, and drew me towards the door. I yielded at once, but heard a moan from the bed as I went. I looked back —the curtains hid her from my view. Outside the door, ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/70/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/70/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley stood listening for a moment, and then led the way downstairs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/70/3)"
 					}
 				}
 			],
@@ -11407,11 +13453,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“I often think she looks more like herself when she’s asleep,” answered she. “And then I have often seen her smile. She never smiles when she’s awake. But, gracious me, Mr. Campbell! what ",
+					"text": "“I often think she looks more like herself when she’s asleep,” answered she. “And then I have often seen her smile. She never smiles when she’s awake. But, gracious me, ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/76/1)"
+					}
+				},
+				{
+					"text": "Mr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/76/2/1)"
+					}
+				},
+				{
+					"text": " Campbell! what ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/76/3)"
 					}
 				},
 				{
@@ -11460,11 +13522,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "But Mrs. Blakesley interfered.",
+					"text": "But ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/80/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/80/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley interfered.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/80/3)"
 					}
 				}
 			],
@@ -11478,11 +13556,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“You don’t leave this house tonight, Mr. Campbell,” she said. “I won’t have your death laid at my door.”",
+					"text": "“You don’t leave this house tonight, ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/82/1)"
+					}
+				},
+				{
+					"text": "Mr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/82/2/1)"
+					}
+				},
+				{
+					"text": " Campbell,” she said. “I won’t have your death laid at my door.”",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/82/3)"
 					}
 				}
 			],
@@ -11514,11 +13608,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“Dear Mrs. Blakesley —” I said, seeing her determined.",
+					"text": "“Dear ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/86/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/86/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley —” I said, seeing her determined.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/86/3)"
 					}
 				}
 			],
@@ -11550,11 +13660,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "I did not care for any storm. It hardly even interested me. That beautiful face filled my whole being. But I yielded to Mrs. Blakesley, and not unwillingly.",
+					"text": "I did not care for any storm. It hardly even interested me. That beautiful face filled my whole being. But I yielded to ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/90/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/90/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley, and not unwillingly.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/52[chapter-22.xhtml]!/2[chapter-22]/90/3)"
 					}
 				}
 			],
@@ -11604,11 +13730,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "Once more I was left alone in that room of dark oak, looking out on the little ivy-mantled court, of which I was now reminded by the howling of the storm within its high walls. Mrs. Blakesley had extemporised a bed for me on the old sofa; and the fire was already blazing away splendidly. I sat down beside it, and the sombre-hued Past rolled back upon me.",
+					"text": "Once more I was left alone in that room of dark oak, looking out on the little ivy-mantled court, of which I was now reminded by the howling of the storm within its high walls. ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/54[chapter-23.xhtml]!/2[chapter-23]/4/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/54[chapter-23.xhtml]!/2[chapter-23]/4/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley had extemporised a bed for me on the old sofa; and the fire was already blazing away splendidly. I sat down beside it, and the sombre-hued Past rolled back upon me.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/54[chapter-23.xhtml]!/2[chapter-23]/4/3)"
 					}
 				}
 			],
@@ -11996,11 +14138,27 @@
 					}
 				},
 				{
-					"text": ", beyond all the power of madness or demons; and mine I trusted she would be beyond the dispute of the world. About me, at least, she was not insane. But what should I do? The only chance of her recovery lay in seeing me still; but I could resolve on nothing till I knew whether Mrs. Blakesley had discovered her absence from her room; because, if I drew her, and she were watched and prevented from coming, it would kill her, or worse. I must take tomorrow to think.",
+					"text": ", beyond all the power of madness or demons; and mine I trusted she would be beyond the dispute of the world. About me, at least, she was not insane. But what should I do? The only chance of her recovery lay in seeing me still; but I could resolve on nothing till I knew whether ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/54[chapter-23.xhtml]!/2[chapter-23]/40/3)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/54[chapter-23.xhtml]!/2[chapter-23]/40/4/1)"
+					}
+				},
+				{
+					"text": " Blakesley had discovered her absence from her room; because, if I drew her, and she were watched and prevented from coming, it would kill her, or worse. I must take tomorrow to think.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/54[chapter-23.xhtml]!/2[chapter-23]/40/5)"
 					}
 				}
 			],
@@ -12085,11 +14243,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "It was with considerable anxiety that I repaired to Mrs. Blakesley’s room. There I found the old lady at the breakfast-table, so thoroughly composed, that I was at once reassured as to her ignorance of what had occurred while she slept. But she seemed uneasy till I should take my departure, which I attributed to the fear that I might happen to meet Lady Alice.",
+					"text": "It was with considerable anxiety that I repaired to ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/56[chapter-24.xhtml]!/2[chapter-24]/4/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/56[chapter-24.xhtml]!/2[chapter-24]/4/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley’s room. There I found the old lady at the breakfast-table, so thoroughly composed, that I was at once reassured as to her ignorance of what had occurred while she slept. But she seemed uneasy till I should take my departure, which I attributed to the fear that I might happen to meet Lady Alice.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/56[chapter-24.xhtml]!/2[chapter-24]/4/3)"
 					}
 				}
 			],
@@ -12587,11 +14761,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "Next morning, I called again upon Mrs. Blakesley, to inquire after Lady Alice, anxious to know how yesterday had passed.",
+					"text": "Next morning, I called again upon ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/56[chapter-24.xhtml]!/2[chapter-24]/56/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/56[chapter-24.xhtml]!/2[chapter-24]/56/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley, to inquire after Lady Alice, anxious to know how yesterday had passed.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/56[chapter-24.xhtml]!/2[chapter-24]/56/3)"
 					}
 				}
 			],
@@ -12693,11 +14883,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“Have you heard of young Lord Hilton’s marriage?” asked Mrs. Blakesley.",
+					"text": "“Have you heard of young Lord Hilton’s marriage?” asked ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/56[chapter-24.xhtml]!/2[chapter-24]/64/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/56[chapter-24.xhtml]!/2[chapter-24]/64/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/56[chapter-24.xhtml]!/2[chapter-24]/64/3)"
 					}
 				}
 			],
@@ -12840,11 +15046,202 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " Days of old, \n Ye are not dead, though gone from me; \n Ye are not cold, \n But like the summer-birds gone o’er the sea. \n The sun brings back the swallows fast, \n O’er the sea: \n When thou comest at the last, \n The days of old come back to me. ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/1)"
+							}
+						},
+						{
+							"text": "Days of old,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/5)"
+							}
+						},
+						{
+							"text": "Ye are not dead, though gone from me;",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/7)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/9)"
+							}
+						},
+						{
+							"text": "Ye are not cold,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/10/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/11)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/13)"
+							}
+						},
+						{
+							"text": "But like the summer-birds gone o’er the sea.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/14/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/15)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/17)"
+							}
+						},
+						{
+							"text": "The sun brings back the swallows fast,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/18/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/19)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/21)"
+							}
+						},
+						{
+							"text": "O’er the sea:",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/22/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/23)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/25)"
+							}
+						},
+						{
+							"text": "When thou comest at the last,",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/26/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/27)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/29)"
+							}
+						},
+						{
+							"text": "The days of old come back to me.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/30/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/8/2/31)"
 							}
 						}
 					],
@@ -12991,11 +15388,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "“Not the least,” she answered. “No one follows me there; not even Mrs. Blakesley, good soul! They are all afraid, as usual.”",
+					"text": "“Not the least,” she answered. “No one follows me there; not even ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/24/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/24/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley, good soul! They are all afraid, as usual.”",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/24/3)"
 					}
 				}
 			],
@@ -13135,11 +15548,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "Next morning, having breakfasted from the contents of my bag, I proceeded to make myself thoroughly acquainted with the bearings, etc., of this portion of the house. Before evening, I knew it all thoroughly.",
+					"text": "Next morning, having breakfasted from the contents of my bag, I proceeded to make myself thoroughly acquainted with the bearings, ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/40/1)"
+					}
+				},
+				{
+					"text": "etc.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/40/2/1)"
+					}
+				},
+				{
+					"text": ", of this portion of the house. Before evening, I knew it all thoroughly.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/58[chapter-25.xhtml]!/2[chapter-25]/40/3)"
 					}
 				}
 			],
@@ -13548,11 +15977,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "I had not seen Mrs. Blakesley since she had told me that the young earl and countess were expected in about a month; else I might have learned one fact which it was very important I should have known, namely, that their arrival had been hastened by eight or ten days. The very morning of our intended departure, I was looking into the court through a little round hole I had cleared for observation in the dust of one of the windows, believing I had observed signs of unusual preparation on the part of the household, when a carriage drove up, followed by two others, and Lord and Lady Hilton descended and entered, with an attendance of some eight or ten.",
+					"text": "I had not seen ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/60[chapter-26.xhtml]!/2[chapter-26]/24/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/60[chapter-26.xhtml]!/2[chapter-26]/24/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley since she had told me that the young earl and countess were expected in about a month; else I might have learned one fact which it was very important I should have known, namely, that their arrival had been hastened by eight or ten days. The very morning of our intended departure, I was looking into the court through a little round hole I had cleared for observation in the dust of one of the windows, believing I had observed signs of unusual preparation on the part of the household, when a carriage drove up, followed by two others, and Lord and Lady Hilton descended and entered, with an attendance of some eight or ten.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/60[chapter-26.xhtml]!/2[chapter-26]/24/3)"
 					}
 				}
 			],
@@ -13799,11 +16244,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "Honest Wood joined us in the course of a week or two, and has continued in my service ever since. Nor was it long before Mrs. Blakesley was likewise added to our household, for she had been instantly dismissed from the countess’s service on the charge of complicity in Lady Alice’s abduction.",
+					"text": "Honest Wood joined us in the course of a week or two, and has continued in my service ever since. Nor was it long before ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/62[chapter-27.xhtml]!/2[chapter-27]/4/1)"
+					}
+				},
+				{
+					"text": "Mrs.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/62[chapter-27.xhtml]!/2[chapter-27]/4/2/1)"
+					}
+				},
+				{
+					"text": " Blakesley was likewise added to our household, for she had been instantly dismissed from the countess’s service on the charge of complicity in Lady Alice’s abduction.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/62[chapter-27.xhtml]!/2[chapter-27]/4/3)"
 					}
 				}
 			],
@@ -13870,11 +16331,27 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "We have never again heard the clanking shoe. Indeed, after we had passed a few months in the absorption of each other’s society, we began to find that we doubted a great deal of what seemed to have happened to us. It was as if the gates of the unseen world were closing against us, because we had shut ourselves up in the world of the present. But we let it go gladly. We felt that love was the gate to an unseen world infinitely beyond that region of the psychological in which we had hitherto moved; for this love was teaching us to love all men, and live for all men. In fact, we are now, I am glad to say, very much like other people; and wonder, sometimes, how much of the story of our lives might be accounted for on the supposition that unusual coincidences had fallen in with psychological peculiarities. Dr. Ruthwell, who is sometimes our most welcome guest, has occasionally hinted at the sabre-cut as the key to all the mysteries of the story, seeing nothing of it was at least recorded before I came under his charge. But I have only to remind him of one or two circumstances, to elicit from his honesty and immediate confession of bewilderment, followed by silence; although he evidently still clings to the notion that in that sabre-cut lies the solution of much of the marvel. At all events, he considers me sane enough now, else he would hardly honour me with so much of his confidence as he does. Having examined into Lady Alice’s affairs, I claimed the fortune which she had inherited. Lord Hilton, my former pupil, at once acknowledged the justice of the claim, and was considerably astonished to find how much more might have been demanded of him, which had been spent over the allowance made from her income for her maintenance. But we had enough without claiming that.",
+					"text": "We have never again heard the clanking shoe. Indeed, after we had passed a few months in the absorption of each other’s society, we began to find that we doubted a great deal of what seemed to have happened to us. It was as if the gates of the unseen world were closing against us, because we had shut ourselves up in the world of the present. But we let it go gladly. We felt that love was the gate to an unseen world infinitely beyond that region of the psychological in which we had hitherto moved; for this love was teaching us to love all men, and live for all men. In fact, we are now, I am glad to say, very much like other people; and wonder, sometimes, how much of the story of our lives might be accounted for on the supposition that unusual coincidences had fallen in with psychological peculiarities. ",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/62[chapter-27.xhtml]!/2[chapter-27]/10/1)"
+					}
+				},
+				{
+					"text": "Dr.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/62[chapter-27.xhtml]!/2[chapter-27]/10/2/1)"
+					}
+				},
+				{
+					"text": " Ruthwell, who is sometimes our most welcome guest, has occasionally hinted at the sabre-cut as the key to all the mysteries of the story, seeing nothing of it was at least recorded before I came under his charge. But I have only to remind him of one or two circumstances, to elicit from his honesty and immediate confession of bewilderment, followed by silence; although he evidently still clings to the notion that in that sabre-cut lies the solution of much of the marvel. At all events, he considers me sane enough now, else he would hardly honour me with so much of his confidence as he does. Having examined into Lady Alice’s affairs, I claimed the fortune which she had inherited. Lord Hilton, my former pupil, at once acknowledged the justice of the claim, and was considerably astonished to find how much more might have been demanded of him, which had been spent over the allowance made from her income for her maintenance. But we had enough without claiming that.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/62[chapter-27.xhtml]!/2[chapter-27]/10/3)"
 					}
 				}
 			],
@@ -13941,7 +16418,40 @@
 						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/4/2/1)"
 					}
 				},
-				{"text": "\n was published in 1894 by\n "},
+				{"text": "\n"},
+				{
+					"text": " was published in ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/4/5)"
+					}
+				},
+				{
+					"text": "1894",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/4/6/1)"
+					}
+				},
+				{
+					"text": " by",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/4/7)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/4/9)"
+					}
+				},
 				{
 					"text": "George MacDonald",
 					"anchor": {
@@ -13970,11 +16480,20 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "This ebook was produced for\n ",
+					"text": "This ebook was produced for",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/6/1)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/6/3)"
 					}
 				},
 				{
@@ -13986,9 +16505,26 @@
 					},
 					"target": {"url": "https://standardebooks.org/"}
 				},
-				{"text": "\n by\n "},
+				{"text": "\n"},
 				{
-					"text": "C. B. Bowman",
+					"text": " by",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/6/7)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/6/9)"
+					}
+				},
+				{
+					"text": "C. B.",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
@@ -13997,11 +16533,54 @@
 					"target": {"url": "https://github.com/cbbowman"}
 				},
 				{
-					"text": ",\n and is based on a transcription produced in 2005 by\n ",
+					"text": " Bowman",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/6/10/3)"
+					},
+					"target": {"url": "https://github.com/cbbowman"}
+				},
+				{
+					"text": ",",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/6/11)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " and is based on a transcription produced in ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/6/13)"
+					}
+				},
+				{
+					"text": "2005",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/6/14/1)"
+					}
+				},
+				{
+					"text": " by",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/6/15)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/6/17)"
 					}
 				},
 				{
@@ -14064,7 +16643,24 @@
 					},
 					"target": {"url": "https://www.pgdp.net/"}
 				},
-				{"text": "\n for\n "},
+				{"text": "\n"},
+				{
+					"text": " for",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/6/27)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/6/29)"
+					}
+				},
 				{
 					"text": "Project Gutenberg",
 					"anchor": {
@@ -14074,7 +16670,24 @@
 					},
 					"target": {"url": "https://www.gutenberg.org/ebooks/8913"}
 				},
-				{"text": "\n and on digital scans from the\n "},
+				{"text": "\n"},
+				{
+					"text": " and on digital scans from the",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/6/33)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/6/35)"
+					}
+				},
 				{
 					"text": "Internet Archive",
 					"anchor": {
@@ -14103,11 +16716,20 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "The cover page is adapted from\n ",
+					"text": "The cover page is adapted from",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/1)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/3)"
 					}
 				},
 				{
@@ -14120,11 +16742,45 @@
 					}
 				},
 				{
-					"text": ",\n a painting completed circa 1908 by\n ",
+					"text": ",",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/5)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " a painting completed circa ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/7)"
+					}
+				},
+				{
+					"text": "1908",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/8/1)"
+					}
+				},
+				{
+					"text": " by",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/9)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/11)"
 					}
 				},
 				{
@@ -14137,11 +16793,29 @@
 					"target": {"url": "https://en.wikipedia.org/wiki/Albert_Pinkham_Ryder"}
 				},
 				{
-					"text": ".\n The cover and title pages feature the\n ",
+					"text": ".",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/13)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " The cover and title pages feature the",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/15)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/17)"
 					}
 				},
 				{
@@ -14170,7 +16844,56 @@
 						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/20/1)"
 					}
 				},
-				{"text": "\n typefaces created in 2014 and 2009 by\n "},
+				{"text": "\n"},
+				{
+					"text": " typefaces created in ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/23)"
+					}
+				},
+				{
+					"text": "2014",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/24/1)"
+					}
+				},
+				{
+					"text": " and ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/25)"
+					}
+				},
+				{
+					"text": "2009",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/26/1)"
+					}
+				},
+				{
+					"text": " by",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/27)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/8/29)"
+					}
+				},
 				{
 					"text": "The League of Moveable Type",
 					"anchor": {
@@ -14199,15 +16922,24 @@
 			"type": "paragraph",
 			"content": [
 				{
-					"text": "This edition was released on\n ",
+					"text": "This edition was released on",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/10/1)"
 					}
 				},
+				{"text": "\n"},
 				{
-					"text": "February 25, 2026, 10:22 p.m.",
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/10/3)"
+					}
+				},
+				{
+					"text": "February 25, 2026, 10:22 ",
 					"style": {"bold": true},
 					"anchor": {
 						"type": "FragmentSelector",
@@ -14215,7 +16947,33 @@
 						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/10/4/2/1)"
 					}
 				},
-				{"text": "\n and is based on\n "},
+				{
+					"text": "p.m.",
+					"style": {"bold": true},
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/10/4/2/2/1)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " and is based on",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/10/7)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/10/9)"
+					}
+				},
 				{
 					"text": "revision 8b7c604",
 					"style": {"bold": true},
@@ -14226,11 +16984,63 @@
 					}
 				},
 				{
-					"text": ".\n The first edition of this ebook was released on\n February 25, 2026, 4:41 p.m.\n You can check for updates to this ebook, view its revision history, or download it for different ereading systems at\n ",
+					"text": ".",
 					"anchor": {
 						"type": "FragmentSelector",
 						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/10/11)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " The first edition of this ebook was released on",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/10/13)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/10/15)"
+					}
+				},
+				{
+					"text": "February 25, 2026, 4:41 ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/10/16/1)"
+					}
+				},
+				{
+					"text": "p.m.",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/10/16/2/1)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " You can check for updates to this ebook, view its revision history, or download it for different ereading systems at",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/10/19)"
+					}
+				},
+				{"text": "\n"},
+				{
+					"text": " ",
+					"anchor": {
+						"type": "FragmentSelector",
+						"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+						"value": "epubcfi(/6/64[colophon.xhtml]!/2[colophon]/10/21)"
 					}
 				},
 				{
@@ -14317,11 +17127,77 @@
 					"type": "paragraph",
 					"content": [
 						{
-							"text": " May you do good and not evil. \n May you find forgiveness for yourself and forgive others. \n May you share freely, never taking more than you give. ",
+							"text": " ",
 							"anchor": {
 								"type": "FragmentSelector",
 								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
 								"value": "epubcfi(/6/66[uncopyright.xhtml]!/2[uncopyright]/4/2/1)"
+							}
+						},
+						{
+							"text": "May you do good and not evil.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/66[uncopyright.xhtml]!/2[uncopyright]/4/2/2/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/66[uncopyright.xhtml]!/2[uncopyright]/4/2/3)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/66[uncopyright.xhtml]!/2[uncopyright]/4/2/5)"
+							}
+						},
+						{
+							"text": "May you find forgiveness for yourself and forgive others.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/66[uncopyright.xhtml]!/2[uncopyright]/4/2/6/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/66[uncopyright.xhtml]!/2[uncopyright]/4/2/7)"
+							}
+						},
+						{"text": "\n"},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/66[uncopyright.xhtml]!/2[uncopyright]/4/2/9)"
+							}
+						},
+						{
+							"text": "May you share freely, never taking more than you give.",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/66[uncopyright.xhtml]!/2[uncopyright]/4/2/10/1)"
+							}
+						},
+						{
+							"text": " ",
+							"anchor": {
+								"type": "FragmentSelector",
+								"conformsTo": "http://www.idpf.org/epub/linking/cfi/epub-cfi.html",
+								"value": "epubcfi(/6/66[uncopyright.xhtml]!/2[uncopyright]/4/2/11)"
 							}
 						}
 					],

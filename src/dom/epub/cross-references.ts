@@ -49,10 +49,19 @@ export function resolveLinks(
 
 		if (isFootnote) {
 			let targetGlobalIdx = sectionOffsets[target.spineIndex] + target.blockIndex;
-			if (!sourceBlock.refs) sourceBlock.refs = [];
-			sourceBlock.refs.push([targetGlobalIdx]);
-
 			let sourceGlobalIdx = sectionOffsets[link.sourceSpineIndex] + link.sourceBlockIndex;
+
+			if (link.textNodes.length > 0) {
+				for (let tn of link.textNodes) {
+					if (!tn.refs) tn.refs = [];
+					tn.refs.push([targetGlobalIdx]);
+				}
+			}
+			else {
+				if (!sourceBlock.refs) sourceBlock.refs = [];
+				sourceBlock.refs.push([targetGlobalIdx]);
+			}
+
 			if (!targetBlock.backRefs) targetBlock.backRefs = [];
 			targetBlock.backRefs.push([sourceGlobalIdx]);
 		}

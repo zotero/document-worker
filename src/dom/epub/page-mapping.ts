@@ -11,8 +11,7 @@ import type { PageListEntry } from './toc';
 import type { PageMarker, PageMarkerSource } from './epub-xhtml-to-blocks';
 import type { IdInfo } from './epub-xhtml-to-blocks';
 import type { ContentBlockNode, PageInfo } from '../../../zotero-structured-text/schema';
-import { getContentRangeFromBlocks } from '../../../zotero-structured-text/src/pdf/block.js';
-import { getNestedBlockPlainText } from '../../../zotero-structured-text/src/pdf/text-node.js';
+import { getContentRange, getNestedBlockPlainText } from '../../../zotero-structured-text/src/text.js';
 import { splitHref } from './cross-references';
 
 const EPUB_LOCATION_BREAK_INTERVAL = 1800;
@@ -317,7 +316,7 @@ function buildPagesArray(mappings: RawPageMapping[], content: ContentBlockNode[]
 		};
 
 		if (startBlock <= endBlock && startBlock < content.length) {
-			let contentRange = getContentRangeFromBlocks(
+			let contentRange = getContentRange(
 				content,
 				startBlock,
 				Math.min(endBlock, content.length - 1),

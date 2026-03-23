@@ -19,7 +19,7 @@ describe('Snapshot structure extraction', () => {
 	let structure;
 
 	it('should extract structure from basic HTML', () => {
-		let buf = loadSnapshot('basic.html');
+		let buf = loadSnapshot('1.html');
 		structure = getSnapshotStructure(buf, 'text/html');
 		assert.ok(structure);
 		assert.equal(structure.processor.type, 'snapshot');
@@ -110,7 +110,7 @@ describe('Snapshot outline', () => {
 	let structure;
 
 	it('should build hierarchical outline from headings', () => {
-		let buf = loadSnapshot('basic.html');
+		let buf = loadSnapshot('1.html');
 		structure = getSnapshotStructure(buf, 'text/html');
 		assert.ok(structure.outline);
 		assert.ok(structure.outline.length > 0);
@@ -158,7 +158,7 @@ describe('Snapshot outline', () => {
 
 describe('Snapshot fulltext extraction', () => {
 	it('should extract fulltext', () => {
-		let buf = loadSnapshot('basic.html');
+		let buf = loadSnapshot('1.html');
 		let result = getSnapshotFulltext(buf, 'text/html');
 		assert.ok(result.text);
 		assert.ok(result.text.includes('Main Title'));
@@ -168,7 +168,7 @@ describe('Snapshot fulltext extraction', () => {
 	});
 
 	it('should accept pre-computed structure', () => {
-		let buf = loadSnapshot('basic.html');
+		let buf = loadSnapshot('1.html');
 		let structure = getSnapshotStructure(buf, 'text/html');
 		let result = getSnapshotFulltext(buf, 'text/html', { structure });
 		assert.ok(result.text.includes('Main Title'));
@@ -177,13 +177,13 @@ describe('Snapshot fulltext extraction', () => {
 
 describe('Snapshot content type handling', () => {
 	it('should work with text/html', () => {
-		let buf = loadSnapshot('basic.html');
+		let buf = loadSnapshot('1.html');
 		let structure = getSnapshotStructure(buf, 'text/html');
 		assert.equal(structure.sourceContentType, 'text/html');
 	});
 
 	it('should work with application/xhtml+xml', () => {
-		let buf = loadSnapshot('basic.html');
+		let buf = loadSnapshot('1.html');
 		let structure = getSnapshotStructure(buf, 'application/xhtml+xml');
 		assert.equal(structure.sourceContentType, 'application/xhtml+xml');
 	});

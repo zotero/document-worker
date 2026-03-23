@@ -10,7 +10,7 @@ import {
 import { generateCFIBase, buildBlockCFI, buildTextNodeCFI } from './cfi';
 import { convertBody } from '../html-to-blocks';
 import type { ConvertHooks, Block } from '../html-to-blocks';
-import type { ContentBlockNode } from '../../../zotero-structured-text/schema';
+import type { ContentBlockNode, TextNode } from '../../../zotero-structured-text/schema';
 
 const NOTE_EPUB_TYPES = new Set(['footnote', 'rearnote', 'note', 'endnote']);
 
@@ -24,6 +24,7 @@ export interface LinkRecord {
 	role: string;
 	hasSup: boolean;
 	elementId: string | null;
+	textNodes: TextNode[];
 }
 
 export interface IdInfo {
@@ -101,7 +102,7 @@ export function convertSection(doc: Document, spineStep: number, spineIndex: num
 				detectPageMarker(el, blocks.length, pageMarkers);
 			}
 		},
-		onInternalLink(el: Element, href: string) {
+		onInternalLink(el: Element, href: string, textNodes: TextNode[]) {
 			let epubType = getAttributeNS(el, EPUB_NS, 'type') || '';
 			let role = getAttribute(el, 'role') || '';
 			let hasSup = hasAncestorOrChild(el, 'sup');
@@ -113,6 +114,7 @@ export function convertSection(doc: Document, spineStep: number, spineIndex: num
 				role,
 				hasSup,
 				elementId: getAttribute(el, 'id'),
+				textNodes,
 			});
 		},
 		isNote(el: Element) {
