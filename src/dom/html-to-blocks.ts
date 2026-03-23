@@ -9,6 +9,7 @@ import type {
     TextStyle,
     TextNode,
     ContentBlockNode,
+    DomAnchor,
     Anchor,
     RefsArray,
     BackRefsArray,
@@ -454,12 +455,74 @@ function walkInline(node: Element, ctx: ConvertContext, textNodes: TextNode[], p
 // Text node helpers:
 
 function createTextNode(text: string, node: ChildNode, ctx: ConvertContext): TextNode {
-	let tn: TextNode = { text };
+	let nfc = text.normalize('NFC');
+	let tn: TextNode = { text: nfc };
 	let merged = mergeStyles(ctx.styleStack);
 	if (merged) tn.style = merged;
 	let anchor = ctx.hooks.textAnchor?.(node);
-	if (anchor) tn.anchor = anchor;
+	if (anchor) {
+		if (nfc !== text && 'selectorMap' in anchor) {
+			(anchor as DomAnchor).deltaMap = computeDeltaMap(text, nfc);
+		}
+		tn.anchor = anchor;
+	}
 	return tn;
+}
+
+/**
+ * Compute a deltaMap encoding the position shifts between original text
+ * and its NFC normalization. Returns a space-separated string of
+ * "nfcPos delta" pairs where delta = nfcIdx - origIdx.
+ */
+function computeDeltaMap(original: string, nfc: string): string {
+	let entries: string[] = [];
+	let oi = 0;
+	let ni = 0;
+	let prevDelta = 0;
+
+	while (ni < nfc.length && oi < original.length) {
+		let nfcCode = nfc.codePointAt(ni)!;
+		let origCode = original.codePointAt(oi)!;
+		let nfcLen = nfcCode > 0xFFFF ? 2 : 1;
+		let origLen = origCode > 0xFFFF ? 2 : 1;
+
+		if (nfcCode === origCode) {
+			// 1:1 match
+			ni += nfcLen;
+			oi += origLen;
+		}
+		else {
+			// NFC composition: find how many original chars compose into
+			// the current NFC character(s) by normalizing increasing slices
+			let end = oi + origLen;
+			while (end <= original.length) {
+				let slice = original.substring(oi, end);
+				let sliceNfc = slice.normalize('NFC');
+				if (sliceNfc.length >= nfcLen
+					&& sliceNfc.codePointAt(0) === nfcCode) {
+					// Advance NFC by however many chars this slice produced
+					let sliceNfcConsumed = sliceNfc.length;
+					oi = end;
+					ni += sliceNfcConsumed;
+					break;
+				}
+				end++;
+			}
+			if (end > original.length) {
+				// Fallback: advance both by one code unit
+				ni += nfcLen;
+				oi += origLen;
+			}
+		}
+
+		let delta = ni - oi;
+		if (delta !== prevDelta) {
+			entries.push(ni + ' ' + delta);
+			prevDelta = delta;
+		}
+	}
+
+	return entries.join(' ');
 }
 
 function mergeStyles(styleStack: (TextStyle | null)[]): TextStyle | null {
