@@ -233,9 +233,9 @@ function processNode(node: ChildNode, ctx: ConvertContext): void {
 			processChildren(el, ctx);
 		}
 		else {
+			let block = makeBlock('paragraph', el, ctx);
 			let content = collectInlineContent(el, ctx);
 			if (content.length > 0) {
-				let block = makeBlock('paragraph', el, ctx);
 				block.content = content;
 				ctx.blocks.push(block);
 			}
@@ -268,9 +268,9 @@ function createContainerBlock(type: string, el: Element, ctx: ConvertContext): B
 		return block;
 	}
 	else {
+		let block = makeBlock(type, el, ctx);
 		let content = collectInlineContent(el, ctx);
 		if (content.length === 0) return null;
-		let block = makeBlock(type, el, ctx);
 		block.content = content;
 		return block;
 	}

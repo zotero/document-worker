@@ -69,12 +69,11 @@ describe('EPUB structure extraction', { timeout: 30000 }, () => {
 				}
 			});
 
-			it('blocks have WADM FragmentSelector anchors', () => {
+			it('blocks have compact DomAnchor with absolute CFI path selectorMap', () => {
 				for (let block of structure.content) {
 					assert.ok(block.anchor, `block of type ${block.type} missing anchor`);
-					assert.equal(block.anchor.type, 'FragmentSelector');
-					assert.equal(block.anchor.conformsTo, 'http://www.idpf.org/epub/linking/cfi/epub-cfi.html');
-					assert.match(block.anchor.value, /^epubcfi\(/, `invalid CFI: ${block.anchor.value}`);
+					assert.ok(block.anchor.selectorMap, `block anchor should have selectorMap`);
+					assert.match(block.anchor.selectorMap, /^\//, `block selectorMap should be absolute CFI path: ${block.anchor.selectorMap}`);
 				}
 			});
 
