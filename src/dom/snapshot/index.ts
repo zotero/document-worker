@@ -11,9 +11,8 @@ import {
 import { convertBody } from '../html-to-blocks';
 import type { ConvertHooks } from '../html-to-blocks';
 import type { ContentBlockNode } from '../../../zotero-structured-text/schema';
-import { getContentRangeFromBlocks } from '../../../zotero-structured-text/src/pdf/block.js';
 import { getFulltextFromStructuredText } from '../../../zotero-structured-text/src/fulltext.js';
-import { getNestedBlockPlainText, getBlockPlainText } from '../../../zotero-structured-text/src/pdf/text-node.js';
+import { getContentRange, getNestedBlockPlainText, getBlockPlainText } from '../../../zotero-structured-text/src/text.js';
 import type { ZoteroStructuredText, OutlineItem } from '../../../zotero-structured-text/schema';
 
 const SCHEMA_VERSION = '1.0.0-draft';
@@ -72,7 +71,7 @@ export function getSnapshotStructure(
 
 	// Build page content range
 	let contentRanges = blocks.length > 0
-		? [getContentRangeFromBlocks(blocks, 0, blocks.length - 1)]
+		? [getContentRange(blocks, 0, blocks.length - 1)]
 		: [];
 
 	// Build outline from headings

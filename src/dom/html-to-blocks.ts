@@ -4,7 +4,7 @@ import {
 	getAttribute,
 	getElementChildren,
 } from './epub/xml';
-import { mergeSequentialTextNodes } from '../../zotero-structured-text/src/pdf/text-node.js';
+import { mergeTextNodes } from '../../zotero-structured-text/src/text.js';
 import type {
     TextStyle,
     TextNode,
@@ -41,8 +41,8 @@ export interface ConvertHooks {
 	textAnchor?(node: ChildNode): Anchor | undefined;
 	/** Called for every element encountered (for ID tracking, etc.) */
 	onElement?(el: Element): void;
-	/** Called for internal links. Return true if handled (to suppress default walkInline). */
-	onInternalLink?(el: Element, href: string): void;
+	/** Called for internal links. textNodes contains the link's inline content. */
+	onInternalLink?(el: Element, href: string, textNodes: TextNode[]): void;
 	/** Check if an element is a note (footnote/endnote). If true, it's rendered as a 'note' block. */
 	isNote?(el: Element): boolean;
 }
@@ -147,12 +147,8 @@ function processNode(node: ChildNode, ctx: ConvertContext): void {
 
 	// Check for format-specific note handling (EPUB footnotes/endnotes)
 	if (ctx.hooks.isNote?.(el)) {
-		let block = makeBlock('note', el, ctx);
-		block.content = collectInlineContent(el, ctx);
-		if (block.content!.length === 0) {
-			block.content = collectBlockInlineContent(el, ctx);
-		}
-		ctx.blocks.push(block);
+		let note = createContainerBlock('note', el, ctx);
+		if (note) ctx.blocks.push(note);
 		return;
 	}
 
@@ -191,15 +187,27 @@ function processNode(node: ChildNode, ctx: ConvertContext): void {
 		let children = getElementChildren(el).filter(c => getLocalName(c) === 'li');
 		for (let li of children) {
 			ctx.hooks.onElement?.(li);
-			let listitem = createListItem(li, ctx);
-			if (listitem) block.content!.push(listitem);
+			if (ctx.hooks.isNote?.(li)) {
+				// A note must be a sibling block, not a list item — emit the in-progress list first
+				if (block.content!.length > 0) {
+					ctx.blocks.push(block);
+					block = { type: 'list', content: [] };
+					if (localName === 'ol') block.ordered = true;
+				}
+				let note = createContainerBlock('note', li, ctx);
+				if (note) ctx.blocks.push(note);
+			}
+			else {
+				let listitem = createContainerBlock('listitem', li, ctx);
+				if (listitem) block.content!.push(listitem);
+			}
 		}
 		if (block.content!.length > 0) {
 			ctx.blocks.push(block);
 		}
 	}
 	else if (blockType === 'listitem') {
-		let listitem = createListItem(el, ctx);
+		let listitem = createContainerBlock('listitem', el, ctx);
 		if (listitem) {
 			let wrapper = makeBlock('list', el, ctx);
 			wrapper.content = [listitem];
@@ -245,24 +253,24 @@ function makeBlock(type: string, node: Element | ChildNode, ctx: ConvertContext)
 	return block;
 }
 
-// List items:
+// Container blocks (notes, list items):
 
-function createListItem(li: Element, ctx: ConvertContext): Block | null {
-	if (hasBlockChildren(li)) {
+function createContainerBlock(type: string, el: Element, ctx: ConvertContext): Block | null {
+	if (hasBlockChildren(el)) {
 		let savedBlocks = ctx.blocks;
 		ctx.blocks = [];
-		processChildren(li, ctx);
+		processChildren(el, ctx);
 		let childBlocks = ctx.blocks;
 		ctx.blocks = savedBlocks;
 		if (childBlocks.length === 0) return null;
-		let block = makeBlock('listitem', li, ctx);
+		let block = makeBlock(type, el, ctx);
 		block.content = childBlocks;
 		return block;
 	}
 	else {
-		let content = collectInlineContent(li, ctx);
+		let content = collectInlineContent(el, ctx);
 		if (content.length === 0) return null;
-		let block = makeBlock('listitem', li, ctx);
+		let block = makeBlock(type, el, ctx);
 		block.content = content;
 		return block;
 	}
@@ -375,27 +383,10 @@ function processFigure(figureNode: Element, ctx: ConvertContext): void {
 
 // Inline content:
 
-function collectBlockInlineContent(node: Element, ctx: ConvertContext): TextNode[] {
-	let allText: TextNode[] = [];
-	for (let child of node.children || []) {
-		if (child.type === 'text') {
-			let text = ((child as any).data || '').replace(/\s+/g, ' ');
-			if (text) {
-				allText.push(createTextNode(text, child, ctx));
-			}
-		}
-		else if (child.type === 'tag') {
-			let content = collectInlineContent(child as Element, ctx);
-			allText.push(...content);
-		}
-	}
-	return mergeSequentialTextNodes(allText);
-}
-
 export function collectInlineContent(node: Element, ctx: ConvertContext, preserveWhitespace = false): TextNode[] {
 	let textNodes: TextNode[] = [];
 	walkInline(node, ctx, textNodes, preserveWhitespace);
-	return mergeSequentialTextNodes(textNodes);
+	return mergeTextNodes(textNodes);
 }
 
 function walkInline(node: Element, ctx: ConvertContext, textNodes: TextNode[], preserveWhitespace: boolean): void {
@@ -439,8 +430,10 @@ function walkInline(node: Element, ctx: ConvertContext, textNodes: TextNode[], p
 					continue;
 				}
 				else if (href) {
-					ctx.hooks.onInternalLink?.(el, href);
-					walkInline(el, ctx, textNodes, preserveWhitespace);
+					let linkTextNodes: TextNode[] = [];
+					walkInline(el, ctx, linkTextNodes, preserveWhitespace);
+					ctx.hooks.onInternalLink?.(el, href, linkTextNodes);
+					textNodes.push(...linkTextNodes);
 					continue;
 				}
 			}
