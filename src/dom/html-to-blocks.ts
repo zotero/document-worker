@@ -541,9 +541,9 @@ function mergeStyles(styleStack: (TextStyle | null)[]): TextStyle | null {
 export function hasBlockChildren(node: Element): boolean {
 	for (let child of node.children || []) {
 		if (child.type === 'tag') {
-            
 			let name = getLocalName(child as Element);
 			if (BLOCK_ELEMENT_MAP[name] && name !== 'img') return true;
+			if (TRANSPARENT_ELEMENTS.has(name) && hasBlockChildren(child as Element)) return true;
 		}
 	}
 	return false;
