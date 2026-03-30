@@ -75,7 +75,7 @@
 		{
 			"type": "heading",
 			"content": [{"text": "The Life of Lazarillo de Tormes", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/2[titlepage.xhtml]!/2[titlepage]/2"}
+			"anchor": {"selectorMap": "/6/2[titlepage.xhtml]!/4/2[titlepage]/2"}
 		},
 		{
 			"type": "paragraph",
@@ -84,22 +84,22 @@
 				{"text": "Clements Markham", "style": {"bold": true}, "anchor": {"selectorMap": "/2/1"}},
 				{"text": ".", "anchor": {"selectorMap": "/3"}}
 			],
-			"anchor": {"selectorMap": "/6/2[titlepage.xhtml]!/2[titlepage]/4"}
+			"anchor": {"selectorMap": "/6/2[titlepage.xhtml]!/4/2[titlepage]/4"}
 		},
 		{
 			"type": "image",
 			"content": [],
-			"anchor": {"selectorMap": "/6/2[titlepage.xhtml]!/2[titlepage]/6"}
+			"anchor": {"selectorMap": "/6/2[titlepage.xhtml]!/4/2[titlepage]/6"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Imprint", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/2[imprint]/2/2"}
+			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/4/2[imprint]/2/2"}
 		},
 		{
 			"type": "image",
 			"content": [{"text": "The Standard Ebooks logo."}],
-			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/2[imprint]/2/4"}
+			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/4/2[imprint]/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -118,7 +118,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/2[imprint]/4"}
+			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/4/2[imprint]/4"}
 		},
 		{
 			"type": "paragraph",
@@ -140,7 +140,7 @@
 				},
 				{"text": ".", "anchor": {"selectorMap": "/5"}}
 			],
-			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/2[imprint]/6"}
+			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/4/2[imprint]/6"}
 		},
 		{
 			"type": "paragraph",
@@ -159,7 +159,7 @@
 					"anchor": {"selectorMap": "40 /3\n11 /4/1\n26 /5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/2[imprint]/8"}
+			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/4/2[imprint]/8"}
 		},
 		{
 			"type": "paragraph",
@@ -175,18 +175,18 @@
 				},
 				{"text": ".", "anchor": {"selectorMap": "/3"}}
 			],
-			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/2[imprint]/10"}
+			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/4/2[imprint]/10"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Introductory", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/2"}
+			"anchor": {"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/2"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "The Family of Mendoza", "anchor": {"selectorMap": "/1"}}],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/2"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/2"
 			}
 		},
 		{
@@ -201,7 +201,7 @@
 				{"text": "1", "anchor": {"selectorMap": "/4[noteref-1]/1"}, "refs": [[197]]}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/4"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/4"
 			}
 		},
 		{
@@ -213,7 +213,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/6"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/6"
 			}
 		},
 		{
@@ -225,7 +225,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/8"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/8"
 			}
 		},
 		{
@@ -237,7 +237,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/10"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/10"
 			}
 		},
 		{
@@ -249,7 +249,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/12"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/12"
 			}
 		},
 		{
@@ -261,7 +261,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/14"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/14"
 			}
 		},
 		{
@@ -280,12 +280,12 @@
 						{"text": " ", "anchor": {"selectorMap": "/7"}}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/16/2"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/16/2"
 					}
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/16"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/16"
 			}
 		},
 		{
@@ -297,7 +297,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/18"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/18"
 			}
 		},
 		{
@@ -309,7 +309,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/20"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/20"
 			}
 		},
 		{
@@ -321,7 +321,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/22"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/22"
 			}
 		},
 		{
@@ -335,7 +335,7 @@
 				{"text": ".", "anchor": {"selectorMap": "/3"}}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/24"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/24"
 			}
 		},
 		{
@@ -361,7 +361,7 @@
 						{"text": " ", "anchor": {"selectorMap": "/15"}}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/26/2"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/26/2"
 					}
 				},
 				{
@@ -384,7 +384,7 @@
 						{"text": " ", "anchor": {"selectorMap": "/15"}}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/26/4"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/26/4"
 					}
 				},
 				{
@@ -407,12 +407,12 @@
 						{"text": " ", "anchor": {"selectorMap": "/15"}}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/26/6"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/26/6"
 					}
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/26"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/26"
 			}
 		},
 		{
@@ -422,7 +422,7 @@
 					"type": "paragraph",
 					"content": [{"text": "Translation", "anchor": {"selectorMap": "/1"}}],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/28/2/2"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/28/2/2"
 					}
 				},
 				{
@@ -445,7 +445,7 @@
 						{"text": " ", "anchor": {"selectorMap": "/15"}}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/28/4"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/28/4"
 					}
 				},
 				{
@@ -468,7 +468,7 @@
 						{"text": " ", "anchor": {"selectorMap": "/15"}}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/28/6"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/28/6"
 					}
 				},
 				{
@@ -491,12 +491,12 @@
 						{"text": " ", "anchor": {"selectorMap": "/15"}}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/28/8"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/28/8"
 					}
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/28"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/28"
 			}
 		},
 		{
@@ -522,7 +522,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/30"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/30"
 			}
 		},
 		{
@@ -534,7 +534,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/32"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/32"
 			}
 		},
 		{
@@ -552,12 +552,12 @@
 								}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/2/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/2/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/2"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/2"
 					}
 				},
 				{
@@ -572,7 +572,7 @@
 								}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/2"
 							}
 						},
 						{
@@ -590,12 +590,12 @@
 												}
 											],
 											"anchor": {
-												"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/4/2/2"
+												"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/4/2/2"
 											}
 										}
 									],
 									"anchor": {
-										"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/4/2"
+										"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/4/2"
 									}
 								},
 								{
@@ -610,23 +610,23 @@
 												}
 											],
 											"anchor": {
-												"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/4/4/2"
+												"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/4/4/2"
 											}
 										}
 									],
 									"anchor": {
-										"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/4/4"
+										"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/4/4"
 									}
 								}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/4"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/4"
 							},
 							"ordered": true
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/4"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/4"
 					}
 				},
 				{
@@ -641,12 +641,12 @@
 								}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/6/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/6/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/6"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/6"
 					}
 				},
 				{
@@ -658,12 +658,12 @@
 								{"text": "Don Lorenzo de Mendoza, first Count of Coruña.", "anchor": {"selectorMap": "/1"}}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/8/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/8/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/8"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/8"
 					}
 				},
 				{
@@ -678,12 +678,12 @@
 								}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/10/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/10/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/10"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/10"
 					}
 				},
 				{
@@ -695,12 +695,12 @@
 								{"text": "Don Juan de Mendoza, Lord of Colmenar.", "anchor": {"selectorMap": "/1"}}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/12/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/12/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/12"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/12"
 					}
 				},
 				{
@@ -712,12 +712,12 @@
 								{"text": "Don Pedro de Mendoza, Lord of Sazedon.", "anchor": {"selectorMap": "/1"}}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/14/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/14/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/14"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/14"
 					}
 				},
 				{
@@ -732,12 +732,12 @@
 								}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/16/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/16/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/16"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/16"
 					}
 				},
 				{
@@ -749,12 +749,12 @@
 								{"text": "Doña Maria, married to Don Ajan de Ribero.", "anchor": {"selectorMap": "/1"}}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/18/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/18/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/18"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/18"
 					}
 				},
 				{
@@ -774,17 +774,17 @@
 								}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/20/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/20/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34/20"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/20"
 					}
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/34"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34"
 			},
 			"ordered": true
 		},
@@ -797,7 +797,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/36"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/36"
 			}
 		},
 		{
@@ -815,12 +815,12 @@
 								}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/38/2/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/2/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/38/2"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/2"
 					}
 				},
 				{
@@ -832,12 +832,12 @@
 								{"text": "Don Diego de Mendoza, Archbishop of Seville.", "anchor": {"selectorMap": "/1"}}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/38/4/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/4/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/38/4"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/4"
 					}
 				},
 				{
@@ -852,12 +852,12 @@
 								}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/38/6/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/6/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/38/6"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/6"
 					}
 				},
 				{
@@ -872,12 +872,12 @@
 								}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/38/8/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/8/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/38/8"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/8"
 					}
 				},
 				{
@@ -892,17 +892,17 @@
 								}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/38/10/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/10/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/38/10"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/10"
 					}
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/38"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38"
 			},
 			"ordered": true
 		},
@@ -915,7 +915,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/40"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/40"
 			}
 		},
 		{
@@ -933,12 +933,12 @@
 								}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/2/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/2/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/2"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/2"
 					}
 				},
 				{
@@ -954,12 +954,12 @@
 								{"text": ".", "anchor": {"selectorMap": "/5"}}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/4/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/4/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/4"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/4"
 					}
 				},
 				{
@@ -973,12 +973,12 @@
 								{"text": ".", "anchor": {"selectorMap": "/3"}}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/6/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/6/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/6"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/6"
 					}
 				},
 				{
@@ -990,12 +990,12 @@
 								{"text": "Don Francisco de Mendoza, Bishop of Jaen.", "anchor": {"selectorMap": "/1"}}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/8/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/8/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/8"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/8"
 					}
 				},
 				{
@@ -1007,12 +1007,12 @@
 								{"text": "Don Diego Hurtado de Mendoza, of whom we treat.", "anchor": {"selectorMap": "/1"}}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/10/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/10/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/10"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/10"
 					}
 				},
 				{
@@ -1027,12 +1027,12 @@
 								}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/12/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/12/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/12"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/12"
 					}
 				},
 				{
@@ -1047,12 +1047,12 @@
 								}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/14/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/14/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/14"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/14"
 					}
 				},
 				{
@@ -1067,17 +1067,17 @@
 								}
 							],
 							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/16/2"
+								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/16/2"
 							}
 						}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42/16"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/16"
 					}
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/42"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42"
 			},
 			"ordered": true
 		},
@@ -1108,19 +1108,19 @@
 						{"text": " ", "anchor": {"selectorMap": "/19"}}
 					],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/44/2"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/44/2"
 					}
 				},
 				{
 					"type": "paragraph",
 					"content": [{"text": "Lope de Vega.", "anchor": {"selectorMap": "/1"}}],
 					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/44/4"
+						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/44/4"
 					}
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/4[introduction-the-family-of-mendoza]/44"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/44"
 			}
 		},
 		{
@@ -1130,7 +1130,7 @@
 				{"text": "Lazarillo de Tormes", "style": {"italic": true}, "anchor": {"selectorMap": "/2/1"}}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/2"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/2"
 			}
 		},
 		{
@@ -1142,7 +1142,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/4"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/4"
 			}
 		},
 		{
@@ -1154,7 +1154,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/6"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/6"
 			}
 		},
 		{
@@ -1166,7 +1166,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/8"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/8"
 			}
 		},
 		{
@@ -1180,7 +1180,7 @@
 				{"text": ".", "anchor": {"selectorMap": "/3"}}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/10"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/10"
 			}
 		},
 		{
@@ -1192,7 +1192,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/12"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/12"
 			}
 		},
 		{
@@ -1204,7 +1204,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/14"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/14"
 			}
 		},
 		{
@@ -1223,7 +1223,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/16"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/16"
 			}
 		},
 		{
@@ -1235,7 +1235,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/18"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/18"
 			}
 		},
 		{
@@ -1247,7 +1247,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/20"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/20"
 			}
 		},
 		{
@@ -1257,7 +1257,7 @@
 				{"text": "Lazarillo de Tormes", "style": {"italic": true}, "anchor": {"selectorMap": "/2/1"}}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/2"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/2"
 			}
 		},
 		{
@@ -1275,7 +1275,7 @@
 				{"text": " of 1667.", "anchor": {"selectorMap": "4 /9\n4 /10/1\n1 /11"}}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/4"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/4"
 			}
 		},
 		{
@@ -1294,7 +1294,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/6"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/6"
 			}
 		},
 		{
@@ -1313,7 +1313,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/8"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/8"
 			}
 		},
 		{
@@ -1325,7 +1325,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/10"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/10"
 			}
 		},
 		{
@@ -1339,14 +1339,14 @@
 				{"text": " as an authority for the meaning of words.", "anchor": {"selectorMap": "/3"}}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/12"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/12"
 			}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "English Translations", "anchor": {"selectorMap": "/1"}}],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/2"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/2"
 			}
 		},
 		{
@@ -1368,7 +1368,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/4"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/4"
 			}
 		},
 		{
@@ -1385,7 +1385,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/6"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/6"
 			}
 		},
 		{
@@ -1403,7 +1403,7 @@
 				{"text": ".", "anchor": {"selectorMap": "/9"}}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/8"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/8"
 			}
 		},
 		{
@@ -1421,7 +1421,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/10"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/10"
 			}
 		},
 		{
@@ -1433,7 +1433,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/12"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/12"
 			}
 		},
 		{
@@ -1445,14 +1445,14 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/14"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/14"
 			}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Notes on the Character of Lazaro", "anchor": {"selectorMap": "/1"}}],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/2"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/2"
 			}
 		},
 		{
@@ -1464,7 +1464,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/4"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/4"
 			}
 		},
 		{
@@ -1481,7 +1481,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/6"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/6"
 			}
 		},
 		{
@@ -1498,7 +1498,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/8"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/8"
 			}
 		},
 		{
@@ -1510,7 +1510,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/10"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/10"
 			}
 		},
 		{
@@ -1527,7 +1527,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/12"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/12"
 			}
 		},
 		{
@@ -1539,7 +1539,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/14"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/14"
 			}
 		},
 		{
@@ -1551,7 +1551,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/16"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/16"
 			}
 		},
 		{
@@ -1563,7 +1563,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/18"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/18"
 			}
 		},
 		{
@@ -1575,7 +1575,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/20"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/20"
 			}
 		},
 		{
@@ -1587,7 +1587,7 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/22"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/22"
 			}
 		},
 		{
@@ -1599,18 +1599,18 @@
 				}
 			],
 			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/24"
+				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/24"
 			}
 		},
 		{
 			"type": "paragraph",
 			"content": [{"text": "     ", "anchor": {"selectorMap": "1 /1\n1 /2/1\n1 /2/3\n1 /2/5\n1 /3"}}],
-			"anchor": {"selectorMap": "/6/8[halftitlepage.xhtml]!/2[halftitlepage]"}
+			"anchor": {"selectorMap": "/6/8[halftitlepage.xhtml]!/4/2[halftitlepage]"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Prologue", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/10[prologue.xhtml]!/2[prologue]/2"}
+			"anchor": {"selectorMap": "/6/10[prologue.xhtml]!/4/2[prologue]/2"}
 		},
 		{
 			"type": "paragraph",
@@ -1625,7 +1625,7 @@
 					"anchor": {"selectorMap": "/5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/10[prologue.xhtml]!/2[prologue]/4"}
+			"anchor": {"selectorMap": "/6/10[prologue.xhtml]!/4/2[prologue]/4"}
 		},
 		{
 			"type": "paragraph",
@@ -1635,7 +1635,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/10[prologue.xhtml]!/2[prologue]/6"}
+			"anchor": {"selectorMap": "/6/10[prologue.xhtml]!/4/2[prologue]/6"}
 		},
 		{
 			"type": "paragraph",
@@ -1645,7 +1645,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/10[prologue.xhtml]!/2[prologue]/8"}
+			"anchor": {"selectorMap": "/6/10[prologue.xhtml]!/4/2[prologue]/8"}
 		},
 		{
 			"type": "paragraph",
@@ -1655,12 +1655,12 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/10[prologue.xhtml]!/2[prologue]/10"}
+			"anchor": {"selectorMap": "/6/10[prologue.xhtml]!/4/2[prologue]/10"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "I", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/2[chapter-1]/2/2"}
+			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -1670,7 +1670,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/2[chapter-1]/2/4"}
+			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -1690,7 +1690,7 @@
 					"anchor": {"selectorMap": "/5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/2[chapter-1]/4"}
+			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/4"}
 		},
 		{
 			"type": "paragraph",
@@ -1700,7 +1700,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/2[chapter-1]/6"}
+			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/6"}
 		},
 		{
 			"type": "paragraph",
@@ -1715,7 +1715,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/2[chapter-1]/8"}
+			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/8"}
 		},
 		{
 			"type": "paragraph",
@@ -1730,7 +1730,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/2[chapter-1]/10"}
+			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/10"}
 		},
 		{
 			"type": "paragraph",
@@ -1740,7 +1740,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/2[chapter-1]/12"}
+			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/12"}
 		},
 		{
 			"type": "paragraph",
@@ -1750,7 +1750,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/2[chapter-1]/14"}
+			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/14"}
 		},
 		{
 			"type": "paragraph",
@@ -1760,7 +1760,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/2[chapter-1]/16"}
+			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/16"}
 		},
 		{
 			"type": "paragraph",
@@ -1770,19 +1770,19 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/2[chapter-1]/18"}
+			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/18"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "First Master", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/2/2"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/2/2"}
 		},
 		{
 			"type": "paragraph",
 			"content": [
 				{"text": "How Lazaro Took Service with a Blind Man", "anchor": {"selectorMap": "/1"}}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/2/4"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -1797,7 +1797,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/4"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/4"}
 		},
 		{
 			"type": "paragraph",
@@ -1812,7 +1812,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/6"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/6"}
 		},
 		{
 			"type": "paragraph",
@@ -1822,7 +1822,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/8"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/8"}
 		},
 		{
 			"type": "paragraph",
@@ -1832,7 +1832,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/10"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/10"}
 		},
 		{
 			"type": "paragraph",
@@ -1842,7 +1842,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/12"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/12"}
 		},
 		{
 			"type": "paragraph",
@@ -1852,7 +1852,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/14"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/14"}
 		},
 		{
 			"type": "paragraph",
@@ -1893,7 +1893,7 @@
 					"anchor": {"selectorMap": "/17"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/16"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/16"}
 		},
 		{
 			"type": "paragraph",
@@ -1903,7 +1903,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/18"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/18"}
 		},
 		{
 			"type": "paragraph",
@@ -1913,7 +1913,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/20"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/20"}
 		},
 		{
 			"type": "paragraph",
@@ -1923,7 +1923,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/22"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/22"}
 		},
 		{
 			"type": "paragraph",
@@ -1933,7 +1933,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/24"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/24"}
 		},
 		{
 			"type": "paragraph",
@@ -1948,7 +1948,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/26"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/26"}
 		},
 		{
 			"type": "paragraph",
@@ -1958,7 +1958,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/28"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/28"}
 		},
 		{
 			"type": "paragraph",
@@ -1968,7 +1968,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/30"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/30"}
 		},
 		{
 			"type": "paragraph",
@@ -1980,7 +1980,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/32"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/32"}
 		},
 		{
 			"type": "paragraph",
@@ -2000,7 +2000,7 @@
 					"anchor": {"selectorMap": "/5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/34"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/34"}
 		},
 		{
 			"type": "paragraph",
@@ -2010,7 +2010,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/36"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/36"}
 		},
 		{
 			"type": "paragraph",
@@ -2020,7 +2020,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/38"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/38"}
 		},
 		{
 			"type": "paragraph",
@@ -2030,7 +2030,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/40"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/40"}
 		},
 		{
 			"type": "paragraph",
@@ -2040,7 +2040,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/42"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/42"}
 		},
 		{
 			"type": "paragraph",
@@ -2055,7 +2055,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/44"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/44"}
 		},
 		{
 			"type": "paragraph",
@@ -2065,7 +2065,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/46"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/46"}
 		},
 		{
 			"type": "paragraph",
@@ -2076,12 +2076,12 @@
 				},
 				{"text": "20", "anchor": {"selectorMap": "/2[noteref-20]/1"}, "refs": [[216]]}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/2[chapter-2]/48"}
+			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/48"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Second Master", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/2/2"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -2091,7 +2091,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/2/4"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2114,7 +2114,7 @@
 					"anchor": {"selectorMap": "/9"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/4"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2124,7 +2124,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/6"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/6"}
 		},
 		{
 			"type": "paragraph",
@@ -2139,7 +2139,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/8"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/8"}
 		},
 		{
 			"type": "paragraph",
@@ -2163,7 +2163,7 @@
 					"anchor": {"selectorMap": "/9"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/10"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/10"}
 		},
 		{
 			"type": "paragraph",
@@ -2173,7 +2173,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/12"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/12"}
 		},
 		{
 			"type": "paragraph",
@@ -2183,7 +2183,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/14"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/14"}
 		},
 		{
 			"type": "paragraph",
@@ -2193,7 +2193,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/16"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/16"}
 		},
 		{
 			"type": "paragraph",
@@ -2203,7 +2203,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/18"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/18"}
 		},
 		{
 			"type": "paragraph",
@@ -2213,7 +2213,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/20"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/20"}
 		},
 		{
 			"type": "paragraph",
@@ -2223,7 +2223,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/22"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/22"}
 		},
 		{
 			"type": "paragraph",
@@ -2233,7 +2233,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/24"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/24"}
 		},
 		{
 			"type": "paragraph",
@@ -2243,7 +2243,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/26"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/26"}
 		},
 		{
 			"type": "paragraph",
@@ -2253,7 +2253,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/28"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/28"}
 		},
 		{
 			"type": "paragraph",
@@ -2263,7 +2263,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/30"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/30"}
 		},
 		{
 			"type": "paragraph",
@@ -2273,7 +2273,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/32"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/32"}
 		},
 		{
 			"type": "paragraph",
@@ -2295,7 +2295,7 @@
 					"anchor": {"selectorMap": "/7"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/34"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/34"}
 		},
 		{
 			"type": "paragraph",
@@ -2305,7 +2305,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/36"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/36"}
 		},
 		{
 			"type": "paragraph",
@@ -2315,12 +2315,12 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/2[chapter-3]/38"}
+			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/38"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Third Master", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/2/2"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -2330,7 +2330,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/2/4"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2340,7 +2340,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/4"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2355,7 +2355,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/6"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/6"}
 		},
 		{
 			"type": "paragraph",
@@ -2365,7 +2365,7 @@
 					"anchor": {"selectorMap": "475 /1\n22 /2/1\n524 /3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/8"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/8"}
 		},
 		{
 			"type": "paragraph",
@@ -2375,7 +2375,7 @@
 					"anchor": {"selectorMap": "1036 /1\n28 /2/1\n81 /3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/10"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/10"}
 		},
 		{
 			"type": "paragraph",
@@ -2385,7 +2385,7 @@
 					"anchor": {"selectorMap": "361 /1\n13 /2/1\n656 /3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/12"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/12"}
 		},
 		{
 			"type": "paragraph",
@@ -2395,7 +2395,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/14"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/14"}
 		},
 		{
 			"type": "paragraph",
@@ -2405,7 +2405,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/16"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/16"}
 		},
 		{
 			"type": "paragraph",
@@ -2415,7 +2415,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/18"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/18"}
 		},
 		{
 			"type": "paragraph",
@@ -2425,7 +2425,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/20"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/20"}
 		},
 		{
 			"type": "paragraph",
@@ -2435,7 +2435,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/22"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/22"}
 		},
 		{
 			"type": "paragraph",
@@ -2445,7 +2445,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/24"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/24"}
 		},
 		{
 			"type": "paragraph",
@@ -2460,7 +2460,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/26"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/26"}
 		},
 		{
 			"type": "paragraph",
@@ -2470,7 +2470,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/28"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/28"}
 		},
 		{
 			"type": "paragraph",
@@ -2480,7 +2480,7 @@
 					"anchor": {"selectorMap": "202 /1\n4 /2/1\n116 /3\n11 /4/1\n154 /5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/30"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/30"}
 		},
 		{
 			"type": "paragraph",
@@ -2490,7 +2490,7 @@
 					"anchor": {"selectorMap": "488 /1\n4 /2/1\n248 /3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/32"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/32"}
 		},
 		{
 			"type": "paragraph",
@@ -2500,7 +2500,7 @@
 					"anchor": {"selectorMap": "285 /1\n3 /2/1\n645 /3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/34"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/34"}
 		},
 		{
 			"type": "paragraph",
@@ -2510,7 +2510,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/36"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/36"}
 		},
 		{
 			"type": "paragraph",
@@ -2520,7 +2520,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/38"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/38"}
 		},
 		{
 			"type": "paragraph",
@@ -2530,7 +2530,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/40"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/40"}
 		},
 		{
 			"type": "paragraph",
@@ -2540,7 +2540,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/42"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/42"}
 		},
 		{
 			"type": "paragraph",
@@ -2560,7 +2560,7 @@
 					"anchor": {"selectorMap": "/5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/44"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/44"}
 		},
 		{
 			"type": "paragraph",
@@ -2570,7 +2570,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/46"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/46"}
 		},
 		{
 			"type": "paragraph",
@@ -2580,7 +2580,7 @@
 					"anchor": {"selectorMap": "647 /1\n4 /2/1\n567 /3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/48"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/48"}
 		},
 		{
 			"type": "paragraph",
@@ -2590,7 +2590,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/50"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/50"}
 		},
 		{
 			"type": "paragraph",
@@ -2600,7 +2600,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/52"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/52"}
 		},
 		{
 			"type": "paragraph",
@@ -2610,7 +2610,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/54"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/54"}
 		},
 		{
 			"type": "paragraph",
@@ -2620,7 +2620,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/56"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/56"}
 		},
 		{
 			"type": "paragraph",
@@ -2630,7 +2630,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/58"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/58"}
 		},
 		{
 			"type": "paragraph",
@@ -2645,7 +2645,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/60"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/60"}
 		},
 		{
 			"type": "paragraph",
@@ -2655,7 +2655,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/62"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/62"}
 		},
 		{
 			"type": "paragraph",
@@ -2665,7 +2665,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/64"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/64"}
 		},
 		{
 			"type": "paragraph",
@@ -2675,7 +2675,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/66"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/66"}
 		},
 		{
 			"type": "paragraph",
@@ -2685,7 +2685,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/68"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/68"}
 		},
 		{
 			"type": "paragraph",
@@ -2695,7 +2695,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/70"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/70"}
 		},
 		{
 			"type": "paragraph",
@@ -2705,7 +2705,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/72"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/72"}
 		},
 		{
 			"type": "paragraph",
@@ -2715,7 +2715,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/74"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/74"}
 		},
 		{
 			"type": "paragraph",
@@ -2725,7 +2725,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/76"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/76"}
 		},
 		{
 			"type": "paragraph",
@@ -2735,12 +2735,12 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/2[chapter-4]/78"}
+			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/78"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Fourth Master", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/20[chapter-5.xhtml]!/2[chapter-5]/2/2"}
+			"anchor": {"selectorMap": "/6/20[chapter-5.xhtml]!/4/2[chapter-5]/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -2750,7 +2750,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/20[chapter-5.xhtml]!/2[chapter-5]/2/4"}
+			"anchor": {"selectorMap": "/6/20[chapter-5.xhtml]!/4/2[chapter-5]/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2760,12 +2760,12 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/20[chapter-5.xhtml]!/2[chapter-5]/4"}
+			"anchor": {"selectorMap": "/6/20[chapter-5.xhtml]!/4/2[chapter-5]/4"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Fifth Master", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/2[chapter-6]/2/2"}
+			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -2775,7 +2775,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/2[chapter-6]/2/4"}
+			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2790,7 +2790,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/2[chapter-6]/4"}
+			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2800,7 +2800,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/2[chapter-6]/6"}
+			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/6"}
 		},
 		{
 			"type": "paragraph",
@@ -2815,7 +2815,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/2[chapter-6]/8"}
+			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/8"}
 		},
 		{
 			"type": "paragraph",
@@ -2825,7 +2825,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/2[chapter-6]/10"}
+			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/10"}
 		},
 		{
 			"type": "paragraph",
@@ -2835,7 +2835,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/2[chapter-6]/12"}
+			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/12"}
 		},
 		{
 			"type": "paragraph",
@@ -2845,7 +2845,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/2[chapter-6]/14"}
+			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/14"}
 		},
 		{
 			"type": "paragraph",
@@ -2855,7 +2855,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/2[chapter-6]/16"}
+			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/16"}
 		},
 		{
 			"type": "paragraph",
@@ -2865,7 +2865,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/2[chapter-6]/18"}
+			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/18"}
 		},
 		{
 			"type": "paragraph",
@@ -2875,7 +2875,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/2[chapter-6]/20"}
+			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/20"}
 		},
 		{
 			"type": "paragraph",
@@ -2885,12 +2885,12 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/2[chapter-6]/22"}
+			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/22"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Sixth Master", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/24[chapter-7.xhtml]!/2[chapter-7]/2/2"}
+			"anchor": {"selectorMap": "/6/24[chapter-7.xhtml]!/4/2[chapter-7]/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -2900,7 +2900,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/24[chapter-7.xhtml]!/2[chapter-7]/2/4"}
+			"anchor": {"selectorMap": "/6/24[chapter-7.xhtml]!/4/2[chapter-7]/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2920,12 +2920,12 @@
 					"anchor": {"selectorMap": "/5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/24[chapter-7.xhtml]!/2[chapter-7]/4"}
+			"anchor": {"selectorMap": "/6/24[chapter-7.xhtml]!/4/2[chapter-7]/4"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Seventh Master", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/2[chapter-8]/2/2"}
+			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -2935,7 +2935,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/2[chapter-8]/2/4"}
+			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2945,7 +2945,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/2[chapter-8]/4"}
+			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2955,7 +2955,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/2[chapter-8]/6"}
+			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/6"}
 		},
 		{
 			"type": "paragraph",
@@ -2970,7 +2970,7 @@
 					"anchor": {"selectorMap": "/5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/2[chapter-8]/8[chapter-8-p-3]"}
+			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/8[chapter-8-p-3]"}
 		},
 		{
 			"type": "paragraph",
@@ -2980,7 +2980,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/2[chapter-8]/10"}
+			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/10"}
 		},
 		{
 			"type": "paragraph",
@@ -2990,7 +2990,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/2[chapter-8]/12"}
+			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/12"}
 		},
 		{
 			"type": "paragraph",
@@ -3005,14 +3005,14 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/2[chapter-8]/14"}
+			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/14"}
 		},
 		{
 			"type": "heading",
 			"content": [
 				{"text": "Sketch Map of the Route from Salamanca to Toledo", "anchor": {"selectorMap": "/1"}}
 			],
-			"anchor": {"selectorMap": "/6/28[appendix.xhtml]!/2[appendix]/2"}
+			"anchor": {"selectorMap": "/6/28[appendix.xhtml]!/4/2[appendix]/2"}
 		},
 		{
 			"type": "image",
@@ -3021,12 +3021,12 @@
 					"text": "A map entitled “Sketch Map of the Route from Salamanca to Toledo.” The route highlighted is in southern Spain, and goes via Calvarasa, Albe de Tormes, Horcaja, Piedrahita, Navalacruz, S. Martin de Val de iglesia, Almorox, Escalona, Magueda, and Torrijos."
 				}
 			],
-			"anchor": {"selectorMap": "/6/28[appendix.xhtml]!/2[appendix]/4[illustration-1]/2"}
+			"anchor": {"selectorMap": "/6/28[appendix.xhtml]!/4/2[appendix]/4[illustration-1]/2"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Endnotes", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/2"}
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/2"}
 		},
 		{
 			"type": "note",
@@ -3046,10 +3046,10 @@
 						{"text": " 291. ", "anchor": {"selectorMap": "/5"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/6/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/2[note-1]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/2[note-1]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/2[note-1]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/2[note-1]"},
 			"backRefs": [[11]]
 		},
 		{
@@ -3071,10 +3071,10 @@
 								{"text": " life and mount on mine.", "anchor": {"selectorMap": "/6/3"}},
 								{"text": " ", "anchor": {"selectorMap": "/7"}}
 							],
-							"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/4[note-2]/2/2"}
+							"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/4[note-2]/2/2"}
 						}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/4[note-2]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/4[note-2]/2"}
 				},
 				{
 					"type": "paragraph",
@@ -3083,10 +3083,10 @@
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}},
 						{"text": " ", "anchor": {"selectorMap": "/3"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/4[note-2]/4"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/4[note-2]/4"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/4[note-2]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/4[note-2]"},
 			"backRefs": [[17]]
 		},
 		{
@@ -3105,10 +3105,10 @@
 						{"text": " 469 – 71. ", "anchor": {"selectorMap": "/5"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/6/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/6[note-3]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/6[note-3]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/6[note-3]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/6[note-3]"},
 			"backRefs": [[43]]
 		},
 		{
@@ -3122,10 +3122,10 @@
 						{"text": ". ", "anchor": {"selectorMap": "/3"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/8[note-4]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/8[note-4]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/8[note-4]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/8[note-4]"},
 			"backRefs": [[44]]
 		},
 		{
@@ -3152,10 +3152,10 @@
 						{"text": ", with the second parts. ", "anchor": {"selectorMap": "/13"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/14/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/10[note-5]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/10[note-5]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/10[note-5]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/10[note-5]"},
 			"backRefs": [[45]]
 		},
 		{
@@ -3172,10 +3172,10 @@
 						{"text": ". ", "anchor": {"selectorMap": "/3"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/12[note-6]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/12[note-6]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/12[note-6]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/12[note-6]"},
 			"backRefs": [[57]]
 		},
 		{
@@ -3187,10 +3187,10 @@
 						{"text": "See Sir Francis Doyle’s poem. ", "anchor": {"selectorMap": "/1"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/14[note-7]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/14[note-7]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/14[note-7]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/14[note-7]"},
 			"backRefs": [[58]]
 		},
 		{
@@ -3207,10 +3207,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/16[note-8]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/16[note-8]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/16[note-8]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/16[note-8]"},
 			"backRefs": [[69]]
 		},
 		{
@@ -3225,10 +3225,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/18[note-9]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/18[note-9]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/18[note-9]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/18[note-9]"},
 			"backRefs": [[75]]
 		},
 		{
@@ -3243,10 +3243,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/20[note-10]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/20[note-10]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/20[note-10]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/20[note-10]"},
 			"backRefs": [[75]]
 		},
 		{
@@ -3271,10 +3271,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/6/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/22[note-11]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/22[note-11]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/22[note-11]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/22[note-11]"},
 			"backRefs": [[77], [209]]
 		},
 		{
@@ -3289,10 +3289,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/24[note-12]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/24[note-12]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/24[note-12]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/24[note-12]"},
 			"backRefs": [[78]]
 		},
 		{
@@ -3306,10 +3306,10 @@
 						{"text": ". ", "anchor": {"selectorMap": "/3"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/26[note-13]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/26[note-13]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/26[note-13]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/26[note-13]"},
 			"backRefs": [[85]]
 		},
 		{
@@ -3324,10 +3324,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/28[note-14]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/28[note-14]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/28[note-14]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/28[note-14]"},
 			"backRefs": [[86]]
 		},
 		{
@@ -3374,10 +3374,10 @@
 						{"text": ", or farthing. ", "anchor": {"selectorMap": "/23"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/24/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/30[note-15]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/30[note-15]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/30[note-15]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/30[note-15]"},
 			"backRefs": [[91]]
 		},
 		{
@@ -3392,10 +3392,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/32[note-16]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/32[note-16]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/32[note-16]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/32[note-16]"},
 			"backRefs": [[96]]
 		},
 		{
@@ -3437,10 +3437,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/14/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/34[note-17]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/34[note-17]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/34[note-17]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/34[note-17]"},
 			"backRefs": [[99]]
 		},
 		{
@@ -3460,10 +3460,10 @@
 						{"text": " 185) calls “navet,” a sort of small turnip. ", "anchor": {"selectorMap": "/7"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/8/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/36[note-18]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/36[note-18]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/36[note-18]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/36[note-18]"},
 			"backRefs": [[100]]
 		},
 		{
@@ -3477,10 +3477,10 @@
 						{"text": ". ", "anchor": {"selectorMap": "/3"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/38[note-19]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/38[note-19]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/38[note-19]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/38[note-19]"},
 			"backRefs": [[105]]
 		},
 		{
@@ -3495,10 +3495,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/40[note-20]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/40[note-20]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/40[note-20]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/40[note-20]"},
 			"backRefs": [[107]]
 		},
 		{
@@ -3518,10 +3518,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/42[note-21]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/42[note-21]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/42[note-21]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/42[note-21]"},
 			"backRefs": [[110]]
 		},
 		{
@@ -3545,10 +3545,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/8/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/44[note-22]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/44[note-22]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/44[note-22]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/44[note-22]"},
 			"backRefs": [[110]]
 		},
 		{
@@ -3563,10 +3563,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/46[note-23]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/46[note-23]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/46[note-23]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/46[note-23]"},
 			"backRefs": [[110]]
 		},
 		{
@@ -3597,10 +3597,10 @@
 						{"text": " (esquires). ", "anchor": {"selectorMap": "/15"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/16/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/48[note-24]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/48[note-24]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/48[note-24]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/48[note-24]"},
 			"backRefs": [[131]]
 		},
 		{
@@ -3620,10 +3620,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/50[note-25]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/50[note-25]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/50[note-25]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/50[note-25]"},
 			"backRefs": [[141]]
 		},
 		{
@@ -3640,10 +3640,10 @@
 						{"text": ", a century and a half earlier. ", "anchor": {"selectorMap": "/3"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/52[note-26]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/52[note-26]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/52[note-26]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/52[note-26]"},
 			"backRefs": [[173]]
 		},
 		{
@@ -3658,10 +3658,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/54[note-27]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/54[note-27]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/54[note-27]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/54[note-27]"},
 			"backRefs": [[175]]
 		},
 		{
@@ -3698,10 +3698,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/12/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/56[note-28]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/56[note-28]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/56[note-28]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/56[note-28]"},
 			"backRefs": [[190]]
 		},
 		{
@@ -3724,16 +3724,16 @@
 						{"text": " ", "anchor": {"selectorMap": "/7"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/8/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/58[note-29]/2"}
+					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/58[note-29]/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/2[endnotes]/4/58[note-29]"},
+			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/58[note-29]"},
 			"backRefs": [[193]]
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "List of Illustrations", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/32[loi.xhtml]!/2[loi]/2"}
+			"anchor": {"selectorMap": "/6/32[loi.xhtml]!/4/2[loi]/2"}
 		},
 		{
 			"type": "list",
@@ -3756,24 +3756,24 @@
 								},
 								{"text": " ", "anchor": {"selectorMap": "/3"}}
 							],
-							"anchor": {"selectorMap": "/6/32[loi.xhtml]!/2[loi]/4/2/2"}
+							"anchor": {"selectorMap": "/6/32[loi.xhtml]!/4/2[loi]/4/2/2"}
 						}
 					],
-					"anchor": {"selectorMap": "/6/32[loi.xhtml]!/2[loi]/4/2"}
+					"anchor": {"selectorMap": "/6/32[loi.xhtml]!/4/2[loi]/4/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/32[loi.xhtml]!/2[loi]/4"},
+			"anchor": {"selectorMap": "/6/32[loi.xhtml]!/4/2[loi]/4"},
 			"ordered": true
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Colophon", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/2[colophon]/2/2"}
+			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/4/2[colophon]/2/2"}
 		},
 		{
 			"type": "image",
 			"content": [{"text": "The Standard Ebooks logo."}],
-			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/2[colophon]/2/4"}
+			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/4/2[colophon]/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -3799,7 +3799,7 @@
 				},
 				{"text": ".", "anchor": {"selectorMap": "/15"}}
 			],
-			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/2[colophon]/4"}
+			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/4/2[colophon]/4"}
 		},
 		{
 			"type": "paragraph",
@@ -3858,7 +3858,7 @@
 				},
 				{"text": ".", "anchor": {"selectorMap": "/35"}}
 			],
-			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/2[colophon]/6"}
+			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/4/2[colophon]/6"}
 		},
 		{
 			"type": "paragraph",
@@ -3906,7 +3906,7 @@
 				},
 				{"text": ".", "anchor": {"selectorMap": "/31"}}
 			],
-			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/2[colophon]/8"}
+			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/4/2[colophon]/8"}
 		},
 		{
 			"type": "paragraph",
@@ -3945,7 +3945,7 @@
 				},
 				{"text": ".", "anchor": {"selectorMap": "/23"}}
 			],
-			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/2[colophon]/10"}
+			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/4/2[colophon]/10"}
 		},
 		{
 			"type": "paragraph",
@@ -3961,12 +3961,12 @@
 				},
 				{"text": ".", "anchor": {"selectorMap": "/3"}}
 			],
-			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/2[colophon]/12"}
+			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/4/2[colophon]/12"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Uncopyright", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/2[uncopyright]/2"}
+			"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/4/2[uncopyright]/2"}
 		},
 		{
 			"type": "blockquote",
@@ -3992,10 +3992,10 @@
 						},
 						{"text": " ", "anchor": {"selectorMap": "/11"}}
 					],
-					"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/2[uncopyright]/4/2"}
+					"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/4/2[uncopyright]/4/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/2[uncopyright]/4"}
+			"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/4/2[uncopyright]/4"}
 		},
 		{
 			"type": "paragraph",
@@ -4007,7 +4007,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/2[uncopyright]/6"}
+			"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/4/2[uncopyright]/6"}
 		},
 		{
 			"type": "paragraph",
@@ -4017,7 +4017,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/2[uncopyright]/8"}
+			"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/4/2[uncopyright]/8"}
 		},
 		{
 			"type": "paragraph",
@@ -4036,7 +4036,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/2[uncopyright]/10"}
+			"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/4/2[uncopyright]/10"}
 		}
 	],
 	"pageMappingType": "locations",
