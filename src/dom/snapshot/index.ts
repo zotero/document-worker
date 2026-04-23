@@ -14,6 +14,7 @@ import type { ContentBlockNode } from '../../../structured-document-text/schema'
 import { getFulltextFromStructuredText } from '../../../structured-document-text/src/fulltext.js';
 import { getContentRange, getNestedBlockPlainText, getBlockPlainText } from '../../../structured-document-text/src/text.js';
 import type { StructuredDocumentText, OutlineItem } from '../../../structured-document-text/schema';
+import { cssEscape } from "./cssEscape";
 
 const SCHEMA_VERSION = '1.0.0-draft';
 const PROCESSOR_VERSION = '1.0.0-draft';
@@ -285,10 +286,6 @@ function getTextOffset(root: Element, target: ChildNode): number {
 		if (walk(child)) break;
 	}
 	return offset;
-}
-
-function cssEscape(str: string): string {
-	return str.replace(/([^\w-])/g, '\\$1');
 }
 
 function getUniqueSelector(el: Element, body: Element): string | null {
