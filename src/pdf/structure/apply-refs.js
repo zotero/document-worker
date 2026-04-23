@@ -1,4 +1,4 @@
-import { applyTextAttributes, getBlockText } from '../../../zotero-structured-text/src/pdf/index.js';
+import { applyTextAttributes, getBlockText } from '../../../structured-document-text/src/pdf/index.js';
 
 function preprocessNumberReferences(refCit) {
 	let { references } = refCit.refList;

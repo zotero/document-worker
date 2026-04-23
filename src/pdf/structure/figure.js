@@ -1,5 +1,5 @@
 
-import { getBlockText } from '../../../zotero-structured-text/src/pdf/index.js';
+import { getBlockText } from '../../../structured-document-text/src/pdf/index.js';
 import { normalizeLabelWord } from './citations.js';
 
 export function getFigures(structure) {

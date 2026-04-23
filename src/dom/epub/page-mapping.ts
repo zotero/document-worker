@@ -10,8 +10,8 @@
 import type { PageListEntry } from './toc';
 import type { PageMarker, PageMarkerSource } from './epub-xhtml-to-blocks';
 import type { IdInfo } from './epub-xhtml-to-blocks';
-import type { ContentBlockNode, PageInfo } from '../../../zotero-structured-text/schema';
-import { getContentRange, getNestedBlockPlainText } from '../../../zotero-structured-text/src/text.js';
+import type { ContentBlockNode, PageInfo } from '../../../structured-document-text/schema';
+import { getContentRange, getNestedBlockPlainText } from '../../../structured-document-text/src/text.js';
 import { splitHref } from './cross-references';
 
 const EPUB_LOCATION_BREAK_INTERVAL = 1800;

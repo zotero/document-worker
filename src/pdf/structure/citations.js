@@ -1,6 +1,6 @@
 // Unified parser for delimited citation ranges like [...] and (...)
 // Returns { items, nextIndex } only if a proper closing delimiter is found; otherwise returns null.
-import { getBlockByRef, getBlockText, getNextBlockRef } from '../../../zotero-structured-text/src/pdf/index.js';
+import { getBlockByRef, getBlockText, getNextBlockRef } from '../../../structured-document-text/src/pdf/index.js';
 
 function parseDelimitedRange(bt, openIndex, openCharVal, closeCharVal, type, refIndex, mathBlocks, blockRef) {
 	const openChar = bt.text[openIndex];

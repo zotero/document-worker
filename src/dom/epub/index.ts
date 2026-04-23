@@ -6,9 +6,9 @@ import { convertSection } from './epub-xhtml-to-blocks';
 import type { IdInfo, LinkRecord, PageMarker } from './epub-xhtml-to-blocks';
 import { buildPageMappings, findPageForBlock } from './page-mapping';
 import { resolveLinks, computeSectionOffsets, splitHref } from './cross-references';
-import { getFulltextFromStructuredText } from '../../../zotero-structured-text/src/fulltext.js';
-import { getNestedBlockPlainText, mergeNodesWithSelectorMap } from '../../../zotero-structured-text/src/text.js';
-import type { ZoteroStructuredText, OutlineItem, PageInfo, ContentBlockNode } from '../../../zotero-structured-text/schema';
+import { getFulltextFromStructuredText } from '../../../structured-document-text/src/fulltext.js';
+import { getNestedBlockPlainText, mergeNodesWithSelectorMap } from '../../../structured-document-text/src/text.js';
+import type { StructuredDocumentText, OutlineItem, PageInfo, ContentBlockNode } from '../../../structured-document-text/schema';
 
 const SCHEMA_VERSION = '1.0.0-draft';
 const PROCESSOR_VERSION = '1.0.0-draft';
@@ -20,13 +20,13 @@ const XHTML_MEDIA_TYPES = new Set([
 ]);
 
 interface FulltextOptions {
-	structure?: ZoteroStructuredText;
+	structure?: StructuredDocumentText;
 }
 
 /**
  * Extract structured text from an EPUB file.
  */
-export function getEpubStructure(arrayBuffer: ArrayBuffer): ZoteroStructuredText {
+export function getEpubStructure(arrayBuffer: ArrayBuffer): StructuredDocumentText {
 	let entries = readZipEntries(arrayBuffer);
 	let decoder = new TextDecoder('utf-8');
 
@@ -165,7 +165,7 @@ export function getEpubStructure(arrayBuffer: ArrayBuffer): ZoteroStructuredText
 	// 13. Compute file size
 	structure.fileSize = arrayBuffer.byteLength;
 
-	return structure as ZoteroStructuredText;
+	return structure as StructuredDocumentText;
 }
 
 /**
