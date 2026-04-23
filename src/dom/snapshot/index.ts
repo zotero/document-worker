@@ -10,16 +10,16 @@ import {
 } from '../epub/xml';
 import { convertBody } from '../html-to-blocks';
 import type { ConvertHooks } from '../html-to-blocks';
-import type { ContentBlockNode } from '../../../zotero-structured-text/schema';
-import { getFulltextFromStructuredText } from '../../../zotero-structured-text/src/fulltext.js';
-import { getContentRange, getNestedBlockPlainText, getBlockPlainText } from '../../../zotero-structured-text/src/text.js';
-import type { ZoteroStructuredText, OutlineItem } from '../../../zotero-structured-text/schema';
+import type { ContentBlockNode } from '../../../structured-document-text/schema';
+import { getFulltextFromStructuredText } from '../../../structured-document-text/src/fulltext.js';
+import { getContentRange, getNestedBlockPlainText, getBlockPlainText } from '../../../structured-document-text/src/text.js';
+import type { StructuredDocumentText, OutlineItem } from '../../../structured-document-text/schema';
 
 const SCHEMA_VERSION = '1.0.0-draft';
 const PROCESSOR_VERSION = '1.0.0-draft';
 
 interface FulltextOptions {
-	structure?: ZoteroStructuredText;
+	structure?: StructuredDocumentText;
 }
 
 const EXCLUDED_ANCESTORS = new Set(['aside', 'nav', 'footer', 'template']);
@@ -29,7 +29,7 @@ const EXCLUDED_ANCESTORS = new Set(['aside', 'nav', 'footer', 'template']);
 export function getSnapshotStructure(
 	buf: ArrayBuffer,
 	contentType: string,
-): ZoteroStructuredText {
+): StructuredDocumentText {
 	let decoder = new TextDecoder('utf-8');
 	let html = decoder.decode(new Uint8Array(buf));
 	let doc = parseXML(html, { xmlMode: false });
@@ -109,7 +109,7 @@ export function getSnapshotStructure(
 		...(outline.length > 0 ? { outline } : {}),
 		...(charCount > 0 ? { characterCount: charCount } : {}),
 		fileSize: buf.byteLength,
-	} as unknown as ZoteroStructuredText;
+	} as unknown as StructuredDocumentText;
 }
 
 export function getSnapshotFulltext(
@@ -334,7 +334,7 @@ function getUniqueSelector(el: Element, body: Element): string | null {
 	return selector || null;
 }
 
-function emptyStructure(contentType: string, fileSize: number): ZoteroStructuredText {
+function emptyStructure(contentType: string, fileSize: number): StructuredDocumentText {
 	return {
 		schemaVersion: SCHEMA_VERSION,
 		processor: { type: 'snapshot' as const, version: PROCESSOR_VERSION },
@@ -345,5 +345,5 @@ function emptyStructure(contentType: string, fileSize: number): ZoteroStructured
 		pages: [{ contentRanges: [] }],
 		content: [],
 		fileSize,
-	} as unknown as ZoteroStructuredText;
+	} as unknown as StructuredDocumentText;
 }

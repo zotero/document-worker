@@ -12,5 +12,5 @@
 		"rootDir": "src",
 		"skipLibCheck": true
 	},
-	"include": ["src/**/*.ts", "zotero-structured-text/schema.d.ts", "zotero-structured-text/src/**/*.d.ts"]
+	"include": ["src/**/*.ts", "structured-document-text/schema.d.ts", "structured-document-text/src/**/*.d.ts"]
 }

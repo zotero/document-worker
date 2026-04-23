@@ -6,7 +6,7 @@
  */
 
 import type { LinkRecord, IdInfo } from './epub-xhtml-to-blocks';
-import type { ContentBlockNode } from '../../../zotero-structured-text/schema';
+import type { ContentBlockNode } from '../../../structured-document-text/schema';
 
 const NOTEREF_ROLES = new Set(['doc-noteref', 'doc-biblioref', 'doc-glossref']);
 

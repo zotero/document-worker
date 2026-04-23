@@ -15,13 +15,13 @@ import {
 	getContentRangeFromBlocks,
 	mergeBlocks,
 	pushArtifactsToTheEnd,
-} from '../../../zotero-structured-text/src/pdf/index.js';
+} from '../../../structured-document-text/src/pdf/index.js';
 import { mergeLists, wrapListItems } from './list-utils.js';
 import { addRefs, getParsedLinkRefs, getAnnotLinkRefs, getLinksFromAnnotations } from './link.js';
 import { cleanupBlockMetrics, cleanupTextNodeStyles, getHeadingMetrics, getParagraphMetrics, mergeListItemContinuations, mergeParagraphs } from './block-cleanup.js';
 import { createBlockAnchor, ensureBlockPageRects } from './util.js';
-// import { getNextChunk } from '../../../zotero-structured-text/src/chunker.js';
-// import { getContent, getRefRangesFromPageRects } from '../../../zotero-structured-text/src/pdf/content.js';
+// import { getNextChunk } from '../../../structured-document-text/src/chunker.js';
+// import { getContent, getRefRangesFromPageRects } from '../../../structured-document-text/src/pdf/content.js';
 
 const SCHEMA_VERSION = '1.0.0-draft';
 const PROCESSOR_VERSION = '1.0.0-draft';

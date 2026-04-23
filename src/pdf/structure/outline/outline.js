@@ -1,4 +1,4 @@
-import { getBlockPlainText } from '../../../../zotero-structured-text/src/pdf/index.js';
+import { getBlockPlainText } from '../../../../structured-document-text/src/pdf/index.js';
 import { resolveDestination } from '../util.js';
 
 const FORCE_TOP_TITLES = [

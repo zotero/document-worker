@@ -1,4 +1,4 @@
-import { getBlockText } from '../../../zotero-structured-text/src/pdf/index.js';
+import { getBlockText } from '../../../structured-document-text/src/pdf/index.js';
 
 function getWords(blockText) {
 	const words = [];

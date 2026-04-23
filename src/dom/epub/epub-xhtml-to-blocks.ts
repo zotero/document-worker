@@ -10,7 +10,7 @@ import {
 import { generateCFIBase, elementPath } from './cfi';
 import { convertBody } from '../html-to-blocks';
 import type { ConvertHooks, Block } from '../html-to-blocks';
-import type { ContentBlockNode, TextNode } from '../../../zotero-structured-text/schema';
+import type { ContentBlockNode, TextNode } from '../../../structured-document-text/schema';
 
 const NOTE_EPUB_TYPES = new Set(['footnote', 'rearnote', 'note', 'endnote']);
 

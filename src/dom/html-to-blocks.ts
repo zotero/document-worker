@@ -4,7 +4,7 @@ import {
 	getAttribute,
 	getElementChildren,
 } from './epub/xml';
-import { mergeTextNodes } from '../../zotero-structured-text/src/text.js';
+import { mergeTextNodes } from '../../structured-document-text/src/text.js';
 import type {
     TextStyle,
     TextNode,
@@ -14,7 +14,7 @@ import type {
     RefsArray,
     BackRefsArray,
     ArtifactFlag,
-} from '../../zotero-structured-text/schema';
+} from '../../structured-document-text/schema';
 
 /** Block type for incremental construction. Covers all block variant properties. */
 export interface Block {

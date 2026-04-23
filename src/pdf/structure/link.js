@@ -1,7 +1,7 @@
 import {
   resolveDestination, getRectCenter, getRangeRects, getClosestDistance
 } from './util.js';
-import { getBlockText, getNextBlockRef, getTextNodesAtRange } from '../../../zotero-structured-text/src/pdf/index.js';
+import { getBlockText, getNextBlockRef, getTextNodesAtRange } from '../../../structured-document-text/src/pdf/index.js';
 
 export async function getLinksFromAnnotations(pdfDocument, page) {
 	let links = [];
