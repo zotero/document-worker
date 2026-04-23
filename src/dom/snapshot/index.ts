@@ -30,7 +30,11 @@ export function getSnapshotStructure(
 	buf: ArrayBuffer,
 	contentType: string,
 ): StructuredDocumentText {
-	let decoder = new TextDecoder('utf-8');
+    if (contentType !== 'text/html') {
+        console.warn(`contentType should be text/html for snapshot; got ${contentType}`);
+    }
+
+    let decoder = new TextDecoder('utf-8');
 	let html = decoder.decode(new Uint8Array(buf));
 	let doc = parseXML(html, { xmlMode: false });
 
@@ -51,33 +55,33 @@ export function getSnapshotStructure(
 		},
 		textAnchor(node) {
 			let el = node.parent;
-			if (!el || !isElement(el as ChildNode)) return undefined;
-			let parent = el as Element;
-			let value = getUniqueSelector(parent, body);
+			if (!el || !isElement(el)) return undefined;
+			let value = getUniqueSelector(el, body);
 			if (!value) return undefined;
 
-			// Compute relative textMap — suffix after block's CSS selector.
+			// Compute relative textMap, storing a suffix after the block's
+            // CSS selector.
 			// Text parent selector always starts with the block selector
-			// (since it walks up through the same ancestors), UNLESS an
+			// (since it walks up through the same ancestors), unless an
 			// inline element or intermediate ancestor has an id attribute
 			// which short-circuits getUniqueSelector. In that case, fall
 			// back to the absolute selector.
-			let children = parent.children || [];
+			let children = el.children || [];
 			let hasOffset = children.length > 1;
-			let offset = hasOffset ? getTextOffset(parent, node) : 0;
+			let offset = hasOffset ? getTextOffset(el, node) : 0;
 
 			if (value === currentBlockSelector) {
-				// Same element as block — just the offset (or empty)
+				// Same element as block: just the offset (or nothing)
 				return { selectorMap: hasOffset ? String(offset) : '' };
 			}
 
 			if (value.startsWith(currentBlockSelector + ' > ')) {
-				// Child of block — store the ' > ...' suffix
+				// Child of block: store the ' > ...' suffix
 				let suffix = value.substring(currentBlockSelector.length);
 				return { selectorMap: hasOffset ? suffix + ' ' + offset : suffix };
 			}
 
-			// Absolute fallback (inline element has its own id)
+			// Absolute fallback (inline element has its own id attribute)
 			return { selectorMap: hasOffset ? value + ' ' + offset : value };
 		},
 	};
@@ -101,7 +105,7 @@ export function getSnapshotStructure(
 		schemaVersion: SCHEMA_VERSION,
 		processor: { type: 'snapshot' as const, version: PROCESSOR_VERSION },
 		dateCreated: new Date().toISOString(),
-		sourceContentType: contentType,
+		sourceContentType: 'text/html',
 		sourceHash: '',
 		metadata: extractMetadata(doc),
 		pages: [{ contentRanges }],
@@ -109,7 +113,7 @@ export function getSnapshotStructure(
 		...(outline.length > 0 ? { outline } : {}),
 		...(charCount > 0 ? { characterCount: charCount } : {}),
 		fileSize: buf.byteLength,
-	} as unknown as StructuredDocumentText;
+	} satisfies StructuredDocumentText;
 }
 
 export function getSnapshotFulltext(
@@ -335,15 +339,18 @@ function getUniqueSelector(el: Element, body: Element): string | null {
 }
 
 function emptyStructure(contentType: string, fileSize: number): StructuredDocumentText {
+    if (contentType !== 'text/html') {
+        console.warn(`contentType should be text/html for snapshot; got ${contentType}`);
+    }
 	return {
 		schemaVersion: SCHEMA_VERSION,
 		processor: { type: 'snapshot' as const, version: PROCESSOR_VERSION },
 		dateCreated: new Date().toISOString(),
-		sourceContentType: contentType,
+		sourceContentType: 'text/html',
 		sourceHash: '',
 		metadata: {},
 		pages: [{ contentRanges: [] }],
 		content: [],
 		fileSize,
-	} as unknown as StructuredDocumentText;
+	} satisfies StructuredDocumentText;
 }
