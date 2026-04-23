@@ -31,9 +31,7 @@ export function getSnapshotStructure(
 	buf: ArrayBuffer,
 	contentType: string,
 ): StructuredDocumentText {
-    if (contentType !== 'text/html') {
-        console.warn(`contentType should be text/html for snapshot; got ${contentType}`);
-    }
+    let sourceContentType = ensureValidContentType(contentType);
 
     let decoder = new TextDecoder('utf-8');
 	let html = decoder.decode(new Uint8Array(buf));
@@ -106,7 +104,7 @@ export function getSnapshotStructure(
 		schemaVersion: SCHEMA_VERSION,
 		processor: { type: 'snapshot' as const, version: PROCESSOR_VERSION },
 		dateCreated: new Date().toISOString(),
-		sourceContentType: 'text/html',
+		sourceContentType,
 		sourceHash: '',
 		metadata: extractMetadata(doc),
 		pages: [{ contentRanges }],
@@ -336,18 +334,24 @@ function getUniqueSelector(el: Element, body: Element): string | null {
 }
 
 function emptyStructure(contentType: string, fileSize: number): StructuredDocumentText {
-    if (contentType !== 'text/html') {
-        console.warn(`contentType should be text/html for snapshot; got ${contentType}`);
-    }
+    let sourceContentType = ensureValidContentType(contentType);
 	return {
 		schemaVersion: SCHEMA_VERSION,
 		processor: { type: 'snapshot' as const, version: PROCESSOR_VERSION },
 		dateCreated: new Date().toISOString(),
-		sourceContentType: 'text/html',
+		sourceContentType,
 		sourceHash: '',
 		metadata: {},
 		pages: [{ contentRanges: [] }],
 		content: [],
 		fileSize,
 	} satisfies StructuredDocumentText;
+}
+
+function ensureValidContentType(contentType: string): 'text/html' | 'application/xhtml+xml' {
+    if (contentType !== 'text/html' && contentType !== 'application/xhtml+xml') {
+        console.warn(`contentType should be text/html or application/xhtml+xml for snapshot; got ${contentType}`);
+        return 'text/html';
+    }
+    return contentType;
 }
