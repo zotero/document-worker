@@ -109,6 +109,7 @@ export function filterForReadability(body: Element): Set<Element> | null {
 		let textLength = kept ? measureKeptText(kept) : 0;
 
 		if (kept && textLength >= DEFAULT_CHAR_THRESHOLD) {
+			addAncestorsToKept(kept, body);
 			return kept;
 		}
 
@@ -126,7 +127,28 @@ export function filterForReadability(body: Element): Set<Element> | null {
 		else {
 			attempts.sort((a, b) => b.textLength - a.textLength);
 			if (!attempts[0].textLength) return null;
-			return attempts[0].kept;
+			let winner = attempts[0].kept;
+			addAncestorsToKept(winner, body);
+			return winner;
+		}
+	}
+}
+
+/**
+ * Extend `kept` with every ancestor of every already-kept element up to
+ * `body`, so the SDT traversal can descend through container elements to
+ * reach the article. Without this, a kept `<article>` nested inside
+ * `<body> > <div id="content">` would be unreachable because `<div id="content">`
+ * itself isn't part of the article subtree.
+ */
+function addAncestorsToKept(kept: Set<Element>, body: Element): void {
+	for (let el of [...kept]) {
+		let current = el.parent;
+		while (current && current !== body) {
+			if (!isElement(current as ChildNode)) break;
+			if (kept.has(current as Element)) break;
+			kept.add(current as Element);
+			current = (current as Element).parent;
 		}
 	}
 }
