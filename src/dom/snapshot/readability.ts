@@ -24,8 +24,8 @@
  *   - three-flag demotion retry loop
  */
 
-import type {ChildNode, DataNode, Element} from 'domhandler';
-import {getElementChildren, getLocalName, isElement} from '../epub/xml';
+import type { ChildNode, DataNode, Element } from 'domhandler';
+import { getElementChildren, getLocalName, isElement } from '../epub/xml';
 
 // Flags & constants:
 
