@@ -46,6 +46,8 @@ export interface ConvertHooks {
 	onInternalLink?(el: Element, href: string, textNodes: TextNode[]): void;
 	/** Check if an element is a note (footnote/endnote). If true, it's rendered as a 'note' block. */
 	isNote?(el: Element): boolean;
+	/** Return false to skip this element and its subtree. */
+	shouldInclude?(el: Element): boolean;
 }
 
 // Maps:
@@ -142,6 +144,9 @@ function processNode(node: ChildNode, ctx: ConvertContext): void {
 	if (node.type !== 'tag') return;
 
 	let el = node as Element;
+
+	if (ctx.hooks.shouldInclude?.(el) === false) return;
+
 	let localName = getLocalName(el);
 
 	ctx.hooks.onElement?.(el);
@@ -285,6 +290,7 @@ function createTable(tableNode: Element, ctx: ConvertContext): Block | null {
 
 	let collectRows = (parent: Element): void => {
 		for (let child of getElementChildren(parent)) {
+			if (ctx.hooks.shouldInclude?.(child) === false) continue;
 			let name = getLocalName(child);
 			if (name === 'tr') {
 				ctx.hooks.onElement?.(child);
@@ -314,6 +320,7 @@ function createTable(tableNode: Element, ctx: ConvertContext): Block | null {
 function createTableRow(tr: Element, ctx: ConvertContext): Block | null {
 	let cells: Block[] = [];
 	for (let child of getElementChildren(tr)) {
+		if (ctx.hooks.shouldInclude?.(child) === false) continue;
 		let name = getLocalName(child);
 		if (name === 'td' || name === 'th') {
 			ctx.hooks.onElement?.(child);
@@ -367,6 +374,7 @@ function createImage(imgNode: Element, ctx: ConvertContext): Block {
 function processFigure(figureNode: Element, ctx: ConvertContext): void {
 	ctx.hooks.onElement?.(figureNode);
 	for (let child of getElementChildren(figureNode)) {
+		if (ctx.hooks.shouldInclude?.(child) === false) continue;
 		let name = getLocalName(child);
 		if (name === 'img') {
 			ctx.blocks.push(createImage(child, ctx));
@@ -403,6 +411,7 @@ function walkInline(node: Element, ctx: ConvertContext, textNodes: TextNode[], p
 		}
 		else if (child.type === 'tag') {
 			let el = child as Element;
+			if (ctx.hooks.shouldInclude?.(el) === false) continue;
 			let localName = getLocalName(el);
 			ctx.hooks.onElement?.(el);
 
