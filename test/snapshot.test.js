@@ -1,230 +1,468 @@
-import { describe, it } from 'node:test';
+import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import stringify from 'json-stringify-pretty-compact';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
+import { parseDocument } from 'htmlparser2';
 import { getSnapshotStructure, getSnapshotFulltext } from '../src/dom/snapshot/index';
 
-function loadSnapshot(name) {
-	let filePath = path.join(__dirname, 'snapshots', name);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const snapshotsDir = path.join(__dirname, 'snapshots');
+
+function load(name) {
+	let filePath = path.join(snapshotsDir, name);
 	let buf = fs.readFileSync(filePath);
 	return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
 }
 
-describe('Snapshot structure extraction', () => {
-	let structure;
+// Flatten an outline tree into an array of titles (in pre-order).
+function outlineTitles(items) {
+	let out = [];
+	for (let item of items) {
+		out.push(item.title);
+		if (item.children) out.push(...outlineTitles(item.children));
+	}
+	return out;
+}
 
-	it('should extract structure from basic HTML', () => {
-		let buf = loadSnapshot('1.html');
-		structure = getSnapshotStructure(buf, 'text/html');
-		assert.ok(structure);
+// Depth-first concatenation of every text fragment reachable from a block
+// tree. Joined with newlines so negative-match assertions can anchor on
+// line boundaries if needed.
+function allText(blocks) {
+	let parts = [];
+	function walk(nodes) {
+		for (let b of nodes || []) {
+			if (typeof b.text === 'string') parts.push(b.text);
+			if (Array.isArray(b.content)) walk(b.content);
+		}
+	}
+	walk(blocks);
+	return parts.join('\n');
+}
+
+// Parse the raw fixture into a domhandler tree and locate <body>.
+function parseBody(name) {
+	let html = fs.readFileSync(path.join(snapshotsDir, name), 'utf8');
+	let doc = parseDocument(html, { xmlMode: false, recognizeSelfClosing: true });
+	function findTag(node, tag) {
+		for (let c of node.children || []) {
+			if (c.type === 'tag' && c.name === tag) return c;
+			if (c.type === 'tag') {
+				let f = findTag(c, tag);
+				if (f) return f;
+			}
+		}
+		return null;
+	}
+	return findTag(doc, 'body');
+}
+
+// Resolve a snapshot-format selector ('tag[:pseudo]' joined by ' > ', or
+// '#id' followed by a ' > ' chain) against a domhandler tree rooted at
+// `root`. Supports exactly the pseudo classes the selector generator emits:
+// :first-child, :last-child, :first-of-type, :last-of-type, :nth-child(N).
+function resolveSelector(root, selector) {
+	let parts = selector.split(/\s*>\s*/);
+	let current = root;
+	for (let i = 0; i < parts.length; i++) {
+		if (!current) return null;
+		let part = parts[i];
+		if (part.startsWith('#')) {
+			let id = part.slice(1).replace(/\\(.)/g, '$1');
+			current = findById(root, id);
+			continue;
+		}
+		let m = /^([a-z0-9]+)(.*)$/i.exec(part);
+		if (!m) return null;
+		let [, tag, pseudo] = m;
+		let children = (current.children || []).filter(c => c.type === 'tag');
+		let sameTag = children.filter(c => c.name === tag);
+		if (!pseudo) {
+			if (sameTag.length !== 1) return null;
+			current = sameTag[0];
+		}
+		else if (pseudo === ':first-child') {
+			current = children[0]?.name === tag ? children[0] : null;
+		}
+		else if (pseudo === ':last-child') {
+			let last = children[children.length - 1];
+			current = last?.name === tag ? last : null;
+		}
+		else if (pseudo === ':first-of-type') {
+			current = sameTag[0] || null;
+		}
+		else if (pseudo === ':last-of-type') {
+			current = sameTag[sameTag.length - 1] || null;
+		}
+		else {
+			let n = /^:nth-child\((\d+)\)$/.exec(pseudo);
+			if (!n) return null;
+			let candidate = children[parseInt(n[1]) - 1];
+			current = candidate?.name === tag ? candidate : null;
+		}
+	}
+	return current;
+}
+
+function findById(root, id) {
+	let found = null;
+	function walk(node) {
+		if (found) return;
+		if (node.type === 'tag' && node.attribs?.id === id) { found = node; return; }
+		for (let c of node.children || []) walk(c);
+	}
+	walk(root);
+	return found;
+}
+
+// Walk every block in a structure and invoke `fn(block)`, including nested
+// content arrays.
+function forEachBlock(blocks, fn) {
+	for (let b of blocks || []) {
+		fn(b);
+		if (Array.isArray(b.content)) forEachBlock(b.content, fn);
+	}
+}
+
+describe('Snapshot SDT: document shape', () => {
+	let structure;
+	before(() => {
+		structure = getSnapshotStructure(load('2.html'), 'text/html');
+	});
+
+	it('identifies as a snapshot processor result', () => {
 		assert.equal(structure.processor.type, 'snapshot');
+		assert.equal(typeof structure.processor.version, 'string');
+	});
+
+	it('records the source content type', () => {
 		assert.equal(structure.sourceContentType, 'text/html');
 	});
 
-	it('should extract metadata', () => {
-		assert.equal(structure.metadata.title, 'Test Snapshot');
-		assert.equal(structure.metadata.author, 'Test Author');
-		assert.equal(structure.metadata.description, 'A test HTML snapshot');
-	});
-
-	it('should have a single page', () => {
+	it('contains a single page with at least one content range', () => {
 		assert.equal(structure.pages.length, 1);
 		assert.ok(structure.pages[0].contentRanges.length > 0);
 	});
 
-	it('should extract content blocks', () => {
-		assert.ok(structure.content.length > 0);
-
-		let headings = structure.content.filter(b => b.type === 'heading');
-		assert.ok(headings.length >= 3); // h1, h2, h2, h3 (+ excluded ones still in content)
-
-		let paragraphs = structure.content.filter(b => b.type === 'paragraph');
-		assert.ok(paragraphs.length > 0);
-	});
-
-	it('should extract inline styles', () => {
-		// First paragraph has bold and italic
-		let firstPara = structure.content.find(
-			b => b.type === 'paragraph' && b.content?.some(t => t.style?.bold)
-		);
-		assert.ok(firstPara, 'Should have a paragraph with bold text');
-
-		let italicNode = firstPara.content.find(t => t.style?.italic);
-		assert.ok(italicNode, 'Should have italic text');
-	});
-
-	it('should extract lists', () => {
-		let lists = structure.content.filter(b => b.type === 'list');
-		assert.ok(lists.length > 0);
-		let ul = lists[0];
-		assert.equal(ul.ordered, undefined);
-		assert.equal(ul.content.length, 3);
-		assert.equal(ul.content[0].type, 'listitem');
-	});
-
-	it('should extract tables', () => {
-		let tables = structure.content.filter(b => b.type === 'table');
-		assert.ok(tables.length > 0);
-		let table = tables[0];
-		assert.equal(table.content.length, 2); // 2 rows
-		assert.equal(table.content[0].type, 'tablerow');
-		// First row has header cells
-		let headerCell = table.content[0].content[0];
-		assert.equal(headerCell.header, true);
-	});
-
-	it('should extract blockquotes', () => {
-		let quotes = structure.content.filter(b => b.type === 'blockquote');
-		assert.ok(quotes.length > 0);
-	});
-
-	it('should extract preformatted text', () => {
-		let pres = structure.content.filter(b => b.type === 'preformatted');
-		assert.ok(pres.length > 0);
-	});
-
-	it('should extract external links', () => {
-		let linkPara = structure.content.find(
-			b => b.type === 'paragraph' && b.content?.some(t => t.target?.url)
-		);
-		assert.ok(linkPara, 'Should have paragraph with a link');
-		let linkNode = linkPara.content.find(t => t.target?.url);
-		assert.equal(linkNode.target.url, 'https://example.com');
-	});
-
-	it('should have character count', () => {
+	it('reports file size and character count', () => {
+		assert.ok(structure.fileSize > 0);
 		assert.ok(structure.characterCount > 0);
 	});
 
-	it('should have file size', () => {
-		assert.ok(structure.fileSize > 0);
+	it('extracts <title> and <meta name="author"> into metadata', () => {
+		assert.equal(structure.metadata.title, 'A Long-Form Article About Widgets');
+		assert.equal(structure.metadata.author, 'Jane Doe');
+	});
+
+	it('accepts application/xhtml+xml', () => {
+		let xhtml = getSnapshotStructure(load('2.html'), 'application/xhtml+xml');
+		assert.equal(xhtml.sourceContentType, 'application/xhtml+xml');
 	});
 });
 
-describe('Snapshot outline', () => {
+describe('Snapshot SDT: block types', () => {
 	let structure;
-
-	it('should build hierarchical outline from headings', () => {
-		let buf = loadSnapshot('1.html');
-		structure = getSnapshotStructure(buf, 'text/html');
-		assert.ok(structure.outline);
-		assert.ok(structure.outline.length > 0);
+	before(() => {
+		structure = getSnapshotStructure(load('1.html'), 'text/html');
 	});
 
-	it('should exclude headings in nav/aside/footer', () => {
-		// The outline should have: Main Title, Section One, Section Two, Subsection
-		// But NOT: Navigation Heading, Sidebar Heading, Footer Heading
-		let allTitles = flattenOutlineTitles(structure.outline);
-		assert.ok(allTitles.includes('Main Title'));
-		assert.ok(allTitles.includes('Section One'));
-		assert.ok(allTitles.includes('Section Two'));
-		assert.ok(allTitles.includes('Subsection'));
-		assert.ok(!allTitles.includes('Navigation Heading'), 'nav heading should be excluded');
-		assert.ok(!allTitles.includes('Sidebar Heading'), 'aside heading should be excluded');
-		assert.ok(!allTitles.includes('Footer Heading'), 'footer heading should be excluded');
+	it('emits headings for h1-h6', () => {
+		let text = allText(structure.content.filter(b => b.type === 'heading'));
+		assert.match(text, /Main Title/);
+		assert.match(text, /Section One/);
+		assert.match(text, /Subsection/);
 	});
 
-	it('should nest headings hierarchically', () => {
-		// h1 "Main Title" should be top-level
-		// h2 "Section One" and "Section Two" should be children of h1
-		// h3 "Subsection" should be child of "Section Two"
-		let mainTitle = structure.outline.find(item => item.title === 'Main Title');
-		assert.ok(mainTitle);
-		assert.ok(mainTitle.children);
-		assert.ok(mainTitle.children.length >= 2);
-
-		let sectionTwo = mainTitle.children.find(item => item.title === 'Section Two');
-		assert.ok(sectionTwo);
-		assert.ok(sectionTwo.children);
-		let subsection = sectionTwo.children.find(item => item.title === 'Subsection');
-		assert.ok(subsection);
+	it('emits paragraphs', () => {
+		assert.ok(structure.content.filter(b => b.type === 'paragraph').length >= 2);
 	});
 
-	it('should have ref pointing to block indices', () => {
-		let mainTitle = structure.outline.find(item => item.title === 'Main Title');
-		assert.ok(mainTitle.ref);
-		assert.equal(mainTitle.ref.length, 1);
-		assert.equal(typeof mainTitle.ref[0], 'number');
-		// The ref should point to the heading block
-		let block = structure.content[mainTitle.ref[0]];
+	it('emits unordered lists as list/listitem trees', () => {
+		let ul = structure.content.find(b => b.type === 'list');
+		assert.ok(ul);
+		assert.equal(ul.ordered, undefined);
+		assert.equal(ul.content[0].type, 'listitem');
+		assert.match(allText([ul]), /Item one/);
+	});
+
+	it('emits tables as tablerow/tablecell trees', () => {
+		let t = structure.content.find(b => b.type === 'table');
+		assert.ok(t);
+		assert.equal(t.content[0].type, 'tablerow');
+		assert.equal(t.content[0].content[0].type, 'tablecell');
+	});
+
+	it('marks th cells with header=true', () => {
+		let t = structure.content.find(b => b.type === 'table');
+		let firstCell = t.content[0].content[0];
+		assert.equal(firstCell.header, true);
+	});
+
+	it('emits blockquotes that contain nested blocks', () => {
+		let q = structure.content.find(b => b.type === 'blockquote');
+		assert.ok(q);
+		assert.equal(q.content[0].type, 'paragraph');
+	});
+
+	it('emits preformatted blocks that preserve newlines', () => {
+		let pre = structure.content.find(b => b.type === 'preformatted');
+		assert.ok(pre);
+		assert.match(allText([pre]), /\n/);
+	});
+
+	it('attaches bold and italic styles to inline text nodes', () => {
+		let p = structure.content.find(
+			b => b.type === 'paragraph' && b.content?.some(t => t.style?.bold)
+		);
+		assert.ok(p);
+		assert.ok(p.content.some(t => t.style?.italic));
+	});
+
+	it('attaches external link URLs to enclosed text nodes', () => {
+		let p = structure.content.find(
+			b => b.type === 'paragraph' && b.content?.some(t => t.target?.url)
+		);
+		assert.ok(p);
+		let link = p.content.find(t => t.target?.url);
+		assert.equal(link.target.url, 'https://example.com');
+	});
+
+	it('normalizes decomposed Unicode text to NFC', () => {
+		// Fixture contains "Cafe" + U+0301 (combining acute); expect "Café".
+		assert.match(allText(structure.content), /Café latté/);
+	});
+});
+
+describe('Snapshot SDT: outline', () => {
+	let structure;
+	before(() => {
+		structure = getSnapshotStructure(load('2.html'), 'text/html');
+	});
+
+	it('builds a hierarchy from heading levels', () => {
+		assert.equal(structure.outline[0].title, 'A Deep Dive Into Widgets');
+		let h2s = structure.outline[0].children.map(c => c.title);
+		assert.deepEqual(
+			h2s,
+			['The History of Widgets', 'Construction', 'Applications', 'Looking Forward'],
+		);
+		let construction = structure.outline[0].children.find(c => c.title === 'Construction');
+		assert.equal(construction.children[0].title, 'Finishing and Quality Control');
+		assert.equal(construction.children[0].level, 3);
+	});
+
+	it('points each outline entry at its heading block by index', () => {
+		let top = structure.outline[0];
+		let block = structure.content[top.ref[0]];
 		assert.equal(block.type, 'heading');
+		assert.equal(allText([block]).trim(), 'A Deep Dive Into Widgets');
+	});
+
+	it('omits headings that Readability filtered out of the article', () => {
+		let titles = outlineTitles(structure.outline);
+		// <aside class="related-posts"><h2>Related Articles</h2>
+		assert.ok(!titles.includes('Related Articles'));
+		// <section class="comments" id="comments"><h2>Comments (42)</h2>
+		assert.ok(!titles.includes('Comments (42)'));
+		// <header class="site-header"><nav class="main-nav"><h2>Main Navigation</h2>
+		assert.ok(!titles.includes('Main Navigation'));
 	});
 });
 
-describe('Snapshot fulltext extraction', () => {
-	it('should extract fulltext', () => {
-		let buf = loadSnapshot('1.html');
-		let result = getSnapshotFulltext(buf, 'text/html');
-		assert.ok(result.text);
-		assert.ok(result.text.includes('Main Title'));
-		assert.ok(result.text.includes('bold'));
-		assert.ok(result.text.includes('italic'));
-		assert.equal(result.totalPages, 1);
+describe('Snapshot SDT: Readability filtering', () => {
+	let structure;
+	before(() => {
+		structure = getSnapshotStructure(load('2.html'), 'text/html');
 	});
 
-	it('should accept pre-computed structure', () => {
-		let buf = loadSnapshot('1.html');
-		let structure = getSnapshotStructure(buf, 'text/html');
-		let result = getSnapshotFulltext(buf, 'text/html', { structure });
-		assert.ok(result.text.includes('Main Title'));
+	it('preserves the entire article body verbatim', () => {
+		let text = allText(structure.content);
+		assert.match(text, /A Deep Dive Into Widgets/);
+		assert.match(text, /The first widgets emerged in the late nineteenth century/);
+		assert.match(text, /Recent advances in additive manufacturing/);
+		assert.match(text, /future of widgets is bright/);
+	});
+
+	it('drops elements whose class or id matches Readability\'s unlikely-candidate regex', () => {
+		let text = allText(structure.content);
+		// <header class="site-header"> matches /header/
+		assert.doesNotMatch(text, /Main Navigation/);
+		// <div class="ad-banner"> matches /banner/
+		assert.doesNotMatch(text, /SPONSORED/);
+		// <section class="comments" id="comments"> matches /comment/
+		assert.doesNotMatch(text, /Great article, thanks/);
+		assert.doesNotMatch(text, /learned a lot about widgets/);
+	});
+
+	it('preserves elements whose class matches the "ok maybe" whitelist', () => {
+		// <article class="post-content">: "content" is in the unlikely regex
+		// as part of other words, but "content" is also in okMaybeItsACandidate.
+		// The whitelist wins.
+		let text = allText(structure.content);
+		assert.match(text, /A Deep Dive Into Widgets/);
+	});
+
+	it('drops <aside> via the unconditional _clean pass', () => {
+		let text = allText(structure.content);
+		assert.doesNotMatch(text, /Everything you wanted to know about gears/);
+		assert.doesNotMatch(text, /The bolt: a retrospective/);
+	});
+
+	it('drops <footer> via the unconditional _clean pass', () => {
+		let text = allText(structure.content);
+		assert.doesNotMatch(text, /All rights reserved/);
+		assert.doesNotMatch(text, /Terms of Service/);
+	});
+
+	it('drops boilerplate elements even when they have their own block-level content', () => {
+		// The site-footer contains a <ul> of links; Readability's filtering
+		// cascades through entire subtrees so those links are gone too.
+		let text = allText(structure.content);
+		assert.doesNotMatch(text, /^\s*Privacy\s*$/m);
 	});
 });
 
-describe('Snapshot content type handling', () => {
-	it('should work with text/html', () => {
-		let buf = loadSnapshot('1.html');
-		let structure = getSnapshotStructure(buf, 'text/html');
-		assert.equal(structure.sourceContentType, 'text/html');
+describe('Snapshot SDT: selectors resolve against the original document', () => {
+	let structure;
+	let body;
+	before(() => {
+		structure = getSnapshotStructure(load('2.html'), 'text/html');
+		body = parseBody('2.html');
 	});
 
-	it('should work with application/xhtml+xml', () => {
-		let buf = loadSnapshot('1.html');
-		let structure = getSnapshotStructure(buf, 'application/xhtml+xml');
-		assert.equal(structure.sourceContentType, 'application/xhtml+xml');
+	it('emits a selector on every block anchor', () => {
+		let count = 0;
+		forEachBlock(structure.content, b => {
+			if (b.anchor) {
+				assert.equal(typeof b.anchor.selectorMap, 'string');
+				count++;
+			}
+		});
+		assert.ok(count > 5);
+	});
+
+	it('every block-level selector resolves to an element of the expected tag', () => {
+		let tagExpectations = {
+			heading: /^h[1-6]$/,
+			paragraph: /^p$/,
+			list: /^(ul|ol)$/,
+			listitem: /^li$/,
+			blockquote: /^blockquote$/,
+			preformatted: /^pre$/,
+			table: /^table$/,
+			tablerow: /^tr$/,
+			tablecell: /^(td|th)$/,
+			image: /^img$/,
+			figure: /^figure$/,
+			caption: /^figcaption$/,
+		};
+		let checked = 0;
+		forEachBlock(structure.content, b => {
+			let expected = tagExpectations[b.type];
+			if (!expected || !b.anchor?.selectorMap) return;
+			let target = resolveSelector(body, b.anchor.selectorMap);
+			assert.ok(target, `did not resolve: ${b.anchor.selectorMap}`);
+			assert.match(
+				target.name,
+				expected,
+				`${b.type} anchor "${b.anchor.selectorMap}" resolved to <${target.name}>`,
+			);
+			checked++;
+		});
+		assert.ok(checked > 5);
+	});
+
+	it('selectors walk back to the same kept subtree they came from', () => {
+		// All block anchors for this fixture live under <article> in the
+		// original document, since <article class="post-content"> is the sole
+		// candidate Readability keeps. Confirm the selectors path through it.
+		let article = resolveSelector(body, 'article');
+		assert.ok(article);
+		forEachBlock(structure.content, b => {
+			if (!b.anchor?.selectorMap) return;
+			let target = resolveSelector(body, b.anchor.selectorMap);
+			assert.ok(target);
+			let p = target;
+			let reached = false;
+			while (p) {
+				if (p === article) { reached = true; break; }
+				p = p.parent;
+			}
+			assert.ok(reached, `${b.anchor.selectorMap} does not descend from <article>`);
+		});
 	});
 });
 
-function flattenOutlineTitles(items) {
-	let titles = [];
-	for (let item of items) {
-		titles.push(item.title);
-		if (item.children) {
-			titles.push(...flattenOutlineTitles(item.children));
-		}
-	}
-	return titles;
-}
+describe('Snapshot SDT: short document fallback', () => {
+	// 1.html is short enough that Readability's char-threshold retries walk
+	// through all three flag demotions before returning a best-effort result.
+	// The tests below exercise what ships out of that path.
+	let structure;
+	before(() => {
+		structure = getSnapshotStructure(load('1.html'), 'text/html');
+	});
 
-// Auto-discover snapshot tests: each .html with a corresponding .json snapshot.
-// Run with UPDATE_SNAPSHOTS=1 to create/update snapshot files.
-let snapshotsDir = path.join(__dirname, 'snapshots');
+	it('still surfaces the article-level outline', () => {
+		let titles = outlineTitles(structure.outline);
+		assert.ok(titles.includes('Main Title'));
+		assert.ok(titles.includes('Section One'));
+		assert.ok(titles.includes('Section Two'));
+		assert.ok(titles.includes('Subsection'));
+	});
+
+	it('still drops <aside> and <footer>', () => {
+		// The _clean pass runs even when flag-gated scoring demotes down to
+		// its weakest form, so aside/footer still disappear.
+		let text = allText(structure.content);
+		assert.doesNotMatch(text, /Sidebar Heading/);
+		assert.doesNotMatch(text, /Footer Heading/);
+	});
+
+	it('keeps a class-less <nav> because no hint triggers exclusion', () => {
+		// <nav> is not in Readability's unconditional _clean list, and the
+		// fixture's <nav> carries no class/id that the unlikely-candidate
+		// regex would match, so it makes it through.
+		let text = allText(structure.content);
+		assert.match(text, /Navigation Heading/);
+	});
+});
+
+describe('Snapshot SDT: fulltext extraction', () => {
+	it('concatenates article text', () => {
+		let r = getSnapshotFulltext(load('2.html'), 'text/html');
+		assert.match(r.text, /A Deep Dive Into Widgets/);
+		assert.match(r.text, /The first widgets emerged/);
+		assert.equal(r.totalPages, 1);
+	});
+
+	it('omits filtered-out boilerplate', () => {
+		let r = getSnapshotFulltext(load('2.html'), 'text/html');
+		assert.doesNotMatch(r.text, /SPONSORED/);
+		assert.doesNotMatch(r.text, /All rights reserved/);
+	});
+
+	it('accepts a precomputed structure', () => {
+		let buf = load('2.html');
+		let s = getSnapshotStructure(buf, 'text/html');
+		let r = getSnapshotFulltext(buf, 'text/html', { structure: s });
+		assert.match(r.text, /A Deep Dive Into Widgets/);
+	});
+});
+
 let allHtmlFiles = fs.readdirSync(snapshotsDir).filter(f => f.endsWith('.html'));
 let htmlWithSnapshots = allHtmlFiles.filter(
 	f => fs.existsSync(path.join(snapshotsDir, f.replace('.html', '.json')))
 );
 
-describe('Snapshot structure snapshots', () => {
-	if (htmlWithSnapshots.length === 0 && !process.env.UPDATE_SNAPSHOTS) {
-		it('no snapshots found — run UPDATE_SNAPSHOTS=1 npm run test:snapshot to generate', () => {
-			assert.fail('No .json snapshot files found next to .html files in test/snapshots/');
-		});
-	}
-
+describe('Snapshot SDT: golden fixture comparison', () => {
 	for (let file of (process.env.UPDATE_SNAPSHOTS ? allHtmlFiles : htmlWithSnapshots)) {
 		let name = file.replace('.html', '');
 		let snapshotPath = path.join(snapshotsDir, name + '.json');
 
 		it(file, () => {
-			let result = getSnapshotStructure(loadSnapshot(file), 'text/html');
-
-			// Strip non-deterministic fields
+			let result = getSnapshotStructure(load(file), 'text/html');
 			delete result.dateCreated;
-
 			let json = stringify(result, { indent: '\t', maxLength: 100 });
 
 			if (process.env.UPDATE_SNAPSHOTS) {

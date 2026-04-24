@@ -15,6 +15,7 @@ import { getFulltextFromStructuredText } from '../../../structured-document-text
 import { getContentRange, getNestedBlockPlainText, getBlockPlainText } from '../../../structured-document-text/src/text.js';
 import type { StructuredDocumentText, OutlineItem } from '../../../structured-document-text/schema';
 import { cssEscape } from "./cssEscape";
+import { filterForReadability, isInKeptSetIncludingAncestors } from './readability';
 
 const SCHEMA_VERSION = '1.0.0-draft';
 const PROCESSOR_VERSION = '1.0.0-draft';
@@ -22,8 +23,6 @@ const PROCESSOR_VERSION = '1.0.0-draft';
 interface FulltextOptions {
 	structure?: StructuredDocumentText;
 }
-
-const EXCLUDED_ANCESTORS = new Set(['aside', 'nav', 'footer', 'template']);
 
 // Entry points:
 
@@ -40,6 +39,15 @@ export function getSnapshotStructure(
 	let body = queryTag(doc, 'body');
 	if (!body) {
 		return emptyStructure(contentType, buf.byteLength);
+	}
+
+	let kept: Set<Element> | null;
+	try {
+		kept = filterForReadability(body);
+	}
+	catch (e) {
+		console.warn('Readability filter threw; proceeding without filtering:', e);
+		kept = null;
 	}
 
 	let currentBlockSelector = '';
@@ -84,6 +92,10 @@ export function getSnapshotStructure(
 			return { selectorMap: hasOffset ? value + ' ' + offset : value };
 		},
 	};
+	if (kept) {
+		let keptSet = kept;
+		hooks.shouldInclude = (el: Element) => isInKeptSetIncludingAncestors(el, body, keptSet);
+	}
 	let { blocks } = convertBody(body, hooks);
 
 	// Build page content range
@@ -92,7 +104,7 @@ export function getSnapshotStructure(
 		: [];
 
 	// Build outline from headings
-	let outline = buildOutlineFromHeadings(body, blocks);
+	let outline = buildOutlineFromHeadings(body, blocks, kept);
 
 	// Character count
 	let charCount = 0;
@@ -133,8 +145,12 @@ interface FlatHeading {
 	blockIndex: number;
 }
 
-function buildOutlineFromHeadings(body: Element, blocks: ContentBlockNode[]): OutlineItem[] {
-	let filteredHeadings = filterHeadingsFromTree(body, blocks);
+function buildOutlineFromHeadings(
+	body: Element,
+	blocks: ContentBlockNode[],
+	kept: Set<Element> | null,
+): OutlineItem[] {
+	let filteredHeadings = filterHeadingsFromTree(body, blocks, kept);
 	if (filteredHeadings.length === 0) return [];
 
 	// Stack-based hierarchy building (from snapshot-view.ts)
@@ -166,11 +182,15 @@ function buildOutlineFromHeadings(body: Element, blocks: ContentBlockNode[]): Ou
 	return outline;
 }
 
-function filterHeadingsFromTree(body: Element, blocks: ContentBlockNode[]): FlatHeading[] {
+function filterHeadingsFromTree(
+	body: Element,
+	blocks: ContentBlockNode[],
+	kept: Set<Element> | null,
+): FlatHeading[] {
 	let headings: FlatHeading[] = [];
 
 	let headingElements: { el: Element; level: number }[] = [];
-	collectHeadingElements(body, headingElements);
+	collectHeadingElements(body, headingElements, kept);
 
 	let headingBlockIndices: number[] = [];
 	for (let i = 0; i < blocks.length; i++) {
@@ -180,42 +200,33 @@ function filterHeadingsFromTree(body: Element, blocks: ContentBlockNode[]): Flat
 	}
 
 	for (let i = 0; i < Math.min(headingElements.length, headingBlockIndices.length); i++) {
-		let { el, level } = headingElements[i];
+		let { level } = headingElements[i];
 		let idx = headingBlockIndices[i];
 		let title = getBlockPlainText(blocks[idx]).trim();
 		if (!title) continue;
-		if (hasExcludedAncestor(el)) continue;
 		headings.push({ level, title, blockIndex: idx });
 	}
 
 	return headings;
 }
 
-function collectHeadingElements(node: Element, result: { el: Element; level: number }[]): void {
+function collectHeadingElements(
+	node: Element,
+	result: { el: Element; level: number }[],
+	kept: Set<Element> | null,
+): void {
 	for (let child of node.children || []) {
 		if (!isElement(child)) continue;
+		if (kept && !kept.has(child)) continue;
 		let name = getLocalName(child);
 		let match = /^h([1-6])$/.exec(name);
 		if (match) {
 			result.push({ el: child, level: parseInt(match[1]) });
 		}
 		else {
-			collectHeadingElements(child, result);
+			collectHeadingElements(child, result, kept);
 		}
 	}
-}
-
-function hasExcludedAncestor(node: Element): boolean {
-	let current = node.parent;
-	while (current) {
-		if (isElement(current as ChildNode)) {
-			let name = getLocalName(current as Element);
-			if (EXCLUDED_ANCESTORS.has(name)) return true;
-			if ((current as Element).attribs?.hidden !== undefined) return true;
-		}
-		current = (current as any).parent;
-	}
-	return false;
 }
 
 function cleanOutline(items: OutlineItem[]): void {
