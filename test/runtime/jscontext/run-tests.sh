@@ -2,15 +2,16 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROJECT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+JSCONTEXT_DIR="test/runtime/jscontext"
 cd "$PROJECT_DIR"
 
 # Compile Swift runner
 echo "Compiling JSContext runner..."
-swiftc test/jscontext/runner.swift -o test/jscontext/jsctx -framework JavaScriptCore -O
+swiftc "$JSCONTEXT_DIR/runner.swift" -o "$JSCONTEXT_DIR/jsctx" -framework JavaScriptCore -O
 
 cleanup() {
-  rm -f test/jscontext/jsctx
+  rm -f "$JSCONTEXT_DIR/jsctx"
 }
 trap cleanup EXIT
 
@@ -18,15 +19,15 @@ FAILED=0
 PASSED=0
 TOTAL=0
 
-for test in test/jscontext/test-*.js; do
+for test in "$JSCONTEXT_DIR"/test-*.js; do
   TOTAL=$((TOTAL + 1))
   name=$(basename "$test" .js)
   echo ""
   echo "=== Running $name ==="
-  if ./test/jscontext/jsctx \
-    test/jscontext/shim.js \
+  if ./"$JSCONTEXT_DIR/jsctx" \
+    "$JSCONTEXT_DIR/shim.js" \
     build/worker.js \
-    test/jscontext/helpers.js \
+    "$JSCONTEXT_DIR/helpers.js" \
     "$test"; then
     PASSED=$((PASSED + 1))
     echo "=== $name: PASSED ==="

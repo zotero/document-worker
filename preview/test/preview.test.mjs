@@ -1,14 +1,14 @@
-import puppeteer from 'puppeteer';
+import { chromium } from '@playwright/test';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const PDF_PATH = resolve(__dirname, '..', '..', 'test/pdfs/full/1.pdf');
+const PDF_PATH = resolve(__dirname, '..', '..', 'test/fixtures/pdf/full/1.pdf');
 const SCREENSHOT_DIR = resolve(__dirname, '..');
 
-const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
+const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage();
-await page.setViewport({ width: 1400, height: 900, deviceScaleFactor: 2 });
+await page.setViewportSize({ width: 1400, height: 900 });
 
 const errors = [];
 const failedRequests = [];
@@ -25,8 +25,7 @@ console.log('   Page loaded');
 
 // Upload PDF
 console.log('2. Uploading PDF...');
-const fileInput = await page.$('#file-input');
-await fileInput.uploadFile(PDF_PATH);
+await page.locator('#file-input').setInputFiles(PDF_PATH);
 
 // Wait for processing
 await page.waitForFunction(
@@ -37,13 +36,13 @@ await page.waitForFunction(
   { timeout: 120000 }
 );
 
-const finalStatus = await page.$eval('#status', el => el.textContent);
+const finalStatus = await page.locator('#status').evaluate(el => el.textContent);
 console.log(`   Status: "${finalStatus}"`);
 
 // ── Verify rendering ──
-const pageCount = await page.$$eval('.pdf-page', els => els.length);
-const blockCount = await page.$$eval('#html-panel [data-block-id]', els => els.length);
-const regionCount = await page.$$eval('.block-region', els => els.length);
+const pageCount = await page.locator('.pdf-page').count();
+const blockCount = await page.locator('#html-panel [data-block-id]').count();
+const regionCount = await page.locator('.block-region').count();
 console.log(`3. Pages: ${pageCount}, HTML blocks: ${blockCount}, PDF overlays: ${regionCount}`);
 
 // Scroll first page into view to trigger render, wait for canvas content
@@ -64,9 +63,9 @@ console.log('   -> screenshot-initial.png');
 console.log('5. Testing hover: HTML block → PDF highlight...');
 const firstBlock = await page.$('#html-panel [data-block-id]');
 await firstBlock.hover();
-await new Promise(r => setTimeout(r, 200));
-const activeRegionsCount = await page.$$eval('.block-region.active', els => els.length);
-const htmlBlockActive = await page.$eval('#html-panel [data-block-id]', el => el.classList.contains('active'));
+await page.waitForTimeout(200);
+const activeRegionsCount = await page.locator('.block-region.active').count();
+const htmlBlockActive = await page.locator('#html-panel [data-block-id]').first().evaluate(el => el.classList.contains('active'));
 console.log(`   Active PDF regions: ${activeRegionsCount}, HTML block highlighted: ${htmlBlockActive}`);
 await page.screenshot({ path: resolve(SCREENSHOT_DIR, 'screenshot-hover-html.png') });
 console.log('   -> screenshot-hover-html.png');
@@ -75,14 +74,14 @@ console.log('   -> screenshot-hover-html.png');
 console.log('6. Testing hover: PDF region → HTML highlight...');
 // Move mouse away first to clear
 await page.mouse.move(0, 0);
-await new Promise(r => setTimeout(r, 200));
+await page.waitForTimeout(200);
 
 const firstRegion = await page.$('.block-region');
 if (firstRegion) {
   await firstRegion.hover();
-  await new Promise(r => setTimeout(r, 200));
-  const activeHtml = await page.$$eval('#html-panel [data-block-id].active', els => els.length);
-  const activeRegs = await page.$$eval('.block-region.active', els => els.length);
+  await page.waitForTimeout(200);
+  const activeHtml = await page.locator('#html-panel [data-block-id].active').count();
+  const activeRegs = await page.locator('.block-region.active').count();
   console.log(`   Active HTML blocks: ${activeHtml}, Active PDF regions: ${activeRegs}`);
   await page.screenshot({ path: resolve(SCREENSHOT_DIR, 'screenshot-hover-pdf.png') });
   console.log('   -> screenshot-hover-pdf.png');
@@ -94,13 +93,13 @@ console.log('7. Testing click: HTML block → scroll PDF...');
 const targetBlock = await page.$('#html-panel [data-block-id="20"]');
 if (targetBlock) {
   // Get its block ID info
-  const blockInfo = await page.$eval('[data-block-id="20"]', el => ({
+  const blockInfo = await page.locator('#html-panel [data-block-id="20"]').evaluate(el => ({
     tag: el.tagName, text: el.textContent.slice(0, 50)
   }));
   console.log(`   Clicking block 20: <${blockInfo.tag}> "${blockInfo.text}"`);
 
   await targetBlock.click();
-  await new Promise(r => setTimeout(r, 800)); // wait for smooth scroll
+  await page.waitForTimeout(800); // wait for smooth scroll
   await page.screenshot({ path: resolve(SCREENSHOT_DIR, 'screenshot-click-html.png') });
   console.log('   -> screenshot-click-html.png');
 }
@@ -109,13 +108,13 @@ if (targetBlock) {
 console.log('8. Testing click: PDF region → scroll HTML...');
 // First scroll the PDF panel to the top
 await page.evaluate(() => document.getElementById('pdf-panel').scrollTop = 0);
-await new Promise(r => setTimeout(r, 300));
+await page.waitForTimeout(300);
 
 // Click a region that corresponds to a block further in the document
 const regions = await page.$$('.block-region');
 if (regions.length > 5) {
   await regions[5].click();
-  await new Promise(r => setTimeout(r, 800)); // wait for smooth scroll
+  await page.waitForTimeout(800); // wait for smooth scroll
   await page.screenshot({ path: resolve(SCREENSHOT_DIR, 'screenshot-click-pdf.png') });
   console.log('   -> screenshot-click-pdf.png');
 }
@@ -128,7 +127,7 @@ await page.mouse.move(divBox.x + 2, divBox.y + divBox.height / 2);
 await page.mouse.down();
 await page.mouse.move(divBox.x + 200, divBox.y + divBox.height / 2, { steps: 10 });
 await page.mouse.up();
-await new Promise(r => setTimeout(r, 200));
+await page.waitForTimeout(200);
 await page.screenshot({ path: resolve(SCREENSHOT_DIR, 'screenshot-resized.png') });
 console.log('   -> screenshot-resized.png');
 

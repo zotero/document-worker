@@ -1,12 +1,12 @@
-// Integration test: getFulltext via JSContext
+// Integration test: pdf.getFulltext via JSContext
 (async function () {
   try {
-    var buf = loadPDF('test/pdfs/full/1.pdf');
+    var buf = loadPDF('test/fixtures/pdf/full/1.pdf');
     console.log('Loaded PDF: ' + buf.length + ' bytes');
 
-    var result = await worker.getFulltext(buf, null, '', dataProvider);
+    var result = await worker.pdf.getFulltext(buf, null, '', dataProvider);
 
-    assert(result, 'getFulltext should return a result');
+    assert(result, 'pdf.getFulltext should return a result');
     assert(typeof result.text === 'string', 'result.text should be a string');
     assert(result.text.length > 0, 'result.text should not be empty');
     assert(typeof result.totalPages === 'number', 'result.totalPages should be a number');

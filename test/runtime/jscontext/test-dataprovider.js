@@ -4,9 +4,9 @@
     var buf = loadPDF('pdf.js/test/pdfs/TAMReview.pdf');
     console.log('Loaded PDF: ' + buf.length + ' bytes');
 
-    var result = await worker.getFulltext(buf, 1, '', dataProvider);
+    var result = await worker.pdf.getFulltext(buf, 1, '', dataProvider);
 
-    assert(result, 'getFulltext should return a result');
+    assert(result, 'pdf.getFulltext should return a result');
     assert(typeof result.text === 'string', 'result.text should be a string');
     assert(result.text.length > 0, 'result.text should not be empty');
     assert(result.totalPages === 23, 'totalPages should be 23');

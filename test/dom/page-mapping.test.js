@@ -1,9 +1,9 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseXML } from '../src/dom/epub/xml';
-import { convertSection } from '../src/dom/epub/epub-xhtml-to-blocks';
-import { parsePageList } from '../src/dom/epub/toc';
-import { buildPageMappings, findPageForBlock } from '../src/dom/epub/page-mapping';
+import { parseXML } from '../../src/dom/epub/xml';
+import { convertSection } from '../../src/dom/epub/epub-xhtml-to-blocks';
+import { parsePageList } from '../../src/dom/epub/toc';
+import { buildPageMappings, findPageForBlock } from '../../src/dom/epub/page-mapping';
 
 // Helpers:
 

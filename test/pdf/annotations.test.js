@@ -22,21 +22,22 @@
 
  ***** END LICENSE BLOCK *****
  */
-import '../scripts/pdfjs-setup.js';
+import '../../scripts/pdfjs-setup.js';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import crypto from 'crypto';
-import * as pdfWorker from '../src/pdf/index.js';
+import * as pdfWorker from '../../src/pdf/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const pdfFixturesDir = path.join(__dirname, '..', 'fixtures', 'pdf');
 
 describe('PDF Worker', function () {
 	it('should import annotations', async function () {
-		let buf = fs.readFileSync(__dirname + '/pdfs/full/1.pdf');
+		let buf = fs.readFileSync(path.join(pdfFixturesDir, 'full', '1.pdf'));
 		let result = await pdfWorker.importAnnotations(buf, []);
 
 		let expectedResult = {
@@ -247,7 +248,7 @@ describe('PDF Worker', function () {
 			'tags': ['tag1', 'tag2', 'tag3']
 		}];
 
-		let buf = fs.readFileSync(__dirname + '/pdfs/full/1.pdf');
+			let buf = fs.readFileSync(path.join(pdfFixturesDir, 'full', '1.pdf'));
 		buf = await pdfWorker.writeAnnotations(buf, annotations);
 		var buffer = Buffer.from(buf);
 		let md5 = crypto.createHash('md5').update(buffer).digest('hex');
@@ -255,8 +256,35 @@ describe('PDF Worker', function () {
 		// fs.writeFileSync(__dirname + '/1-out.pdf', buffer);
 	});
 
+	it('should preserve annotation text outside the BMP', async function () {
+		let buf = fs.readFileSync(path.join(pdfFixturesDir, 'full', '1.pdf'));
+		let comment = 'Emoji comment \u{1f600}';
+		let authorName = 'Emoji author \u{1f600}';
+		let tags = ['tag-\u{1f600}'];
+		let written = await pdfWorker.writeAnnotations(buf, [{
+			id: 'EMOJI0001',
+			type: 'note',
+			color: '#f8c348',
+			position: {
+				pageIndex: 0,
+				rects: [[100, 100, 122, 122]]
+			},
+			authorName,
+			comment,
+			dateModified: '2026-01-02T03:04:05.000Z',
+			tags
+		}]);
+
+		let result = await pdfWorker.importAnnotations(written, []);
+		let imported = result.imported.find(annotation => annotation.comment === comment);
+
+		assert.ok(imported);
+		assert.equal(imported.authorName, authorName);
+		assert.deepEqual(imported.tags, tags);
+	});
+
 	it('should import Mendeley annotations', async function () {
-		let buf = fs.readFileSync(__dirname + '/pdfs/full/2.pdf');
+			let buf = fs.readFileSync(path.join(pdfFixturesDir, 'full', '2.pdf'));
 		let mendeleyAnnotations = [
 			{
 				id: 1,
@@ -437,7 +465,7 @@ describe('PDF Worker', function () {
 			tags: [{ name: 'red' }],
 			color: '#ff6666'
 		};
-		const buf = fs.readFileSync(path.join(__dirname, 'pdfs', 'full', '2.pdf'));
+			const buf = fs.readFileSync(path.join(pdfFixturesDir, 'full', '2.pdf'));
 		const [processedAnnotations] = await pdfWorker.importCitaviAnnotations(buf, [citaviAnnotation]);
 		assert.equal(processedAnnotations.key, 'B3UENNWP');
 		assert.equal(processedAnnotations.sortIndex, '00000|000103|00206');

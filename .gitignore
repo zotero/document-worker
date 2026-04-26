@@ -4,3 +4,4 @@ node_modules
 !.gitmodules
 !.editorconfig
 build
+preview/screenshot-*.png

@@ -5,7 +5,7 @@
     "test": "node test/preview.test.mjs"
   },
   "devDependencies": {
-    "puppeteer": "^24.37.4",
+    "@playwright/test": "^1.59.1",
     "vite": "^6"
   }
 }

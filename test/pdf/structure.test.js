@@ -1,15 +1,15 @@
-import '../scripts/pdfjs-setup.js';
+import '../../scripts/pdfjs-setup.js';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
-import { getStructure } from '../src/pdf/index.js';
+import { getStructure } from '../../src/pdf/index.js';
 import stringify from 'json-stringify-pretty-compact';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const buildDir = resolve(__dirname, '..', 'build');
-const pdfsDir = resolve(__dirname, 'pdfs', 'full');
+const buildDir = resolve(__dirname, '..', '..', 'build');
+const pdfsDir = resolve(__dirname, '..', 'fixtures', 'pdf', 'full');
 
 function dataProvider(path) {
 	return fs.readFileSync(resolve(buildDir, path));
@@ -35,7 +35,7 @@ describe('getStructure snapshots', { timeout: 120000 }, () => {
 
 			let json = stringify(result, { indent: '\t', maxLength: 100 });
 
-			if (process.env.UPDATE_SNAPSHOTS) {
+			if (process.env.UPDATE_FIXTURES) {
 				fs.writeFileSync(snapshotPath, json + '\n', 'utf8');
 				t.skip();
 			}

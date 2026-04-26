@@ -1,18 +1,19 @@
-import '../scripts/pdfjs-setup.js';
+import '../../scripts/pdfjs-setup.js';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { createCanvas } from 'canvas';
-import * as pdfjs from '../pdf.js/build/lib-legacy/pdf.js';
-import * as pdfjsWorker from '../pdf.js/build/lib-legacy/pdf.worker.js';
-import { getFulltext, getStructure } from '../src/pdf/index.js';
+import * as pdfjs from '../../pdf.js/build/lib-legacy/pdf.js';
+import * as pdfjsWorker from '../../pdf.js/build/lib-legacy/pdf.worker.js';
+import { getFulltext, getStructure } from '../../src/pdf/index.js';
 
 globalThis.pdfjsWorker = pdfjsWorker;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const buildDir = resolve(__dirname, '..', 'build');
+const buildDir = resolve(__dirname, '..', '..', 'build');
+const pdfFixturesDir = resolve(__dirname, '..', 'fixtures', 'pdf');
 const NODE_MAJOR = Number.parseInt(process.versions.node, 10);
 const SHOULD_SKIP_OPENJPEG_TEST = NODE_MAJOR >= 24;
 
@@ -28,7 +29,7 @@ describe('dataProvider integration', { timeout: 30000 }, () => {
 			return dataProvider(path);
 		}
 
-		let buf = fs.readFileSync(resolve(__dirname, 'pdfs', 'special', 'non-embedded-fonts.pdf'));
+		let buf = fs.readFileSync(resolve(pdfFixturesDir, 'special', 'non-embedded-fonts.pdf'));
 		let result = await getFulltext(buf, 1, '', trackingProvider);
 
 		assert.equal(typeof result, 'object');
@@ -46,7 +47,7 @@ describe('dataProvider integration', { timeout: 30000 }, () => {
 			return dataProvider(path);
 		}
 
-		let buf = fs.readFileSync(resolve(__dirname, 'pdfs', 'special', 'cjk-cmap.pdf'));
+		let buf = fs.readFileSync(resolve(pdfFixturesDir, 'special', 'cjk-cmap.pdf'));
 		let result = await getFulltext(buf, 1, '', trackingProvider);
 
 		assert.equal(typeof result, 'object');
@@ -64,7 +65,7 @@ describe('dataProvider integration', { timeout: 30000 }, () => {
 			return dataProvider(path);
 		}
 
-		let buf = fs.readFileSync(resolve(__dirname, 'pdfs', 'full', '1.pdf'));
+		let buf = fs.readFileSync(resolve(pdfFixturesDir, 'full', '1.pdf'));
 		let result = await getStructure(buf, '', trackingProvider);
 
 		assert.equal(typeof result, 'object');
@@ -88,7 +89,7 @@ describe('dataProvider integration', { timeout: 30000 }, () => {
 			return dataProvider(path);
 		}
 
-		let buf = fs.readFileSync(resolve(__dirname, 'pdfs', 'special', 'jpeg2000.pdf'));
+		let buf = fs.readFileSync(resolve(pdfFixturesDir, 'special', 'jpeg2000.pdf'));
 		let ownerDocument = {
 			createElement: (name) => {
 				if (name === 'canvas') return createCanvas(1, 1);

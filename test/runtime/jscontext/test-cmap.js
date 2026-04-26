@@ -1,7 +1,7 @@
 // Integration test: dataProvider resolves CMap data for CJK fonts
 (async function () {
   try {
-    var buf = loadPDF('test/pdfs/special/cjk-cmap.pdf');
+    var buf = loadPDF('test/fixtures/pdf/special/cjk-cmap.pdf');
 
     var fetched = [];
     function trackingProvider(path) {
@@ -9,9 +9,9 @@
       return dataProvider(path);
     }
 
-    var result = await worker.getFulltext(buf, 1, '', trackingProvider);
+    var result = await worker.pdf.getFulltext(buf, 1, '', trackingProvider);
 
-    assert(result, 'getFulltext should return a result');
+    assert(result, 'pdf.getFulltext should return a result');
     assert(typeof result.text === 'string', 'result.text should be a string');
 
     // Verify CMap data was requested and loaded

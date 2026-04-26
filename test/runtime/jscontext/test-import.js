@@ -1,12 +1,12 @@
-// Integration test: importAnnotations via JSContext
+// Integration test: pdf.importAnnotations via JSContext
 (async function () {
   try {
-    var buf = loadPDF('test/pdfs/full/1.pdf');
+    var buf = loadPDF('test/fixtures/pdf/full/1.pdf');
     console.log('Loaded PDF: ' + buf.length + ' bytes');
 
-    var result = await worker.importAnnotations(buf, [], '', false, dataProvider);
+    var result = await worker.pdf.importAnnotations(buf, [], '', false, dataProvider);
 
-    assert(result, 'importAnnotations should return a result');
+    assert(result, 'pdf.importAnnotations should return a result');
     assert(Array.isArray(result.imported), 'result.imported should be an array');
 
     console.log('Imported annotations: ' + result.imported.length);

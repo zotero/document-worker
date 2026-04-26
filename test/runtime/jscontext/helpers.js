@@ -18,11 +18,13 @@
     }
   };
 
-  g.loadPDF = function (path) {
+  g.loadBytes = function (path) {
     var bytes = __nativeReadFileBytes(path);
-    assert(bytes.length > 0, 'Failed to load PDF: ' + path);
+    assert(bytes.length > 0, 'Failed to load file: ' + path);
     return new Uint8Array(bytes);
   };
+
+  g.loadPDF = g.loadBytes;
 
   g.dataProvider = function (path) {
     var bytes = __nativeReadFileBytes('build/' + path);

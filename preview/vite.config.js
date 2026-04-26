@@ -3,7 +3,7 @@ import { dirname, resolve } from 'path';
 import { existsSync, readdirSync, statSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const TEST_PDF_DIRS = ['test/pdfs/full', 'test/pdfs/extra'];
+const TEST_PDF_DIRS = ['test/fixtures/pdf/full', 'test/fixtures/pdf/extra'];
 
 function isDirectory(path) {
   try {

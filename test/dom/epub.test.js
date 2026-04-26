@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
-import { getEpubStructure, getEpubFulltext } from '../src/dom/epub/index';
+import { getEpubStructure, getEpubFulltext } from '../../src/dom/epub/index';
 import stringify from 'json-stringify-pretty-compact';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const epubsDir = resolve(__dirname, 'epubs');
+const epubsDir = resolve(__dirname, '..', 'fixtures', 'epub');
 
 function loadEpub(filename) {
 	let buf = fs.readFileSync(resolve(epubsDir, filename));
@@ -351,19 +351,19 @@ describe('EPUB-specific content checks', { timeout: 30000 }, () => {
 });
 
 // Auto-discover snapshot tests: each .epub with a corresponding .json snapshot.
-// Run with UPDATE_SNAPSHOTS=1 to create/update snapshot files.
+// Run with UPDATE_FIXTURES=1 to create/update fixture files.
 let epubsWithSnapshots = epubFiles.filter(
 	f => fs.existsSync(resolve(epubsDir, f.replace('.epub', '.json')))
 );
 
 describe('EPUB structure snapshots', { timeout: 30000 }, () => {
-	if (epubsWithSnapshots.length === 0 && !process.env.UPDATE_SNAPSHOTS) {
-		it('no snapshots found — run UPDATE_SNAPSHOTS=1 npm run test:epub to generate', () => {
-			assert.fail('No .json snapshot files found next to .epub files in test/epubs/');
+	if (epubsWithSnapshots.length === 0 && !process.env.UPDATE_FIXTURES) {
+		it('no snapshots found — run npm run fixtures:update to generate', () => {
+			assert.fail('No .json snapshot files found next to .epub files in test/fixtures/epub/');
 		});
 	}
 
-	for (let file of (process.env.UPDATE_SNAPSHOTS ? epubFiles : epubsWithSnapshots)) {
+	for (let file of (process.env.UPDATE_FIXTURES ? epubFiles : epubsWithSnapshots)) {
 		let name = file.replace('.epub', '');
 		let snapshotPath = resolve(epubsDir, name + '.json');
 
@@ -375,7 +375,7 @@ describe('EPUB structure snapshots', { timeout: 30000 }, () => {
 
 			let json = stringify(result, { indent: '\t', maxLength: 100 });
 
-			if (process.env.UPDATE_SNAPSHOTS) {
+			if (process.env.UPDATE_FIXTURES) {
 				fs.writeFileSync(snapshotPath, json + '\n', 'utf8');
 			}
 			else {

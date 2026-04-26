@@ -5,10 +5,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import stringify from 'json-stringify-pretty-compact';
 import { parseDocument } from 'htmlparser2';
-import { getSnapshotStructure, getSnapshotFulltext } from '../src/dom/snapshot/index';
+import { getSnapshotStructure, getSnapshotFulltext } from '../../src/dom/snapshot/index';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const snapshotsDir = path.join(__dirname, 'snapshots');
+const snapshotsDir = path.join(__dirname, '..', 'fixtures', 'snapshot');
 
 function load(name) {
 	let filePath = path.join(snapshotsDir, name);
@@ -456,7 +456,7 @@ let htmlWithSnapshots = allHtmlFiles.filter(
 );
 
 describe('Snapshot SDT: golden fixture comparison', () => {
-	for (let file of (process.env.UPDATE_SNAPSHOTS ? allHtmlFiles : htmlWithSnapshots)) {
+	for (let file of (process.env.UPDATE_FIXTURES ? allHtmlFiles : htmlWithSnapshots)) {
 		let name = file.replace('.html', '');
 		let snapshotPath = path.join(snapshotsDir, name + '.json');
 
@@ -465,7 +465,7 @@ describe('Snapshot SDT: golden fixture comparison', () => {
 			delete result.dateCreated;
 			let json = stringify(result, { indent: '\t', maxLength: 100 });
 
-			if (process.env.UPDATE_SNAPSHOTS) {
+			if (process.env.UPDATE_FIXTURES) {
 				fs.writeFileSync(snapshotPath, json + '\n', 'utf8');
 			}
 			else {

@@ -316,7 +316,7 @@ async function populateTestPdfSelect() {
     const files = await resp.json();
     for (const file of files) {
       const name = typeof file === 'string' ? file : (file.name || file.path);
-      const path = typeof file === 'string' ? `test/pdfs/full/${file}` : file.path;
+      const path = typeof file === 'string' ? `test/fixtures/pdf/full/${file}` : file.path;
       const label = typeof file === 'string' ? file : (file.label || file.name);
       const opt = document.createElement('option');
       opt.value = path;

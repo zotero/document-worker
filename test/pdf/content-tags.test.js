@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { getContent } from '../structured-document-text/src/pdf/content.js';
+import { getContent } from '../../structured-document-text/src/pdf/content.js';
 
 describe('getContent JSON format', () => {
 	it('returns block JSON with refs and sentence entries', () => {
