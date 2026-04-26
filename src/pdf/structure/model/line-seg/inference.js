@@ -1024,14 +1024,17 @@ function detectPreformattedBlocks(blocks, lines) {
 	return overlayRegions(blocks, regions);
 }
 
+const MAX_OBJECT_LINES_PER_PAGE = 2000;
+const MAX_INFERENCE_LINES_PER_PAGE = 4096;
+
 export async function inference(pageDataList, onnxRuntimeProvider, modelProvider, val) {
 
 	let model = await initModel(onnxRuntimeProvider, modelProvider);
 
 	let pageDataList2 = [];
 	for (let pageDataItem of pageDataList) {
-		let pageHeight = pageDataItem.viewBox[3] - pageDataItem.viewBox[1];
 		let lines = getLines(pageDataItem.chars);
+		let objectLineCount = 0;
 
 		if (Array.isArray(pageDataItem.objects) && pageDataItem.objects.length) {
 			let objects = filterLargeObjects(pageDataItem.objects, lines, pageDataItem.viewBox);
@@ -1041,6 +1044,13 @@ export async function inference(pageDataList, onnxRuntimeProvider, modelProvider
 				rect: object.rect,
 				...(Number.isFinite(object.seq) ? { seq: object.seq } : {}),
 			}));
+			objectLineCount = objectLines.length;
+			if (objectLineCount > MAX_OBJECT_LINES_PER_PAGE) {
+				const pageNumber = Number.isInteger(pageDataItem.pageIndex) ? pageDataItem.pageIndex + 1 : '?';
+				throw new Error(
+					`PDF page ${pageNumber} is not eligible for structure extraction: ${objectLineCount} objects, too many objects`
+				);
+			}
 			lines = mergeObjectLinesBySeq(lines, objectLines);
 		}
 
@@ -1051,6 +1061,14 @@ export async function inference(pageDataList, onnxRuntimeProvider, modelProvider
 	}
 
 	let inferenceLines = getPageLines(pageDataList2[0]).lines;
+	if (inferenceLines.length > MAX_INFERENCE_LINES_PER_PAGE) {
+		const pageIndex = pageDataList[0]?.pageIndex;
+		const pageNumber = Number.isInteger(pageIndex) ? pageIndex + 1 : '?';
+		const objectCount = Array.isArray(pageDataList[0]?.objects) ? pageDataList[0].objects.length : 0;
+		throw new Error(
+			`PDF page ${pageNumber} is not eligible for structure extraction: ${objectCount} objects, ${inferenceLines.length} lines`
+		);
+	}
 
 
 		let lines = pageDataList2[0].lines;

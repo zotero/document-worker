@@ -92,7 +92,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 			linkMap.set(i, links);
 		}
 
-		let pageDataList = [{ chars, objects, viewBox: page.view }];
+		let pageDataList = [{ chars, objects, viewBox: page.view, pageIndex: i }];
 		let blocks = [];
 
 		if (chars.length) {

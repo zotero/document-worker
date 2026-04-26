@@ -13,7 +13,6 @@ import { renderAnnotations, renderArea } from './renderer.js';
 
 import { runInference, loadModel, initModel } from './structure/model/line-seg/model.js';
 import { getFullStructure } from './structure/structure.js';
-import { getFulltextFromStructuredText } from '../../structured-document-text/src/fulltext.js';
 
 // loadModel({ modelUrl: "./model/out1.onnx",  crfUrl: "./model/out1.crf.json" });
 
@@ -452,7 +451,7 @@ async function getPdfManager(arrayBuffer, password) {
 	return pdfManager;
 }
 
-async function getFulltext(buf, pages, password, dataProvider, options = {}) {
+async function getFulltext(buf, pages, password, dataProvider) {
 	let pdfManager = await getPdfManager(buf);
 	let actualCount = pdfManager.pdfDocument.numPages;
 
@@ -469,32 +468,30 @@ async function getFulltext(buf, pages, password, dataProvider, options = {}) {
 		pageIndexes = Array.from({ length: actualCount }, (_, i) => i);
 	}
 
-	let text;
-	if (options.structure) {
-		text = getFulltextFromStructuredText(options.structure, pageIndexes);
-	}
-	else {
-		let parts = [];
-		for (let i = 0; i < pageIndexes.length; i++) {
-			let pageIndex = pageIndexes[i];
-			let chars = await getPageChars(pdfManager.pdfDocument, dataProvider, pageIndex);
-			for (let char of chars) {
-				if (!char.ignorable) {
-					parts.push(char.c);
-					if (char.spaceAfter || (char.lineBreakAfter && !char.paragraphBreakAfter)) {
-						parts.push(' ');
-					}
-				}
-				if (char.paragraphBreakAfter) {
-					parts.push('\n\n');
+	let text = [];
+	for (let i = 0; i < pageIndexes.length; i++) {
+		let pageIndex = pageIndexes[i];
+		let chars = await getPageChars(pdfManager.pdfDocument, dataProvider, pageIndex);
+		for (let char of chars) {
+			if (!char.ignorable) {
+				text.push(char.c);
+				if (char.spaceAfter || (char.lineBreakAfter && !char.paragraphBreakAfter)) {
+					text.push(' ');
 				}
 			}
+			if (char.paragraphBreakAfter) {
+				text.push('\n');
+			}
 		}
-
-		// Normalize text by precomposing characters and accents into single composed characters
-		// to prevent indexing issues
-		text = parts.join('').trim().normalize('NFC');
+		text.push('\n\n');
+		if (i !== pageIndexes.length - 1) {
+			text.push('\f');
+		}
 	}
+
+	// Normalize text by precomposing characters and accents into single composed characters
+	// to prevent indexing issues
+	text = text.join('').trim().normalize('NFC');
 
 	return {
 		text,
