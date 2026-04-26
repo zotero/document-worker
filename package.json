@@ -3,9 +3,7 @@
 	"version": "1.0.0",
 	"description": "A document processing toolkit that runs on Node.js and Web Worker",
 	"exports": {
-		".": "./src/index.js",
-		"./pdf": "./src/pdf/index.js",
-		"./build/*": "./build/*"
+		".": "./src/index.js"
 	},
 	"scripts": {
 		"build": "npm run build:assets && npm run build:worker",

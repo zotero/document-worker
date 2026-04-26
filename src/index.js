@@ -3,19 +3,16 @@ import {
 	importAnnotations,
 	deletePages,
 	rotatePages,
-	getFulltext as getPdfFulltext,
+	getFulltext,
 	getRecognizerData,
-	getOutline,
-	getProcessedData,
-	getStructure as getPdfStructure,
-	getPdfManager,
+	getStructure as pdfGetStructure,
 	importCitaviAnnotations,
 	importMendeleyAnnotations,
 	hasAnnotations,
 	renderAnnotations
 } from './pdf/index.js';
-import { getEpubStructure, getEpubFulltext } from './dom/epub/index';
-import { getSnapshotStructure, getSnapshotFulltext } from './dom/snapshot/index';
+import { getEpubStructure } from './dom/epub/index';
+import { getSnapshotStructure } from './dom/snapshot/index';
 
 const EPUB_CONTENT_TYPE = 'application/epub+zip';
 
@@ -27,29 +24,38 @@ function isSnapshot(contentType) {
 	return contentType && contentType.endsWith('html');
 }
 
-export {
+async function getStructuredDocumentText(buf, options = {}) {
+	let {
+		contentType,
+		password,
+		dataProvider,
+	} = options;
+
+	if (isEpub(contentType)) {
+		return getEpubStructure(buf);
+	}
+	if (isSnapshot(contentType)) {
+		return getSnapshotStructure(buf, contentType);
+	}
+	return await pdfGetStructure(buf, password, dataProvider);
+}
+
+const pdf = {
 	writeAnnotations,
 	importAnnotations,
 	deletePages,
 	rotatePages,
-	getPdfFulltext,
+	getFulltext,
 	getRecognizerData,
-	getOutline,
-	getProcessedData,
-	getPdfStructure,
-	getPdfManager,
 	importCitaviAnnotations,
 	importMendeleyAnnotations,
 	hasAnnotations,
-	renderAnnotations,
-	getEpubStructure,
-	getEpubFulltext,
-	getSnapshotStructure,
-	getSnapshotFulltext,
 };
 
-// Re-export getPages (exported inline in pdf/index.js)
-export { getPages } from './pdf/index.js';
+export {
+	pdf,
+	getStructuredDocumentText,
+};
 
 function errObject(err) {
 	return JSON.parse(JSON.stringify(err, Object.getOwnPropertyNames(err)));
@@ -92,7 +98,7 @@ if (typeof self !== 'undefined') {
 			return;
 		}
 
-		if (message.action === 'export') {
+		if (message.action === 'pdf.writeAnnotations') {
 			let buf;
 			try {
 				buf = await writeAnnotations(
@@ -111,7 +117,7 @@ if (typeof self !== 'undefined') {
 				}, []);
 			}
 		}
-		else if (message.action === 'import') {
+		else if (message.action === 'pdf.importAnnotations') {
 			try {
 				let { buf, existingAnnotations, password, transfer } = message.data;
 				let data = await importAnnotations(
@@ -130,7 +136,7 @@ if (typeof self !== 'undefined') {
 				}, []);
 			}
 		}
-		else if (message.action === 'importMendeley') {
+		else if (message.action === 'pdf.importMendeleyAnnotations') {
 			try {
 				let annotations = await importMendeleyAnnotations(
 					message.data.buf,
@@ -150,7 +156,7 @@ if (typeof self !== 'undefined') {
 				}, []);
 			}
 		}
-		else if (message.action === 'importCitavi') {
+		else if (message.action === 'pdf.importCitaviAnnotations') {
 			try {
 				let annotations = await importCitaviAnnotations(
 					message.data.buf,
@@ -170,7 +176,7 @@ if (typeof self !== 'undefined') {
 				}, []);
 			}
 		}
-		else if (message.action === 'deletePages') {
+		else if (message.action === 'pdf.deletePages') {
 			try {
 				let buf = await deletePages(message.data.buf, message.data.pageIndexes, message.data.password);
 				self.postMessage({ responseID: message.id, data: { buf } }, [buf]);
@@ -182,7 +188,7 @@ if (typeof self !== 'undefined') {
 				}, []);
 			}
 		}
-		else if (message.action === 'rotatePages') {
+		else if (message.action === 'pdf.rotatePages') {
 			try {
 				let buf = await rotatePages(
 					message.data.buf,
@@ -199,31 +205,14 @@ if (typeof self !== 'undefined') {
 				}, []);
 			}
 		}
-		else if (message.action === 'getFulltext') {
+		else if (message.action === 'pdf.getFulltext') {
 			try {
-				let data;
-				if (isEpub(message.data.contentType)) {
-					data = getEpubFulltext(
-						message.data.buf,
-						{ structure: message.data.structure }
-					);
-				}
-				else if (isSnapshot(message.data.contentType)) {
-					data = getSnapshotFulltext(
-						message.data.buf,
-						message.data.contentType,
-						{ structure: message.data.structure }
-					);
-				}
-				else {
-					data = await getPdfFulltext(
-						message.data.buf,
-						message.data.maxPages || message.data.pageIndexes,
-						message.data.password,
-						fetchData,
-						{ structure: message.data.structure }
-					);
-				}
+				let data = await getFulltext(
+					message.data.buf,
+					message.data.maxPages || message.data.pageIndexes,
+					message.data.password,
+					fetchData
+				);
 				self.postMessage({ responseID: message.id, data }, []);
 			}
 			catch (e) {
@@ -233,7 +222,7 @@ if (typeof self !== 'undefined') {
 				}, []);
 			}
 		}
-		else if (message.action === 'getRecognizerData') {
+		else if (message.action === 'pdf.getRecognizerData') {
 			try {
 				let data = await getRecognizerData(
 					message.data.buf,
@@ -249,22 +238,13 @@ if (typeof self !== 'undefined') {
 				}, []);
 			}
 		}
-		else if (message.action === 'getStructuredData') {
+		else if (message.action === 'getStructuredDocumentText') {
 			try {
-				let data;
-				if (isEpub(message.data.contentType)) {
-					data = getEpubStructure(message.data.buf);
-				}
-				else if (isSnapshot(message.data.contentType)) {
-					data = getSnapshotStructure(message.data.buf, message.data.contentType);
-				}
-				else {
-					data = await getPdfStructure(
-						message.data.buf,
-						message.data.password,
-						fetchData
-					);
-				}
+				let data = await getStructuredDocumentText(message.data.buf, {
+					contentType: message.data.contentType,
+					password: message.data.password,
+					dataProvider: fetchData,
+				});
 				self.postMessage({ responseID: message.id, data }, []);
 			}
 			catch (e) {
@@ -274,7 +254,7 @@ if (typeof self !== 'undefined') {
 				}, []);
 			}
 		}
-		else if (message.action === 'renderAnnotations') {
+		else if (message.action === 'pdf.renderAnnotations') {
 			try {
 				let data = await renderAnnotations(
 					message.data.libraryID,
@@ -293,7 +273,7 @@ if (typeof self !== 'undefined') {
 				}, []);
 			}
 		}
-		else if (message.action === 'hasAnnotations') {
+		else if (message.action === 'pdf.hasAnnotations') {
 			try {
 				let data = {
 					hasAnnotations: await hasAnnotations(
