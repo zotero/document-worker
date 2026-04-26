@@ -20,6 +20,8 @@ export const mainPdfNamespaceExportNames = [
 	'importCitaviAnnotations',
 	'importMendeleyAnnotations',
 	'hasAnnotations',
+	'renderAnnotations',
+	'renderArea',
 ];
 
 export const workerActionNames = [
@@ -33,5 +35,6 @@ export const workerActionNames = [
 	'pdf.getRecognizerData',
 	'getStructuredDocumentText',
 	'pdf.renderAnnotations',
+	'pdf.renderArea',
 	'pdf.hasAnnotations',
 ];

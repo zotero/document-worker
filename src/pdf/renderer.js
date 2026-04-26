@@ -1,12 +1,13 @@
-let pdfjsWorker, pdfjs;
+import * as pdfjsWorker from '../../pdf.js/src/pdf.worker.js';
+import * as pdfjs from '../../pdf.js/src/pdf.js';
+import {
+	canvasToPNGArrayBuffer,
+	createCanvas,
+	createCanvasFactory,
+	createOwnerDocument,
+} from './render-runtime.js';
 
-async function ensurePdfjs() {
-	if (!pdfjs) {
-		pdfjsWorker = await import('../../pdf.js/src/pdf.worker.js');
-		pdfjs = await import('../../pdf.js/src/pdf.js');
-		self.pdfjsWorker = pdfjsWorker;
-	}
-}
+globalThis.pdfjsWorker = pdfjsWorker;
 
 const SCALE = 4;
 const PATH_BOX_PADDING = 10; // pt
@@ -82,6 +83,49 @@ function getPositionBoundingRect(position) {
 	}
 }
 
+async function getRenderablePdfDocument(source, password, dataProvider) {
+	if (source?.getPage) {
+		return {
+			pdfDocument: source,
+			cleanup: async () => {},
+		};
+	}
+
+	let document = await createOwnerDocument();
+	let CanvasFactory = await createCanvasFactory();
+	let options = {
+		data: new Uint8Array(source).buffer,
+		ownerDocument: document,
+		CanvasFactory,
+		disableFontFace: false,
+		password,
+	};
+
+	if (dataProvider) {
+		options.CMapReaderFactory = function () {
+			this.fetch = async ({ name }) => {
+				let raw = await dataProvider('cmaps/' + name + '.bcmap');
+				return { cMapData: raw, isCompressed: true };
+			};
+		};
+		options.StandardFontDataFactory = function () {
+			this.fetch = async ({ filename }) => dataProvider('standard_fonts/' + filename);
+		};
+		options.WasmFactory = function () {
+			this.fetch = async ({ filename }) => dataProvider('wasm/' + filename);
+		};
+	}
+
+	let pdfDocument = await pdfjs.getDocument(options).promise;
+	return {
+		pdfDocument,
+		cleanup: async () => {
+			await pdfDocument.destroy?.();
+			document.releaseNodeFonts?.();
+		},
+	};
+}
+
 async function renderImage(pdfDocument, annotation) {
 	let { position, color } = annotation;
 
@@ -139,7 +183,7 @@ async function renderImage(pdfDocument, annotation) {
 		return null;
 	}
 
-	let canvas = new OffscreenCanvas(canvasWidth, canvasHeight);
+	let canvas = await createCanvas(canvasWidth, canvasHeight);
 	let ctx = canvas.getContext('2d', { alpha: false });
 
 	let renderContext = {
@@ -174,83 +218,67 @@ async function renderImage(pdfDocument, annotation) {
 
 export async function renderArea(pdfDocument, pageIndex, rect, options = {}) {
 	let scale = options.scale || SCALE;
+	let renderablePdf = await getRenderablePdfDocument(
+		pdfDocument,
+		options.password,
+		options.dataProvider
+	);
+	pdfDocument = renderablePdf.pdfDocument;
 
-	let page = await pdfDocument.getPage(pageIndex + 1);
-	rect = fitRectIntoRect(rect, page.view);
+	try {
+		let page = await pdfDocument.getPage(pageIndex + 1);
+		rect = fitRectIntoRect(rect, page.view);
 
-	let width = rect[2] - rect[0];
-	let height = rect[3] - rect[1];
-	if (!width || !height) {
-		return null;
+		let width = rect[2] - rect[0];
+		let height = rect[3] - rect[1];
+		if (!width || !height) {
+			return null;
+		}
+
+		let maxScale = Math.sqrt(MAX_CANVAS_PIXELS / (width * height));
+		scale = Math.min(scale, maxScale);
+
+		let position = { pageIndex, rects: [rect] };
+		let viewport = page.getViewport({ scale });
+		position = p2v(position, viewport);
+		let vRect = position.rects[0];
+
+		let offsetViewport = page.getViewport({ scale, offsetX: -vRect[0], offsetY: -vRect[1] });
+
+		let canvasWidth = vRect[2] - vRect[0];
+		let canvasHeight = vRect[3] - vRect[1];
+		if (!canvasWidth || !canvasHeight) {
+			return null;
+		}
+
+		let canvas = await createCanvas(canvasWidth, canvasHeight);
+		let ctx = canvas.getContext('2d', { alpha: false });
+		await page.render({ canvasContext: ctx, viewport: offsetViewport }).promise;
+
+		return canvas;
 	}
-
-	let maxScale = Math.sqrt(MAX_CANVAS_PIXELS / (width * height));
-	scale = Math.min(scale, maxScale);
-
-	let position = { pageIndex, rects: [rect] };
-	let viewport = page.getViewport({ scale });
-	position = p2v(position, viewport);
-	let vRect = position.rects[0];
-
-	let offsetViewport = page.getViewport({ scale, offsetX: -vRect[0], offsetY: -vRect[1] });
-
-	let canvasWidth = vRect[2] - vRect[0];
-	let canvasHeight = vRect[3] - vRect[1];
-	if (!canvasWidth || !canvasHeight) {
-		return null;
+	finally {
+		await renderablePdf.cleanup();
 	}
-
-	let canvas = new OffscreenCanvas(canvasWidth, canvasHeight);
-	let ctx = canvas.getContext('2d', { alpha: false });
-	await page.render({ canvasContext: ctx, viewport: offsetViewport }).promise;
-
-	return canvas;
 }
 
 export async function renderAnnotations(libraryID, buf, annotations, password, dataProvider, renderedAnnotationSaver) {
-	await ensurePdfjs();
-	let document = {
-		fonts: self.fonts,
-		createElement: (name) => {
-			if (name === 'canvas') {
-				return new OffscreenCanvas(1, 1);
-			}
-			throw new Error(`Unexpected element name "${name}"`);
-			// return null;
-		},
-	};
-	buf = new Uint8Array(buf).buffer;
-	let pdfDocument = await pdfjs.getDocument({
-		data: buf, ownerDocument: document,
-		password,
-		CMapReaderFactory: function () {
-			this.fetch = async ({ name }) => {
-				let raw = await dataProvider('cmaps/' + name + '.bcmap');
-				return { cMapData: raw, isCompressed: true };
-			};
-		},
-		StandardFontDataFactory: function () {
-			this.fetch = async ({ filename }) => dataProvider('standard_fonts/' + filename);
-		},
-		WasmFactory: function () {
-			this.fetch = async ({ filename }) => dataProvider('wasm/' + filename);
-		},
-	}).promise;
+	let renderablePdf = await getRenderablePdfDocument(buf, password, dataProvider);
+	let pdfDocument = renderablePdf.pdfDocument;
 
-	let num = 0;
-	for (let annotation of annotations) {
-		let canvas = await renderImage(pdfDocument, annotation);
-		let blob = await canvas.convertToBlob({ type: "image/png" });
-		let reader = new FileReader();
-		reader.readAsArrayBuffer(blob);
-		await new Promise((resolve) => {
-			reader.onloadend = resolve;
-		});
-		let image = reader.result;
-		if (!await renderedAnnotationSaver(libraryID, annotation.id, image)) {
-			throw new Error('Failed to save rendered annotation');
+	try {
+		let num = 0;
+		for (let annotation of annotations) {
+			let canvas = await renderImage(pdfDocument, annotation);
+			let image = await canvasToPNGArrayBuffer(canvas);
+			if (!await renderedAnnotationSaver(libraryID, annotation.id, image)) {
+				throw new Error('Failed to save rendered annotation');
+			}
+			num++;
 		}
-		num++;
+		return num;
 	}
-	return num;
+	finally {
+		await renderablePdf.cleanup();
+	}
 }

@@ -26,12 +26,14 @@
 		"htmlparser2": "^9.1.0",
 		"pako": "2.1.0"
 	},
+	"optionalDependencies": {
+		"canvas": "^3.2.1"
+	},
 	"devDependencies": {
 		"@eslint/eslintrc": "^3.3.4",
 		"@eslint/js": "^10.0.1",
 		"@playwright/test": "^1.59.1",
 		"@zotero/eslint-config": "^1.0.9",
-		"canvas": "^3.2.1",
 		"eslint": "^10.0.2",
 		"json-stringify-pretty-compact": "^4.0.0",
 		"ts-loader": "^9.5.4",

@@ -1,77 +1,16 @@
 import { test, expect } from '@playwright/test';
-import http from 'node:http';
-import fs from 'node:fs';
-import { dirname, extname, resolve, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { Buffer } from 'node:buffer';
 import {
 	sampleCitaviAnnotations,
 	sampleMendeleyAnnotations,
 	sampleRenderableAnnotations,
 	sampleZoteroAnnotations,
 } from '../../helpers/fixtures.js';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const repoDir = resolve(__dirname, '../../..');
-
-const MIME_TYPES = {
-	'.bcmap': 'application/octet-stream',
-	'.html': 'text/html; charset=utf-8',
-	'.js': 'application/javascript; charset=utf-8',
-	'.json': 'application/json; charset=utf-8',
-	'.onnx': 'application/octet-stream',
-	'.pdf': 'application/pdf',
-	'.wasm': 'application/wasm',
-	'.epub': 'application/epub+zip',
-};
-
-function createStaticServer() {
-	return http.createServer((req, res) => {
-		try {
-			let url = new URL(req.url || '/', 'http://127.0.0.1');
-			let pathname = decodeURIComponent(url.pathname);
-			if (pathname === '/') {
-				res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-				res.end('<!doctype html><meta charset="utf-8"><title>worker runtime</title>');
-				return;
-			}
-
-			let filePath = resolve(repoDir, pathname.slice(1));
-			if (filePath !== repoDir && !filePath.startsWith(repoDir + sep)) {
-				res.writeHead(403);
-				res.end('Forbidden');
-				return;
-			}
-
-			let data = fs.readFileSync(filePath);
-			res.writeHead(200, {
-				'Content-Type': MIME_TYPES[extname(filePath)] || 'application/octet-stream',
-			});
-			res.end(data);
-		}
-		catch (err) {
-			res.writeHead(err.code === 'ENOENT' ? 404 : 500);
-			res.end(err.message);
-		}
-	});
-}
-
-async function listen(server) {
-	await new Promise((resolveListen, rejectListen) => {
-		server.once('error', rejectListen);
-		server.listen(0, '127.0.0.1', () => {
-			server.off('error', rejectListen);
-			resolveListen();
-		});
-	});
-	let address = server.address();
-	return `http://${address.address}:${address.port}`;
-}
-
-async function close(server) {
-	await new Promise((resolveClose, rejectClose) => {
-		server.close((err) => err ? rejectClose(err) : resolveClose());
-	});
-}
+import {
+	assertRenderedTextCropPNG,
+	pdfTextCropRenderContract,
+} from '../../helpers/render-assertions.js';
+import { close, createStaticServer, listen } from './server.js';
 
 function assertStructure(result, type) {
 	expect(result.processor?.type).toBe(type);
@@ -103,7 +42,16 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 			const worker = new Worker('/build/worker.js');
 			const pending = new Map();
 			let nextID = 0;
-			let savedRenderedAnnotations = 0;
+			let renderedAnnotationPNGs = [];
+
+			function arrayBufferToBase64(buf) {
+				let bytes = new Uint8Array(buf);
+				let binary = '';
+				for (let i = 0; i < bytes.length; i++) {
+					binary += String.fromCharCode(bytes[i]);
+				}
+				return btoa(binary);
+			}
 
 			worker.onmessage = async (event) => {
 				const message = event.data;
@@ -126,7 +74,7 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 				}
 				if (message.action === 'SaveRenderedAnnotation') {
 					if (message.data?.buf?.byteLength > 0) {
-						savedRenderedAnnotations++;
+						renderedAnnotationPNGs.push(arrayBufferToBase64(message.data.buf));
 					}
 					worker.postMessage({ responseID: message.id, data: true });
 					return;
@@ -236,6 +184,12 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 				password: '',
 			});
 
+			const renderedArea = await callWorkerWithBuffer('pdf.renderArea', pdf, {
+				pageIndex: samples.renderAreaContract.pageIndex,
+				rect: samples.renderAreaContract.rect,
+				password: '',
+			});
+
 			const hasAnnotations = await callWorkerWithBuffer('pdf.hasAnnotations', pdf, {
 				password: '',
 			});
@@ -255,10 +209,11 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 				epubStructure,
 				snapshotStructure,
 				renderedAnnotationCount,
-				savedRenderedAnnotations,
+				renderedAnnotationPNGs,
+				renderedAreaPNG: arrayBufferToBase64(renderedArea.buf),
 				hasAnnotations,
 			};
-		}, samples);
+		}, { ...samples, renderAreaContract: pdfTextCropRenderContract });
 
 		expect(Array.isArray(result.imported.imported)).toBe(true);
 		expect(Array.isArray(result.imported.deleted)).toBe(true);
@@ -278,7 +233,9 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 		assertStructure(result.epubStructure, 'epub');
 		assertStructure(result.snapshotStructure, 'snapshot');
 		expect(result.renderedAnnotationCount).toBe(1);
-		expect(result.savedRenderedAnnotations).toBe(1);
+		expect(result.renderedAnnotationPNGs).toHaveLength(1);
+		await assertRenderedTextCropPNG(Buffer.from(result.renderedAnnotationPNGs[0], 'base64'));
+		await assertRenderedTextCropPNG(Buffer.from(result.renderedAreaPNG, 'base64'));
 		expect(typeof result.hasAnnotations.hasAnnotations).toBe('boolean');
 	}
 	finally {

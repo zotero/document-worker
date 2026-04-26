@@ -19,8 +19,14 @@ import {
 	readFixtureArrayBuffer,
 	sampleCitaviAnnotations,
 	sampleMendeleyAnnotations,
+	sampleRenderableAnnotations,
 	sampleZoteroAnnotations,
 } from '../../helpers/fixtures.js';
+import {
+	assertRenderedTextCropCanvas,
+	assertRenderedTextCropPNG,
+	pdfTextCropRenderContract,
+} from '../../helpers/render-assertions.js';
 
 function pdf1() {
 	return readFixtureArrayBuffer('pdf', 'full', '1.pdf');
@@ -82,6 +88,36 @@ describe('package main export in Node.js', { timeout: 120000 }, () => {
 
 		let hasAnnotations = await worker.pdf.hasAnnotations(pdf1(), '');
 		assert.equal(typeof hasAnnotations, 'boolean');
+	});
+
+	it('runs renderer exports in Node.js', async () => {
+		let canvas = await worker.pdf.renderArea(
+			readFixtureArrayBuffer(...pdfTextCropRenderContract.fixture),
+			pdfTextCropRenderContract.pageIndex,
+			pdfTextCropRenderContract.rect,
+			{ dataProvider }
+		);
+		assert.ok(canvas);
+		assertRenderedTextCropCanvas(canvas);
+
+		let saved = [];
+		let count = await worker.pdf.renderAnnotations(
+			1,
+			pdf1(),
+			sampleRenderableAnnotations(),
+			'',
+			dataProvider,
+			async (libraryID, annotationKey, buf) => {
+				saved.push({ libraryID, annotationKey, buf });
+				return true;
+			}
+		);
+
+		assert.equal(count, 1);
+		assert.equal(saved.length, 1);
+		assert.equal(saved[0].libraryID, 1);
+		assert.equal(saved[0].annotationKey, 'render-test');
+		await assertRenderedTextCropPNG(saved[0].buf);
 	});
 
 	it('extracts structured document text for PDF, EPUB, and snapshot', async () => {

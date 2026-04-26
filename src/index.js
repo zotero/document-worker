@@ -9,8 +9,10 @@ import {
 	importCitaviAnnotations,
 	importMendeleyAnnotations,
 	hasAnnotations,
-	renderAnnotations
+	renderAnnotations,
+	renderArea
 } from './pdf/index.js';
+import { canvasToPNGArrayBuffer } from './pdf/render-runtime.js';
 import { getEpubStructure } from './dom/epub/index';
 import { getSnapshotStructure } from './dom/snapshot/index';
 
@@ -50,6 +52,8 @@ const pdf = {
 	importCitaviAnnotations,
 	importMendeleyAnnotations,
 	hasAnnotations,
+	renderAnnotations,
+	renderArea,
 };
 
 export {
@@ -265,6 +269,32 @@ if (typeof self !== 'undefined') {
 					renderedAnnotationSaver
 				);
 				self.postMessage({ responseID: message.id, data }, []);
+			}
+			catch (e) {
+				self.postMessage({
+					responseID: message.id,
+					error: errObject(e)
+				}, []);
+			}
+		}
+		else if (message.action === 'pdf.renderArea') {
+			try {
+				let canvas = await renderArea(
+					message.data.buf,
+					message.data.pageIndex,
+					message.data.rect,
+					{
+						password: message.data.password,
+						scale: message.data.scale,
+						dataProvider: fetchData
+					}
+				);
+				if (!canvas) {
+					self.postMessage({ responseID: message.id, data: { buf: null } }, []);
+					return;
+				}
+				let buf = await canvasToPNGArrayBuffer(canvas);
+				self.postMessage({ responseID: message.id, data: { buf } }, [buf]);
 			}
 			catch (e) {
 				self.postMessage({

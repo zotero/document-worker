@@ -9,7 +9,9 @@
       'getRecognizerData',
       'importCitaviAnnotations',
       'importMendeleyAnnotations',
-      'hasAnnotations'
+      'hasAnnotations',
+      'renderAnnotations',
+      'renderArea'
     ];
 
     assert(worker && typeof worker === 'object', 'worker export should exist');
