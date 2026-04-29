@@ -225,6 +225,11 @@ export function mergeParagraphs(structure, mergeBlocks) {
 		return metrics.rect[2] - metrics.rect[0];
 	};
 
+	const isDegradedExtractionPage = (pageIndex) => {
+		return Number.isInteger(pageIndex)
+			&& structure.pages?.[pageIndex]?.extractionDegraded === true;
+	};
+
 	const canMergeParagraphs = (first, second) => {
 		const m1 = first._metrics;
 		const m2 = second._metrics;
@@ -235,6 +240,10 @@ export function mergeParagraphs(structure, mergeBlocks) {
 
 		// Check page proximity (same page or next page)
 		if (m2.pageIndex !== m1.pageIndex && m2.pageIndex !== m1.pageIndex + 1) {
+			return false;
+		}
+
+		if (m2.pageIndex !== m1.pageIndex && (isDegradedExtractionPage(m1.pageIndex) || isDegradedExtractionPage(m2.pageIndex))) {
 			return false;
 		}
 

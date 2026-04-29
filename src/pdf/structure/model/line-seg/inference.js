@@ -1024,13 +1024,203 @@ function detectPreformattedBlocks(blocks, lines) {
 	return overlayRegions(blocks, regions);
 }
 
-const MAX_OBJECT_LINES_PER_PAGE = 2000;
-const MAX_INFERENCE_LINES_PER_PAGE = 4096;
+const MAX_OBJECT_LINES_PER_PAGE = 500;
+const MAX_INFERENCE_LINES_PER_PAGE = 1000;
+const MAX_FALLBACK_BLOCKS_PER_PAGE = 200;
 
-export async function inference(pageDataList, onnxRuntimeProvider, modelProvider, val) {
+function getPageNumber(pageDataItem) {
+	return Number.isInteger(pageDataItem?.pageIndex) ? pageDataItem.pageIndex + 1 : '?';
+}
 
-	let model = await initModel(onnxRuntimeProvider, modelProvider);
+function recordLayoutFallback(pageDataItem, val, fallback) {
+	const pageIndex = Number.isInteger(pageDataItem?.pageIndex) ? pageDataItem.pageIndex : null;
+	const pageNumber = getPageNumber(pageDataItem);
+	const record = {
+		type: 'text_only_layout',
+		pageIndex,
+		pageNumber,
+		...fallback,
+	};
 
+	if (val) {
+		val.layoutFallbacks ||= [];
+		val.layoutFallbacks.push(record);
+	}
+
+	return record;
+}
+
+function recordTextOnlyObjectFallback(pageDataItem, objectLineCount, rawObjectCount, val) {
+	const pageNumber = Number.isInteger(pageDataItem.pageIndex) ? pageDataItem.pageIndex + 1 : '?';
+	recordLayoutFallback(pageDataItem, val, {
+		reason: 'too_many_objects',
+		objectLineCount,
+		rawObjectCount,
+		limit: MAX_OBJECT_LINES_PER_PAGE,
+	});
+
+	console.warn(
+		`PDF page ${pageNumber} has ${objectLineCount} objects after filtering (${rawObjectCount} raw), above limit ${MAX_OBJECT_LINES_PER_PAGE}; using text-only layout inference`
+	);
+}
+
+function unionLineBbox(lines) {
+	let bbox = null;
+	for (const line of lines) {
+		if (!Array.isArray(line?.rect) || line.rect.length !== 4) continue;
+		if (!bbox) {
+			bbox = line.rect.slice(0, 4);
+		}
+		else {
+			bbox[0] = Math.min(bbox[0], line.rect[0]);
+			bbox[1] = Math.min(bbox[1], line.rect[1]);
+			bbox[2] = Math.max(bbox[2], line.rect[2]);
+			bbox[3] = Math.max(bbox[3], line.rect[3]);
+		}
+	}
+	return bbox || [0, 0, 0, 0];
+}
+
+function hasParagraphBreakAfter(line) {
+	return Array.isArray(line?.chars) && line.chars.some(char => char?.paragraphBreakAfter);
+}
+
+function createParagraphFallbackBlock(lines) {
+	let startOffset = null;
+	let endOffset = null;
+	for (const line of lines) {
+		if (Number.isInteger(line.startOffset)) {
+			startOffset = startOffset === null ? line.startOffset : Math.min(startOffset, line.startOffset);
+		}
+		if (Number.isInteger(line.endOffset)) {
+			endOffset = endOffset === null ? line.endOffset : Math.max(endOffset, line.endOffset);
+		}
+	}
+	return {
+		type: 'body',
+		bbox: unionLineBbox(lines),
+		lines: lines.map(line => line.id),
+		startOffset: startOffset ?? 0,
+		endOffset: endOffset ?? startOffset ?? 0,
+		text: lines.map(line => line.text).join(' '),
+	};
+}
+
+function unionBlockBbox(blocks) {
+	let bbox = null;
+	for (const block of blocks) {
+		if (!Array.isArray(block?.bbox) || block.bbox.length !== 4) continue;
+		if (!bbox) {
+			bbox = block.bbox.slice(0, 4);
+		}
+		else {
+			bbox[0] = Math.min(bbox[0], block.bbox[0]);
+			bbox[1] = Math.min(bbox[1], block.bbox[1]);
+			bbox[2] = Math.max(bbox[2], block.bbox[2]);
+			bbox[3] = Math.max(bbox[3], block.bbox[3]);
+		}
+	}
+	return bbox || [0, 0, 0, 0];
+}
+
+function mergeParagraphFallbackBlocks(blocks) {
+	let startOffset = null;
+	let endOffset = null;
+	for (const block of blocks) {
+		if (Number.isInteger(block.startOffset)) {
+			startOffset = startOffset === null ? block.startOffset : Math.min(startOffset, block.startOffset);
+		}
+		if (Number.isInteger(block.endOffset)) {
+			endOffset = endOffset === null ? block.endOffset : Math.max(endOffset, block.endOffset);
+		}
+	}
+	return {
+		type: 'body',
+		bbox: unionBlockBbox(blocks),
+		lines: blocks.flatMap(block => block.lines),
+		startOffset: startOffset ?? 0,
+		endOffset: endOffset ?? startOffset ?? 0,
+		text: blocks.map(block => block.text).join(' '),
+	};
+}
+
+function coalesceParagraphFallbackBlocks(blocks, maxBlocks) {
+	const blockCount = blocks.length;
+	if (blockCount <= maxBlocks) return blocks;
+
+	const coalesced = [];
+	for (let i = 0; i < maxBlocks; i++) {
+		const start = Math.floor(i * blockCount / maxBlocks);
+		const end = Math.floor((i + 1) * blockCount / maxBlocks);
+		coalesced.push(mergeParagraphFallbackBlocks(blocks.slice(start, end)));
+	}
+	return coalesced;
+}
+
+export function buildParagraphFallbackBlocks(pageDataItem, val) {
+	const lines = getLines(pageDataItem?.chars || []).filter(line => line.type !== 'object');
+	const blocks = [];
+	let currentLines = [];
+
+	const flush = () => {
+		if (!currentLines.length) return;
+		blocks.push(createParagraphFallbackBlock(currentLines));
+		currentLines = [];
+	};
+
+	for (const line of lines) {
+		currentLines.push(line);
+		if (hasParagraphBreakAfter(line)) {
+			flush();
+		}
+	}
+	flush();
+
+	const coalescedBlocks = coalesceParagraphFallbackBlocks(blocks, MAX_FALLBACK_BLOCKS_PER_PAGE);
+	if (coalescedBlocks.length !== blocks.length) {
+		recordLayoutFallback(pageDataItem, val, {
+			reason: 'fallback_blocks_coalesced',
+			blockCount: blocks.length,
+			coalescedBlockCount: coalescedBlocks.length,
+			limit: MAX_FALLBACK_BLOCKS_PER_PAGE,
+		});
+	}
+
+	return coalescedBlocks;
+}
+
+function buildRecordedParagraphFallback(pageDataItem, val, reason, details = {}) {
+	const lineCount = Number.isInteger(details.lineCount) ? details.lineCount : undefined;
+	const fallback = recordLayoutFallback(pageDataItem, val, {
+		reason,
+		...(lineCount !== undefined ? { lineCount } : {}),
+		...details,
+	});
+
+	const pageNumber = getPageNumber(pageDataItem);
+	if (reason === 'too_many_lines') {
+		console.warn(
+			`PDF page ${pageNumber} has ${lineCount} inference lines, above limit ${MAX_INFERENCE_LINES_PER_PAGE}; using paragraph-only layout fallback`
+		);
+	}
+	else if (reason === 'inference_error') {
+		console.warn(
+			`PDF page ${pageNumber} layout inference failed; using paragraph-only layout fallback`
+		);
+	}
+
+	return { blocks: buildParagraphFallbackBlocks(pageDataItem, val), fallback };
+}
+
+export function buildInferenceErrorFallbackBlocks(pageDataItem, val, error, details = {}) {
+	return buildRecordedParagraphFallback(pageDataItem, val, 'inference_error', {
+		...details,
+		errorName: error?.name || 'Error',
+		errorMessage: error?.message || String(error),
+	}).blocks;
+}
+
+export function preparePageDataForInference(pageDataList, val) {
 	let pageDataList2 = [];
 	for (let pageDataItem of pageDataList) {
 		let lines = getLines(pageDataItem.chars);
@@ -1046,12 +1236,11 @@ export async function inference(pageDataList, onnxRuntimeProvider, modelProvider
 			}));
 			objectLineCount = objectLines.length;
 			if (objectLineCount > MAX_OBJECT_LINES_PER_PAGE) {
-				const pageNumber = Number.isInteger(pageDataItem.pageIndex) ? pageDataItem.pageIndex + 1 : '?';
-				throw new Error(
-					`PDF page ${pageNumber} is not eligible for structure extraction: ${objectLineCount} objects, too many objects`
-				);
+				recordTextOnlyObjectFallback(pageDataItem, objectLineCount, pageDataItem.objects.length, val);
 			}
-			lines = mergeObjectLinesBySeq(lines, objectLines);
+			else {
+				lines = mergeObjectLinesBySeq(lines, objectLines);
+			}
 		}
 
 		pageDataList2.push({
@@ -1059,63 +1248,70 @@ export async function inference(pageDataList, onnxRuntimeProvider, modelProvider
 			lines: lines
 		});
 	}
+	return pageDataList2;
+}
+
+export async function inference(pageDataList, onnxRuntimeProvider, modelProvider, val) {
+
+	let pageDataList2 = preparePageDataForInference(pageDataList, val);
 
 	let inferenceLines = getPageLines(pageDataList2[0]).lines;
 	if (inferenceLines.length > MAX_INFERENCE_LINES_PER_PAGE) {
-		const pageIndex = pageDataList[0]?.pageIndex;
-		const pageNumber = Number.isInteger(pageIndex) ? pageIndex + 1 : '?';
 		const objectCount = Array.isArray(pageDataList[0]?.objects) ? pageDataList[0].objects.length : 0;
-		throw new Error(
-			`PDF page ${pageNumber} is not eligible for structure extraction: ${objectCount} objects, ${inferenceLines.length} lines`
-		);
+		return buildRecordedParagraphFallback(pageDataList[0], val, 'too_many_lines', {
+			objectCount,
+			lineCount: inferenceLines.length,
+			limit: MAX_INFERENCE_LINES_PER_PAGE,
+		}).blocks;
 	}
 
+	let model = await initModel(onnxRuntimeProvider, modelProvider);
 
-		let lines = pageDataList2[0].lines;
+	let lines = pageDataList2[0].lines;
+	let infms = Date.now();
 
-		let infms = Date.now();
+	const { predictions, logitsShape } = await runInference({
+		...model,
+		records: [
+			{ lines: inferenceLines }
+		],
+		shape: { T: inferenceLines.length }
+	});
 
-		const { predictions, logitsShape } = await runInference({
-			...model,
-			records: [
-				{ lines: inferenceLines }
-			],
-			shape: { T: inferenceLines.length }
-		});
-
-		infms = Date.now() - infms;
+	infms = Date.now() - infms;
+	if (val) {
 		val.inferenceTime = infms;
+	}
 
+	let result = predictions[0];
 
-		let result = predictions[0];
+	let blocks = buildBlocks(lines, result);
+	blocks = mergeOverlappingImageBlocks(blocks, lines);
 
-		let blocks = buildBlocks(lines, result);
-		blocks = mergeOverlappingImageBlocks(blocks, lines);
-
-		// The model's "ignore" type (class 9) is trained exclusively on object lines
-		// (images, paths, xobjects) that don't cleanly belong to a single block.
-		// Object-only ignore blocks have no text content and would produce empty
-		// paragraphs — drop them. If the model mispredicts "ignore" for a text line,
-		// reclassify the block as "body" so it becomes a normal paragraph.
-		blocks = blocks.filter(block => {
-			if (block.type !== 'ignore') return true;
-			const hasText = block.lines.some(id => lines[id] && lines[id].type !== 'object');
-			if (hasText) {
-				block.type = 'body';
-				return true;
-			}
-			return false;
-		});
-
-		blocks = detectPreformattedBlocks(blocks, lines);
-
-		for (let block of blocks) {
-			block.text = block.lines
-				.map(l => lines[l])
-				.filter(line => line.type !== 'object')
-				.map(line => line.text)
-				.join(' ');
+	// The model's "ignore" type (class 9) is trained exclusively on object lines
+	// (images, paths, xobjects) that don't cleanly belong to a single block.
+	// Object-only ignore blocks have no text content and would produce empty
+	// paragraphs — drop them. If the model mispredicts "ignore" for a text line,
+	// reclassify the block as "body" so it becomes a normal paragraph.
+	blocks = blocks.filter(block => {
+		if (block.type !== 'ignore') return true;
+		const hasText = block.lines.some(id => lines[id] && lines[id].type !== 'object');
+		if (hasText) {
+			block.type = 'body';
+			return true;
 		}
+		return false;
+	});
 
-		return blocks;
+	blocks = detectPreformattedBlocks(blocks, lines);
+
+	for (let block of blocks) {
+		block.text = block.lines
+			.map(l => lines[l])
+			.filter(line => line.type !== 'object')
+			.map(line => line.text)
+			.join(' ');
+	}
+
+	return blocks;
 }

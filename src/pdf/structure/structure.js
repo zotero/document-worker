@@ -1,4 +1,4 @@
-import { inference } from './model/line-seg/inference.js';
+import { buildInferenceErrorFallbackBlocks, inference } from './model/line-seg/inference.js';
 import { getOutline } from './outline/outline.js';
 import { getReferenceLists } from './reference/reference.js';
 import { getCandidates } from './citations.js';
@@ -26,6 +26,15 @@ import { createStructureIndex } from './structure-index.js';
 
 const SCHEMA_VERSION = '1.0.0-draft';
 const PROCESSOR_VERSION = '1.0.0-draft';
+const DEGRADED_EXTRACTION_FALLBACK_REASONS = new Set([
+	'inference_error',
+	'too_many_lines',
+	'too_many_objects',
+]);
+
+function hasDegradedExtractionFallbacks(layoutFallbacks) {
+	return layoutFallbacks?.some(fallback => DEGRADED_EXTRACTION_FALLBACK_REASONS.has(fallback.reason));
+}
 
 export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelProvider, options = {}) {
 	const pageCount = pdfDocument.numPages;
@@ -95,10 +104,19 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 		let pageDataList = [{ chars, objects, viewBox: page.view, pageIndex: i }];
 		let blocks = [];
+		let extractionDegraded = false;
 
 		if (chars.length) {
-			let val= {};
-			blocks = await inference(pageDataList, onnxRuntimeProvider, modelProvider, val);
+			let val = {};
+			try {
+				blocks = await inference(pageDataList, onnxRuntimeProvider, modelProvider, val);
+			}
+			catch (error) {
+				blocks = buildInferenceErrorFallbackBlocks(pageDataList[0], val, error);
+			}
+			if (val.layoutFallbacks?.length) {
+				extractionDegraded = hasDegradedExtractionFallbacks(val.layoutFallbacks);
+			}
 		}
 
 		for (let j = 0; j < blocks.length; j++) {
@@ -207,11 +225,12 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 		let newPage = {
 			viewRect: page.view,
+			...(extractionDegraded ? { extractionDegraded: true } : {}),
 			contentRanges: []
 		};
 
 		if (prevContentLength < structure.content.length) {
-			let contentRange = getContentRangeFromBlocks(structure.content, prevContentLength - 1, structure.content.length - 1)
+			let contentRange = getContentRangeFromBlocks(structure.content, prevContentLength, structure.content.length - 1)
 			newPage.contentRanges.push(contentRange);
 		}
 
