@@ -1,7 +1,8 @@
 import {
   resolveDestination, getRectCenter, getRangeRects, getClosestDistance
 } from './util.js';
-import { getBlockText, getNextBlockRef, getTextNodesAtRange } from '../../../structured-document-text/src/pdf/index.js';
+import { getBlockText, getTextNodesAtRange } from '../../../structured-document-text/src/pdf/index.js';
+import { createStructureIndex, rectsIntersect } from './structure-index.js';
 
 export async function getLinksFromAnnotations(pdfDocument, page) {
 	let links = [];
@@ -71,234 +72,165 @@ function getUnderlyingTextRange(bt, {pageIndex, rect }) {
 	return { offsetStart, offsetEnd, text };
 }
 
-function intersectWithBlock(bt, {pageIndex, rect }) {
-	// Check if any character in the block's text intersects with the link rect on the given page
-	if (!bt.text || bt.text.length === 0) {
-		return false;
-	}
-
-	for (let i = 0; i < bt.text.length; i++) {
-		let charRect = bt.rects[i];
-		let charPageIndex = bt.pageIndexes[i];
-
-		// Skip if no rect info or different page
-		if (!charRect || charPageIndex !== pageIndex) {
-			continue;
-		}
-
-		// Check if character center is within link rect
-		let [x, y] = getRectCenter(charRect);
-		if (rect[0] <= x && x <= rect[2] && rect[1] <= y && y <= rect[3]) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
-// Get all block refs that appear on a specific page by walking through content ranges
-function getBlockRefsForPage(structure, pageIndex) {
-	if (!structure.pages || !structure.pages[pageIndex]) {
-		return [];
-	}
-
-	let page = structure.pages[pageIndex];
-	if (!page.contentRanges || page.contentRanges.length === 0) {
-		return [];
-	}
-
-	let blockRefs = [];
-
-	for (let range of page.contentRanges) {
-		if (!range.start?.ref || !range.end?.ref) {
-			continue;
-		}
-
-		// Walk from start ref to end ref, collecting all block refs
-		let currentBlockRef = range.start.ref.slice(0, 1); // Start with top-level block
-
-		// First, add the start block ref (may be nested)
-		if (range.start.ref.length > 0) {
-			blockRefs.push([...range.start.ref.slice(0, 1)]);
-		}
-
-		// Then collect all top-level blocks between start and end
-		let startTopLevel = range.start.ref[0];
-		let endTopLevel = range.end.ref[0];
-
-		for (let i = startTopLevel; i <= endTopLevel; i++) {
-			if (!blockRefs.some(ref => ref[0] === i)) {
-				blockRefs.push([i]);
-			}
-		}
-	}
-
-	return blockRefs;
-}
-
-function getDestinationRange(structure, sourceText, dest) {
-	if (!structure?.content || !sourceText || dest?.pageIndex === undefined) {
+function getDestinationRange(sourceText, dest, pageEntries, destinationRangeCache) {
+	if (!sourceText || dest?.pageIndex === undefined) {
 		return null;
 	}
 
-	let pageBlockRefs = getBlockRefsForPage(structure, dest.pageIndex);
-	if (!pageBlockRefs || pageBlockRefs.length === 0) {
-		return null;
+	let cacheKey;
+	if (destinationRangeCache) {
+		cacheKey = `${dest.pageIndex}:${dest.rect?.join(',') || ''}:${sourceText}`;
+		if (destinationRangeCache.has(cacheKey)) {
+			return destinationRangeCache.get(cacheKey);
+		}
 	}
 
 	let bestMatch = null;
 	let bestDistance = Infinity;
 	let bestIsHeading = false;
 
-	for (let topLevelBlockRef of pageBlockRefs) {
-		let blockRef = topLevelBlockRef;
+	for (let entry of pageEntries) {
+		let { blockRef, block, bt } = entry;
 
-		do {
-			let bt = getBlockText(structure, blockRef);
+		// Search for sourceText in the block text
+		let index = bt.text.indexOf(sourceText);
+		if (index === -1) {
+			continue;
+		}
 
-			if (!bt.text || bt.text.length === 0) {
-				let nextRef = getNextBlockRef(structure, blockRef);
-				if (nextRef && nextRef[0] === topLevelBlockRef[0]) {
-					blockRef = nextRef;
-				} else {
-					blockRef = null;
-				}
-				continue;
-			}
+		// Found a match - calculate distance from dest.rect to the matching text
+		let offsetStart = index;
+		let offsetEnd = index + sourceText.length - 1;
 
-			// Search for sourceText in the block text
-			let index = bt.text.indexOf(sourceText);
-			if (index === -1) {
-				let nextRef = getNextBlockRef(structure, blockRef);
-				if (nextRef && nextRef[0] === topLevelBlockRef[0]) {
-					blockRef = nextRef;
-				} else {
-					blockRef = null;
-				}
-				continue;
-			}
+		let isHeading = block?.type === 'heading';
 
-			// Found a match - calculate distance from dest.rect to the matching text
-			let offsetStart = index;
-			let offsetEnd = index + sourceText.length - 1;
+		// Calculate distance - use the rects of the matched text
+		let minDistance = Infinity;
+		for (let i = offsetStart; i <= offsetEnd && i < bt.rects.length; i++) {
+			let charRect = bt.rects[i];
+			let charPageIndex = bt.pageIndexes[i];
 
-			// Get the actual block node to check if it's a heading
-			let blockNode = structure.content[blockRef[0]];
-			for (let i = 1; i < blockRef.length; i++) {
-				blockNode = blockNode?.content?.[blockRef[i]];
-			}
-			let isHeading = blockNode?.type === 'heading';
-
-			// Calculate distance - use the rects of the matched text
-			let minDistance = Infinity;
-			for (let i = offsetStart; i <= offsetEnd && i < bt.rects.length; i++) {
-				let charRect = bt.rects[i];
-				let charPageIndex = bt.pageIndexes[i];
-
-				if (charRect && charPageIndex === dest.pageIndex) {
-					let distance = getClosestDistance(dest.rect, charRect);
-					if (distance < minDistance) {
-						minDistance = distance;
-					}
+			if (charRect && charPageIndex === dest.pageIndex) {
+				let distance = getClosestDistance(dest.rect, charRect);
+				if (distance < minDistance) {
+					minDistance = distance;
 				}
 			}
+		}
 
-			// Update best match - prefer headings, then closer matches
-			if (isHeading && !bestIsHeading) {
-				// Always prefer heading over non-heading
-				bestMatch = { blockRef: [...blockRef], offsetStart, offsetEnd };
-				bestDistance = minDistance;
-				bestIsHeading = true;
-			} else if (isHeading === bestIsHeading && minDistance < bestDistance) {
-				// Same heading status, prefer closer match
-				bestMatch = { blockRef: [...blockRef], offsetStart, offsetEnd };
-				bestDistance = minDistance;
-			}
+		// Update best match - prefer headings, then closer matches
+		if (isHeading && !bestIsHeading) {
+			// Always prefer heading over non-heading
+			bestMatch = { blockRef: [...blockRef], offsetStart, offsetEnd };
+			bestDistance = minDistance;
+			bestIsHeading = true;
+		} else if (isHeading === bestIsHeading && minDistance < bestDistance) {
+			// Same heading status, prefer closer matches
+			bestMatch = { blockRef: [...blockRef], offsetStart, offsetEnd };
+			bestDistance = minDistance;
+		}
+	}
 
-			// Get next block
-			let nextRef = getNextBlockRef(structure, blockRef);
-			if (nextRef && nextRef[0] === topLevelBlockRef[0]) {
-				blockRef = nextRef;
-			} else {
-				blockRef = null;
-			}
-		} while (blockRef);
+	if (destinationRangeCache) {
+		destinationRangeCache.set(cacheKey, bestMatch);
 	}
 
 	return bestMatch;
 }
 
-export function getAnnotLinkRefs(structure, linkMap) {
+function resolveDestinationLinks(items, pageIndex, pageEntries, structureIndex, destinationRangeCache) {
+	let itemsByDestPage = new Map();
+	for (let item of items) {
+		let destPageIndex = item.processedLink.dest?.pageIndex;
+		if (destPageIndex === undefined) {
+			continue;
+		}
+		if (!itemsByDestPage.has(destPageIndex)) {
+			itemsByDestPage.set(destPageIndex, []);
+		}
+		itemsByDestPage.get(destPageIndex).push(item);
+	}
+
+	let resolveItems = (destItems, destEntries) => {
+		for (let item of destItems) {
+			let destRange = getDestinationRange(item.text, item.processedLink.dest, destEntries, destinationRangeCache);
+			if (destRange) {
+				item.processedLink.dest = destRange;
+			}
+			else {
+				delete item.processedLink.dest;
+			}
+		}
+	};
+
+	for (let [destPageIndex, destItems] of itemsByDestPage) {
+		if (destPageIndex === pageIndex) {
+			resolveItems(destItems, pageEntries);
+		}
+		else {
+			structureIndex.withPageEntries(destPageIndex, entries => resolveItems(destItems, entries));
+		}
+	}
+}
+
+function addLinkRef(linkRefsMap, item) {
+	if (!linkRefsMap.has(item.blockRefKey)) {
+		linkRefsMap.set(item.blockRefKey, []);
+	}
+
+	linkRefsMap.get(item.blockRefKey).push({
+		...item.processedLink,
+		src: {
+			blockRef: [...item.blockRef],
+			offsetStart: item.offsetStart,
+			offsetEnd: item.offsetEnd,
+			text: item.text
+		}
+	});
+}
+
+export function getAnnotLinkRefs(structure, linkMap, structureIndex = createStructureIndex(structure)) {
 	let linkRefsMap = new Map();
+	let destinationRangeCache = new Map();
 
 	// Iterate through all links in linkMap (pageIndex -> links[])
 	for (let [pageIndex, links] of linkMap) {
-		// Get blocks that appear on this page
-		let pageBlockRefs = getBlockRefsForPage(structure, pageIndex);
+		structureIndex.withPageEntries(pageIndex, (pageBlockTextEntries) => {
+			let pageItems = [];
 
-	for (let link of links) {
-		let { rect } = link.src;
+			for (let link of links) {
+				let { rect } = link.src;
 
-		// Iterate through blocks on this page and their descendants
-		for (let topLevelBlockRef of pageBlockRefs) {
-				// Start from this top-level block and iterate through all its descendants
-				let blockRef = topLevelBlockRef;
-				do {
-					let bt = getBlockText(structure, blockRef);
+				for (let entry of pageBlockTextEntries) {
+					let { blockRef, blockRefKey, bt, pageRect } = entry;
+					if (!pageRect || !rectsIntersect(pageRect, rect)) {
+						continue;
+					}
 
 					// Find the text range that intersects with this link
 					let { offsetStart, offsetEnd, text } = getUnderlyingTextRange(bt, { pageIndex, rect });
 
 					// Skip blocks that don't intersect with the source rect
 					if (offsetStart === null || offsetEnd === null) {
-						// Get next block, but only within descendants of the current top-level block
-						let nextRef = getNextBlockRef(structure, blockRef);
-						if (nextRef && nextRef[0] === topLevelBlockRef[0]) {
-							blockRef = nextRef;
-						} else {
-							blockRef = null;
-						}
 						continue;
 					}
 
-					let blockRefKey = blockRef.join(',');
-
-					if (!linkRefsMap.has(blockRefKey)) {
-						linkRefsMap.set(blockRefKey, []);
-					}
-
-					let processedLink = { ...link };
-
-					// Replace dest with destination range if present
-					if (link.dest) {
-						let destRange = getDestinationRange(structure, text, link.dest);
-						if (destRange) {
-							processedLink.dest = destRange;
-						} else {
-							delete processedLink.dest;
-						}
-					}
-
-					linkRefsMap.get(blockRefKey).push({
-						...processedLink,
-						src: {
-							blockRef: [...blockRef],
-							offsetStart,
-							offsetEnd,
-							text
-						}
+					pageItems.push({
+						blockRef,
+						blockRefKey,
+						offsetStart,
+						offsetEnd,
+						text,
+						processedLink: { ...link },
 					});
-
-					// Get next block, but only within descendants of the current top-level block
-					let nextRef = getNextBlockRef(structure, blockRef);
-					if (nextRef && nextRef[0] === topLevelBlockRef[0]) {
-						blockRef = nextRef;
-					} else {
-						blockRef = null;
-					}
-				} while (blockRef);
+				}
 			}
-		}
+
+			resolveDestinationLinks(pageItems, pageIndex, pageBlockTextEntries, structureIndex, destinationRangeCache);
+			for (let item of pageItems) {
+				addLinkRef(linkRefsMap, item);
+			}
+		});
 	}
 
 	return linkRefsMap;

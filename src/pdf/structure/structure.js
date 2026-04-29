@@ -20,13 +20,14 @@ import { mergeLists, wrapListItems } from './list-utils.js';
 import { addRefs, getParsedLinkRefs, getAnnotLinkRefs, getLinksFromAnnotations } from './link.js';
 import { cleanupBlockMetrics, cleanupTextNodeStyles, getHeadingMetrics, getParagraphMetrics, mergeListItemContinuations, mergeParagraphs } from './block-cleanup.js';
 import { createBlockAnchor, ensureBlockPageRects } from './util.js';
+import { createStructureIndex } from './structure-index.js';
 // import { getNextChunk } from '../../../structured-document-text/src/chunker.js';
 // import { getContent, getRefRangesFromPageRects } from '../../../structured-document-text/src/pdf/content.js';
 
 const SCHEMA_VERSION = '1.0.0-draft';
 const PROCESSOR_VERSION = '1.0.0-draft';
 
-export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelProvider) {
+export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelProvider, options = {}) {
 	const pageCount = pdfDocument.numPages;
 
 	let structure = {
@@ -229,8 +230,9 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	addPageLabels(structure, catalogPageLabels);
 
 	let candidateGroups = new Map();
+	let structureIndex = createStructureIndex(structure, options.structureIndex);
 
-	let annotLinkRefs = getAnnotLinkRefs(structure, linkMap);
+	let annotLinkRefs = getAnnotLinkRefs(structure, linkMap, structureIndex);
 	let parsedLinkRefs = getParsedLinkRefs(structure);
 
 	let referenceLists = getReferenceLists(structure, regularWordsSet);
@@ -246,7 +248,8 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	let refIndex = getReferenceIndex(referenceLists, regularWordsSet);
 	let figures = getFigures(structure);
 	let mathBlocks = getMathBlocks(structure);
-	getCandidates(structure, candidateGroups, refIndex, figures, mathBlocks);
+	getCandidates(structure, candidateGroups, refIndex, figures, mathBlocks, structureIndex);
+	structureIndex.clearPageTextCache();
 	let mainRefs = getRefsList(candidateGroups);
 
 	addRefs(annotLinkRefs, parsedLinkRefs);

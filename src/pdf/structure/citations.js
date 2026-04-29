@@ -1,6 +1,6 @@
 // Unified parser for delimited citation ranges like [...] and (...)
 // Returns { items, nextIndex } only if a proper closing delimiter is found; otherwise returns null.
-import { getBlockByRef, getBlockText, getNextBlockRef } from '../../../structured-document-text/src/pdf/index.js';
+import { createStructureIndex } from './structure-index.js';
 
 function parseDelimitedRange(bt, openIndex, openCharVal, closeCharVal, type, refIndex, mathBlocks, blockRef) {
 	const openChar = bt.text[openIndex];
@@ -542,53 +542,54 @@ function collectUrlSequence(bt, startIndex) {
 	return { from, to };
 }
 
-export function getCandidates(structure, candidateGroups, refIndex, figures, mathBlocks) {
+export function getCandidates(structure, candidateGroups, refIndex, figures, mathBlocks, structureIndex = createStructureIndex(structure)) {
 	// { type, blockIndex, rect, text, offsetStart, offsetEnd, char }
 
 	// write a parser
 
 	let items = [];
 
-	let blockRef = null;
-	while ((blockRef = getNextBlockRef(structure, blockRef))) {
-		let block = getBlockByRef(structure, blockRef);
+	for (let entry of structureIndex.blockEntries()) {
+		let blockRef = entry.ref;
+		let block = entry.block;
 		if (block.type === 'preformatted') continue;
-		let bt = getBlockText(structure, blockRef);
-		for (let i = 0; i < bt.text.length; i++) {
-			if (bt.attrs[i]?.style?.monospace) continue;
-			let parsed;
+		structureIndex.withBlockText(blockRef, (bt) => {
+			for (let i = 0; i < bt.text.length; i++) {
+				if (bt.attrs[i]?.style?.monospace) continue;
+				let parsed;
 
-			// Try delimited ranges; parser will validate openings
-			if ((parsed = parseDelimitedRange(bt, i, '[', ']', 'brackets', refIndex, mathBlocks, blockRef))) {
-				if (parsed.items && parsed.items.length) items.push(...parsed.items);
-				i = parsed.nextIndex;
+				// Try delimited ranges; parser will validate openings
+				if ((parsed = parseDelimitedRange(bt, i, '[', ']', 'brackets', refIndex, mathBlocks, blockRef))) {
+					if (parsed.items && parsed.items.length) items.push(...parsed.items);
+					i = parsed.nextIndex;
+				}
+				else if ((parsed = parseDelimitedRange(bt, i, '(', ')', 'parentheses', refIndex, mathBlocks, blockRef))) {
+					if (parsed.items && parsed.items.length) items.push(...parsed.items);
+					i = parsed.nextIndex;
+				}
+				// Superscript detection
+				else
+				if ((parsed = parseSuperscriptRange(bt, i, refIndex, blockRef))) {
+					if (parsed.items && parsed.items.length) items.push(...parsed.items);
+					i = parsed.nextIndex;
+				}
+				// Year token (e.g., 1998)
+				else if ((parsed = parseYearAt(bt, i, refIndex, blockRef))) {
+					items.push(parsed.item);
+					i = parsed.nextIndex;
+				}
+				// Name token (capitalized word, e.g., Smith)
+				else if ((parsed = parseNameAt(bt, i, refIndex, blockRef))) {
+					items.push(parsed.item);
+					i = parsed.nextIndex;
+				}
+				// In-text figure reference (e.g., Fig. 2, (Figure 3), Table 1)
+				else if ((parsed = parseFigureRefAt(bt, i, figures, blockRef))) {
+					items.push(parsed.item);
+					i = parsed.nextIndex;
+				}
 			}
-			else if ((parsed = parseDelimitedRange(bt, i, '(', ')', 'parentheses', refIndex, mathBlocks, blockRef))) {
-				if (parsed.items && parsed.items.length) items.push(...parsed.items);
-				i = parsed.nextIndex;
-			}
-			// Superscript detection
-			else
-			if ((parsed = parseSuperscriptRange(bt, i, refIndex, blockRef))) {
-				if (parsed.items && parsed.items.length) items.push(...parsed.items);
-				i = parsed.nextIndex;
-			}
-			// Year token (e.g., 1998)
-			else if ((parsed = parseYearAt(bt, i, refIndex, blockRef))) {
-				items.push(parsed.item);
-				i = parsed.nextIndex;
-			}
-			// Name token (capitalized word, e.g., Smith)
-			else if ((parsed = parseNameAt(bt, i, refIndex, blockRef))) {
-				items.push(parsed.item);
-				i = parsed.nextIndex;
-			}
-			// In-text figure reference (e.g., Fig. 2, (Figure 3), Table 1)
-			else if ((parsed = parseFigureRefAt(bt, i, figures, blockRef))) {
-				items.push(parsed.item);
-				i = parsed.nextIndex;
-			}
-		}
+		});
 	}
 
 	// Group items by item.group using a Map for simplicity
