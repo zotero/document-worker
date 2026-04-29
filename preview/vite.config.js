@@ -74,6 +74,8 @@ export default {
     alias: {
       'pdfjs/pdf.worker.js': resolve(__dirname, '../pdf.js/src/pdf.worker.js'),
       'display-node_utils': resolve(__dirname, '../pdf.js/src/display/stubs.js'),
+      'display-binary_data_factory': resolve(__dirname, '../pdf.js/src/display/binary_data_factory.js'),
+      'display-network_stream': resolve(__dirname, '../pdf.js/src/display/network_stream.js'),
       'display-node_stream': resolve(__dirname, '../pdf.js/src/display/stubs.js'),
       'display-cmap_reader_factory': resolve(__dirname, '../pdf.js/src/display/cmap_reader_factory.js'),
       'display-standard_fontdata_factory': resolve(__dirname, '../pdf.js/src/display/standard_fontdata_factory.js'),

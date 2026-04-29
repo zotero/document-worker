@@ -36,6 +36,8 @@ globalThis.PDFJSDev = {
 	},
 };
 
+await import('../src/pdf/pdfjs-polyfills.js');
+
 // Polyfill `self` for Node.js (used by renderer.js for web worker compat)
 if (typeof globalThis.self === 'undefined') {
 	globalThis.self = globalThis;

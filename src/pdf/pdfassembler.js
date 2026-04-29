@@ -96,6 +96,21 @@ function arraysToBytes(arr) {
 	return data;
 }
 
+function setDictEntries(dict, entries) {
+	for (let [key, value] of Object.entries(entries)) {
+		if (value !== undefined) {
+			dict.set(key, value);
+		}
+	}
+}
+
+function getDictRawEntries(dict) {
+	if (dict?.getRawEntries) {
+		return dict.getRawEntries();
+	}
+	return null;
+}
+
 export class PDFAssembler {
 	constructor() {
 		this.pdfManager = null;
@@ -127,6 +142,7 @@ export class PDFAssembler {
 					source: arrayBuffer,
 					evaluatorOptions: {
 						cMapUrl: null,
+						cMapPacked: true,
 						standardFontDataUrl: null,
 						ignoreErrors: true
 					},
@@ -151,7 +167,7 @@ export class PDFAssembler {
 
 				this.pdfTree['/Root'] = this.resolveNodeRefs();
 				const infoDict = new Dict();
-				infoDict._map = this.pdfManager.pdfDocument.documentInfo;
+				setDictEntries(infoDict, this.pdfManager.pdfDocument.documentInfo);
 				this.pdfTree['/Info'] = this.resolveNodeRefs(infoDict) || {};
 				delete this.pdfTree['/Info']['/PDFFormatVersion'];
 				delete this.pdfTree['/Info']['/Language'];
@@ -165,7 +181,7 @@ export class PDFAssembler {
 				if (this.pdfManager.pdfDocument.documentInfo['Custom']) {
 					delete this.pdfTree['/Info']['/Custom'];
 					let customDict = new Dict();
-					customDict._map = this.pdfManager.pdfDocument.documentInfo['Custom'];
+					setDictEntries(customDict, this.pdfManager.pdfDocument.documentInfo['Custom']);
 					this.pdfTree['/Info'] = { ...this.pdfTree['/Info'], ...(this.resolveNodeRefs(customDict) || {}) };
 				}
 
@@ -296,13 +312,12 @@ export class PDFAssembler {
 		else if (typeof node === 'object' && node !== null) {
 			const objectNode = Object.create(null);
 			let source = null;
-			let nodeMap = node.dict instanceof Dict ? node.dict._map : node instanceof Dict ? node._map : null;
-			if (nodeMap) {
-				if (nodeMap instanceof Map) {
-					nodeMap = Object.fromEntries(nodeMap);
-				}
-				for (let key of Object.keys(nodeMap)) {
-					objectNode[`/${key}`] = this.resolveNodeRefs(nodeMap[key], `/${key}`, objectNode, !!nodeMap.Contents);
+			let nodeDict = node.dict instanceof Dict ? node.dict : node instanceof Dict ? node : null;
+			let nodeEntries = getDictRawEntries(nodeDict);
+			if (nodeEntries) {
+				let hasContents = !!nodeDict.getRaw?.('Contents');
+				for (let [key, value] of nodeEntries) {
+					objectNode[`/${key}`] = this.resolveNodeRefs(value, `/${key}`, objectNode, hasContents);
 				}
 			}
 			if (node instanceof DecodeStream || node instanceof Stream) {

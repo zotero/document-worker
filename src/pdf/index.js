@@ -1,3 +1,4 @@
+import './pdfjs-polyfills.js';
 import { PDFAssembler } from './pdfassembler.js';
 import { readRawAnnotations } from './annotations/read.js';
 import { writeRawAnnotations } from './annotations/write.js';
@@ -30,7 +31,17 @@ function setHandler(pdfDocument, dataProvider) {
 			return await dataProvider('standard_fonts/' + data.filename);
 		}
 		else if (op === 'FetchBinaryData') {
-			if (data.type === 'cMapReaderFactory') {
+			if (data.kind === 'cMapUrl') {
+				let filename = data.filename.endsWith('.bcmap') ? data.filename : data.filename + '.bcmap';
+				return await dataProvider('cmaps/' + filename);
+			}
+			else if (data.kind === 'standardFontDataUrl') {
+				return await dataProvider('standard_fonts/' + data.filename);
+			}
+			else if (data.kind === 'wasmUrl') {
+				return await dataProvider('wasm/' + data.filename);
+			}
+			else if (data.type === 'cMapReaderFactory') {
 				let raw = await dataProvider('cmaps/' + data.name + '.bcmap');
 				return { cMapData: raw, isCompressed: true };
 			}
@@ -429,6 +440,7 @@ async function getPdfManager(arrayBuffer, password) {
 		source: arrayBuffer,
 		evaluatorOptions: {
 			cMapUrl: null,
+			cMapPacked: true,
 			standardFontDataUrl: null,
 			useWorkerFetch: false,
 			ignoreErrors: true
