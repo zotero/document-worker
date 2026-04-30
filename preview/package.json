@@ -1,4 +1,5 @@
 {
+  "name": "preview",
   "private": true,
   "scripts": {
     "dev": "vite --config vite.config.js",
