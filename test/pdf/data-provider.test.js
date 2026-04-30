@@ -5,8 +5,8 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { createCanvas } from 'canvas';
-import * as pdfjs from '../../pdf.js/build/lib-legacy/pdf.js';
-import * as pdfjsWorker from '../../pdf.js/build/lib-legacy/pdf.worker.js';
+import * as pdfjs from '../../pdf.js/src/pdf.js';
+import * as pdfjsWorker from '../../pdf.js/src/pdf.worker.js';
 import { getFulltext, getStructure } from '../../src/pdf/index.js';
 
 globalThis.pdfjsWorker = pdfjsWorker;
