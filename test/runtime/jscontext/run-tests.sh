@@ -6,6 +6,11 @@ PROJECT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 JSCONTEXT_DIR="test/runtime/jscontext"
 cd "$PROJECT_DIR"
 
+if [ "$(uname -s)" != "Darwin" ]; then
+  echo "Skipping JSContext runtime tests: JavaScriptCore.framework is only available on Apple platforms."
+  exit 0
+fi
+
 # Compile Swift runner
 echo "Compiling JSContext runner..."
 swiftc "$JSCONTEXT_DIR/runner.swift" -o "$JSCONTEXT_DIR/jsctx" -framework JavaScriptCore -O
