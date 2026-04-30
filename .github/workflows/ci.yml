@@ -38,7 +38,7 @@ jobs:
         run: |
           cd build
           mkdir build-zip
-          zip -r build-zip/$GITHUB_SHA.zip worker.js cmaps standard_fonts
+          zip -r build-zip/$GITHUB_SHA.zip . -x 'build-zip/*'
           gem install --no-document dpl -v '>= 2.0'
           dpl s3 --bucket zotero-download --local_dir build-zip --upload_dir ci/document-worker --acl public_read
 
