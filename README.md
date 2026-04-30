@@ -1,16 +1,18 @@
-# A PDF toolkit that runs on Node.js or Web Worker
+# Document Worker
 
-- Import/export annotations.
-- Extract general PDF file information.
-- Extract full-text.
-- Extract PDF file text structure that can be fed into recognizer-server.
+Zotero worker for document processing.
+
+It supports PDF annotation processing, PDF text extraction and rendering, and structured text extraction from PDFs, EPUBs, and HTML snapshots.
+
+The source modules run in Node.js for tests and tooling. Production builds emit a Web Worker bundle for Zotero desktop, and the same worker code is exercised in JavaScriptCore/JSContext for Zotero's iOS runtime.
 
 ## Build
 
-Clone the repository:
-
-```
+```bash
 git clone https://github.com/zotero/document-worker --recursive
+cd document-worker
+npm ci
+npm run build
 ```
 
-Run `npm run build` and look the examples.
+`npm run build` creates `build/worker.js` and the static assets loaded by the worker.

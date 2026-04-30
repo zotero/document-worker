@@ -1,7 +1,7 @@
 {
 	"name": "document-worker",
 	"version": "1.0.0",
-	"description": "A document processing toolkit that runs on Node.js and Web Worker",
+	"description": "Document processing worker for PDFs, EPUBs, and HTML snapshots",
 	"exports": {
 		".": "./src/index.js"
 	},
