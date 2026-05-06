@@ -658,13 +658,13 @@ async function getProcessedData(buf, password, dataProvider) {
 	return outline;
 }
 
-async function getStructure(buf, password, dataProvider) {
+async function getStructure(buf, password, dataProvider, options = {}) {
 	let pdfManager = await getPdfManager(buf);
 	setHandler(pdfManager.pdfDocument, dataProvider);
 
 	let onnxRuntimeProvider = () => dataProvider('onnx/ort-wasm-simd.wasm');
 	let modelProvider = (name) => dataProvider(name + '/model.onnx');
-	return await getFullStructure(pdfManager.pdfDocument, onnxRuntimeProvider, modelProvider);
+	return await getFullStructure(pdfManager.pdfDocument, onnxRuntimeProvider, modelProvider, options);
 }
 
 async function getRecognizerData(buf, password, dataProvider) {

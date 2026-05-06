@@ -31,15 +31,38 @@ async function getStructuredDocumentText(buf, options = {}) {
 		contentType,
 		password,
 		dataProvider,
+		onChunk,
+		batchSize,
+		shouldAbort,
 	} = options;
 
-	if (isEpub(contentType)) {
-		return getEpubStructure(buf);
+	if (isEpub(contentType) || isSnapshot(contentType)) {
+		let result = isEpub(contentType)
+			? await getEpubStructure(buf)
+			: await getSnapshotStructure(buf, contentType);
+		// EPUB/snapshot have no per-page chunking, so emit the whole
+		// structure as a single partial chunk before the final, matching
+		// PDF's protocol so consumer-side handling stays uniform.
+		if (onChunk && result) {
+			let pages = result.pages || [];
+			await onChunk({
+				kind: 'partial',
+				pages,
+				content: result.content || [],
+				pageIndexOffset: 0,
+				contentIndexOffset: 0,
+				pageIndexRange: [0, Math.max(0, pages.length - 1)],
+				totalPageCount: Math.max(1, pages.length),
+			});
+			await onChunk({ kind: 'final', structure: result });
+		}
+		return result;
 	}
-	if (isSnapshot(contentType)) {
-		return getSnapshotStructure(buf, contentType);
-	}
-	return await pdfGetStructure(buf, password, dataProvider);
+	return await pdfGetStructure(buf, password, dataProvider, {
+		onChunk,
+		batchSize,
+		shouldAbort,
+	});
 }
 
 const pdf = {
@@ -82,6 +105,8 @@ async function renderedAnnotationSaver(libraryID, annotationKey, buf) {
 if (typeof self !== 'undefined') {
 	let promiseID = 0;
 	let waitingPromises = {};
+	// id -> { aborted } flipped by 'abort' messages and checked between pages.
+	let abortFlags = {};
 
 	self.query = async function (action, data, transfer) {
 		return new Promise(function (resolve) {
@@ -99,6 +124,12 @@ if (typeof self !== 'undefined') {
 			if (resolve) {
 				resolve(message.data);
 			}
+			return;
+		}
+
+		if (message.action === 'abort') {
+			let flag = abortFlags[message.id];
+			if (flag) flag.aborted = true;
 			return;
 		}
 
@@ -243,19 +274,41 @@ if (typeof self !== 'undefined') {
 			}
 		}
 		else if (message.action === 'getStructuredDocumentText') {
+			let abortFlag = { aborted: false };
+			abortFlags[message.id] = abortFlag;
 			try {
+				let streaming = !!message.data.streaming;
+				let onChunk = streaming
+					? (chunk) => {
+						self.postMessage({
+							responseID: message.id,
+							data: chunk,
+							isPartial: true
+						}, []);
+					}
+					: undefined;
 				let data = await getStructuredDocumentText(message.data.buf, {
 					contentType: message.data.contentType,
 					password: message.data.password,
 					dataProvider: fetchData,
+					onChunk,
+					batchSize: message.data.batchSize,
+					shouldAbort: streaming ? () => abortFlag.aborted : undefined,
 				});
-				self.postMessage({ responseID: message.id, data }, []);
+				// Streaming already delivered the structure via the 'final' chunk.
+				self.postMessage({
+					responseID: message.id,
+					data: streaming ? null : data
+				}, []);
 			}
 			catch (e) {
 				self.postMessage({
 					responseID: message.id,
 					error: errObject(e)
 				}, []);
+			}
+			finally {
+				delete abortFlags[message.id];
 			}
 		}
 		else if (message.action === 'pdf.renderAnnotations') {

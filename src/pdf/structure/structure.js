@@ -36,8 +36,29 @@ function hasDegradedExtractionFallbacks(layoutFallbacks) {
 	return layoutFallbacks?.some(fallback => DEGRADED_EXTRACTION_FALLBACK_REASONS.has(fallback.reason));
 }
 
+export class StructureAbortError extends Error {
+	constructor() {
+		super('Structured document text generation aborted');
+		this.name = 'AbortError';
+		this.aborted = true;
+	}
+}
+
+// Options:
+//   onChunk(chunk): when set, emits { kind: 'partial', ... } per batch (blocks
+//     are pre-post-processing) and { kind: 'final', structure } once the
+//     canonical structure is ready.
+//   batchSize: pages per partial chunk (default 5).
+//   shouldAbort(): checked between pages; throws StructureAbortError when truthy.
 export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelProvider, options = {}) {
 	const pageCount = pdfDocument.numPages;
+	const onChunk = typeof options.onChunk === 'function' ? options.onChunk : null;
+	const batchSize = Math.max(1, options.batchSize || 5);
+	const shouldAbort = typeof options.shouldAbort === 'function' ? options.shouldAbort : null;
+
+	function checkAbort() {
+		if (shouldAbort?.()) throw new StructureAbortError();
+	}
 
 	let structure = {
 		schemaVersion: SCHEMA_VERSION,
@@ -87,7 +108,32 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	let regularWordsSet = new Set();
 	let catalogPageLabels = await pdfDocument.pdfManager.ensureCatalog("pageLabels");
 
+	let lastEmittedPageCount = 0;
+	let lastEmittedContentCount = 0;
+
+	async function emitPartialChunkIfDue(pageIndex, force = false) {
+		if (!onChunk) return;
+		let pagesInBatch = structure.pages.length - lastEmittedPageCount;
+		if (!force && pagesInBatch < batchSize) return;
+		if (pagesInBatch === 0) return;
+		let pageIndexOffset = lastEmittedPageCount;
+		let contentIndexOffset = lastEmittedContentCount;
+		let chunk = {
+			kind: 'partial',
+			pages: structure.pages.slice(pageIndexOffset),
+			content: structure.content.slice(contentIndexOffset),
+			pageIndexOffset,
+			contentIndexOffset,
+			pageIndexRange: [pageIndexOffset, pageIndex],
+			totalPageCount: pageCount,
+		};
+		lastEmittedPageCount = structure.pages.length;
+		lastEmittedContentCount = structure.content.length;
+		await onChunk(chunk);
+	}
+
 	for (let i = 0; i < pageCount; i++) {
+		checkAbort();
 
 		let prevContentLength = structure.content.length;
 
@@ -235,7 +281,11 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 		}
 
 		structure.pages.push(newPage);
+
+		await emitPartialChunkIfDue(i);
 	}
+
+	await emitPartialChunkIfDue(pageCount - 1, true);
 
 	// Block transformations
 	mergeListItemContinuations(structure, mergeBlocks);
@@ -284,6 +334,10 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	cleanupBlockMetrics(structure);
 	cleanupTextNodeStyles(structure);
 	ensureBlockPageRects(structure);
+
+	if (onChunk) {
+		await onChunk({ kind: 'final', structure });
+	}
 
 	// let chunks = [];
 	// let startIndex = 0;
