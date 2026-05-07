@@ -18,7 +18,7 @@ function xhtml(bodyContent) {
 
 function extractMarkers(bodyContent) {
 	let doc = parseXML(xhtml(bodyContent));
-	let result = convertSection(doc, 4, 0, 'test');
+	let result = convertSection(doc, 4, 0);
 	return result.pageMarkers;
 }
 

@@ -1,11 +1,14 @@
 /**
  * EPUB CFI (Canonical Fragment Identifier) generation from htmlparser2 trees.
  *
- * CFI format: epubcfi(/<spineStep>/<itemStep>[<idref>]!/<path>)
+ * CFI format: epubcfi(/<spineStep>/<itemStep>!/<path>)
  *   - /<spineStep> references the <spine> in the OPF (position among <package> children)
  *   - Element steps use even indices: /(2*(position+1))
  *   - Text node steps use odd indices between element siblings
  *   - Character offsets are appended as :offset
+ *
+ * We deliberately skip the optional id assertions (`[idref]`, `[id]`) the spec
+ * permits.
  */
 
 import type { ChildNode } from 'domhandler';
@@ -35,10 +38,9 @@ function isSanitizerRemovedElement(node: TreeNode): boolean {
  * Generate the base CFI path for a spine item.
  * spineStep = CFI step for <spine> within <package> (computed from OPF).
  */
-export function generateCFIBase(spineStep: number, spineIndex: number, idref?: string): string {
+export function generateCFIBase(spineStep: number, spineIndex: number): string {
 	let itemStep = 2 * (spineIndex + 1);
-	let assertion = idref ? `[${idref}]` : '';
-	return `/${spineStep}/${itemStep}${assertion}`;
+	return `/${spineStep}/${itemStep}`;
 }
 
 /**
@@ -80,11 +82,7 @@ export function elementPath(node: TreeNode): string {
 	let steps: string[] = [];
 	let current: TreeNode = node;
 	while (current && current.parent) {
-		let stepIndex = getNodeStepIndex(current);
-		let id = (isElement(current) && current.attribs?.id)
-			? `[${current.attribs.id}]`
-			: '';
-		steps.unshift(`/${stepIndex}${id}`);
+		steps.unshift(`/${getNodeStepIndex(current)}`);
 
 		// Stop after including this node's step if its parent is <html>
 		// (the document element).

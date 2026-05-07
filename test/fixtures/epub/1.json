@@ -75,7 +75,7 @@
 		{
 			"type": "heading",
 			"content": [{"text": "The Life of Lazarillo de Tormes", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/2[titlepage.xhtml]!/4/2[titlepage]/2"}
+			"anchor": {"selectorMap": "/6/2!/4/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -84,22 +84,18 @@
 				{"text": "Clements Markham", "style": {"bold": true}, "anchor": {"selectorMap": "/2/1"}},
 				{"text": ".", "anchor": {"selectorMap": "/3"}}
 			],
-			"anchor": {"selectorMap": "/6/2[titlepage.xhtml]!/4/2[titlepage]/4"}
+			"anchor": {"selectorMap": "/6/2!/4/2/4"}
 		},
-		{
-			"type": "image",
-			"content": [],
-			"anchor": {"selectorMap": "/6/2[titlepage.xhtml]!/4/2[titlepage]/6"}
-		},
+		{"type": "image", "content": [], "anchor": {"selectorMap": "/6/2!/4/2/6"}},
 		{
 			"type": "heading",
 			"content": [{"text": "Imprint", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/4/2[imprint]/2/2"}
+			"anchor": {"selectorMap": "/6/4!/4/2/2/2"}
 		},
 		{
 			"type": "image",
 			"content": [{"text": "The Standard Ebooks logo."}],
-			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/4/2[imprint]/2/4"}
+			"anchor": {"selectorMap": "/6/4!/4/2/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -118,7 +114,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/4/2[imprint]/4"}
+			"anchor": {"selectorMap": "/6/4!/4/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -140,7 +136,7 @@
 				},
 				{"text": ".", "anchor": {"selectorMap": "/5"}}
 			],
-			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/4/2[imprint]/6"}
+			"anchor": {"selectorMap": "/6/4!/4/2/6"}
 		},
 		{
 			"type": "paragraph",
@@ -159,7 +155,7 @@
 					"anchor": {"selectorMap": "40 /3\n11 /4/1\n26 /5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/4/2[imprint]/8"}
+			"anchor": {"selectorMap": "/6/4!/4/2/8"}
 		},
 		{
 			"type": "paragraph",
@@ -175,19 +171,17 @@
 				},
 				{"text": ".", "anchor": {"selectorMap": "/3"}}
 			],
-			"anchor": {"selectorMap": "/6/4[imprint.xhtml]!/4/2[imprint]/10"}
+			"anchor": {"selectorMap": "/6/4!/4/2/10"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Introductory", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/2"}
+			"anchor": {"selectorMap": "/6/6!/4/2/2"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "The Family of Mendoza", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/2"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/2"}
 		},
 		{
 			"type": "paragraph",
@@ -198,11 +192,9 @@
 					"text": " was a scion of one of the noblest families of Spain, and some account of it should precede a notice of the author’s life.",
 					"anchor": {"selectorMap": "/3"}
 				},
-				{"text": "1", "anchor": {"selectorMap": "/4[noteref-1]/1"}, "refs": [[197]]}
+				{"text": "1", "anchor": {"selectorMap": "/4/1"}, "refs": [[197]]}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/4"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/4"}
 		},
 		{
 			"type": "paragraph",
@@ -212,9 +204,7 @@
 					"anchor": {"selectorMap": "37 /1\n4 /2/1\n188 /3"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/6"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/6"}
 		},
 		{
 			"type": "paragraph",
@@ -224,9 +214,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/8"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/8"}
 		},
 		{
 			"type": "paragraph",
@@ -236,9 +224,7 @@
 					"anchor": {"selectorMap": "203 /1\n2 /2/1\n58 /3"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/10"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/10"}
 		},
 		{
 			"type": "paragraph",
@@ -248,9 +234,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/12"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/12"}
 		},
 		{
 			"type": "paragraph",
@@ -260,9 +244,7 @@
 					"anchor": {"selectorMap": "103 /1\n1 /2/1\n130 /3"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/14"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/14"}
 		},
 		{
 			"type": "blockquote",
@@ -272,21 +254,17 @@
 					"content": [
 						{"text": " ", "anchor": {"selectorMap": "/1"}},
 						{"text": "El cavallo vos han muerto,", "anchor": {"selectorMap": "/2/1"}},
-						{"text": "2", "anchor": {"selectorMap": "/2/2[noteref-2]/1"}, "refs": [[198]]},
+						{"text": "2", "anchor": {"selectorMap": "/2/2/1"}, "refs": [[198]]},
 						{"text": " ", "anchor": {"selectorMap": "/3"}},
 						{"text": "\n"},
 						{"text": " ", "anchor": {"selectorMap": "/5"}},
 						{"text": "Subid Rey en mi cavallo.", "anchor": {"selectorMap": "/6/1"}},
 						{"text": " ", "anchor": {"selectorMap": "/7"}}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/16/2"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/16/2"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/16"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/16"}
 		},
 		{
 			"type": "paragraph",
@@ -296,9 +274,7 @@
 					"anchor": {"selectorMap": "80 /1\n15 /2/1\n36 /3\n4 /4/1\n1 /5"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/18"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/18"}
 		},
 		{
 			"type": "paragraph",
@@ -308,9 +284,7 @@
 					"anchor": {"selectorMap": "141 /1\n2 /2/1\n101 /3"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/20"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/20"}
 		},
 		{
 			"type": "paragraph",
@@ -320,9 +294,7 @@
 					"anchor": {"selectorMap": "43 /1\n4 /2/1\n95 /3\n4 /4/1\n64 /5\n2 /6/1\n1 /7"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/22"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/22"}
 		},
 		{
 			"type": "paragraph",
@@ -334,9 +306,7 @@
 				{"text": "serranilla", "style": {"italic": true}, "anchor": {"selectorMap": "/2/1"}},
 				{"text": ".", "anchor": {"selectorMap": "/3"}}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/24"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/24"}
 		},
 		{
 			"type": "blockquote",
@@ -360,9 +330,7 @@
 						{"text": "De la Finojosa.", "anchor": {"selectorMap": "/14/1"}},
 						{"text": " ", "anchor": {"selectorMap": "/15"}}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/26/2"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/26/2"}
 				},
 				{
 					"type": "paragraph",
@@ -383,9 +351,7 @@
 						{"text": "Con otros pastores,", "anchor": {"selectorMap": "/14/1"}},
 						{"text": " ", "anchor": {"selectorMap": "/15"}}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/26/4"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/26/4"}
 				},
 				{
 					"type": "paragraph",
@@ -406,14 +372,10 @@
 						{"text": "De la Finojosa.", "anchor": {"selectorMap": "/14/1"}},
 						{"text": " ", "anchor": {"selectorMap": "/15"}}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/26/6"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/26/6"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/26"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/26"}
 		},
 		{
 			"type": "blockquote",
@@ -421,9 +383,7 @@
 				{
 					"type": "paragraph",
 					"content": [{"text": "Translation", "anchor": {"selectorMap": "/1"}}],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/28/2/2"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/28/2/2"}
 				},
 				{
 					"type": "paragraph",
@@ -444,9 +404,7 @@
 						{"text": "On Finojosa’s frontier green.", "anchor": {"selectorMap": "/14/1"}},
 						{"text": " ", "anchor": {"selectorMap": "/15"}}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/28/4"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/28/4"}
 				},
 				{
 					"type": "paragraph",
@@ -467,9 +425,7 @@
 						{"text": "With other girls, but none like her.", "anchor": {"selectorMap": "/14/1"}},
 						{"text": " ", "anchor": {"selectorMap": "/15"}}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/28/6"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/28/6"}
 				},
 				{
 					"type": "paragraph",
@@ -490,14 +446,10 @@
 						{"text": "Of Finojosa’s frontier green.", "anchor": {"selectorMap": "/14/1"}},
 						{"text": " ", "anchor": {"selectorMap": "/15"}}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/28/8"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/28/8"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/28"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/28"}
 		},
 		{
 			"type": "paragraph",
@@ -521,9 +473,7 @@
 					"anchor": {"selectorMap": "21 /9\n2 /10/1\n68 /11"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/30"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/30"}
 		},
 		{
 			"type": "paragraph",
@@ -533,9 +483,7 @@
 					"anchor": {"selectorMap": "141 /1\n4 /2/1\n25 /3"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/32"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/32"}
 		},
 		{
 			"type": "list",
@@ -551,14 +499,10 @@
 									"anchor": {"selectorMap": "/1"}
 								}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/2/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/34/2/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/2"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/34/2"}
 				},
 				{
 					"type": "listitem",
@@ -571,9 +515,7 @@
 									"anchor": {"selectorMap": "/1"}
 								}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/34/4/2"}
 						},
 						{
 							"type": "list",
@@ -589,14 +531,10 @@
 													"anchor": {"selectorMap": "/1"}
 												}
 											],
-											"anchor": {
-												"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/4/2/2"
-											}
+											"anchor": {"selectorMap": "/6/6!/4/2/4/34/4/4/2/2"}
 										}
 									],
-									"anchor": {
-										"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/4/2"
-									}
+									"anchor": {"selectorMap": "/6/6!/4/2/4/34/4/4/2"}
 								},
 								{
 									"type": "listitem",
@@ -609,25 +547,17 @@
 													"anchor": {"selectorMap": "/1"}
 												}
 											],
-											"anchor": {
-												"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/4/4/2"
-											}
+											"anchor": {"selectorMap": "/6/6!/4/2/4/34/4/4/4/2"}
 										}
 									],
-									"anchor": {
-										"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/4/4"
-									}
+									"anchor": {"selectorMap": "/6/6!/4/2/4/34/4/4/4"}
 								}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/4/4"
-							},
+							"anchor": {"selectorMap": "/6/6!/4/2/4/34/4/4"},
 							"ordered": true
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/4"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/34/4"}
 				},
 				{
 					"type": "listitem",
@@ -640,14 +570,10 @@
 									"anchor": {"selectorMap": "/1"}
 								}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/6/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/34/6/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/6"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/34/6"}
 				},
 				{
 					"type": "listitem",
@@ -657,14 +583,10 @@
 							"content": [
 								{"text": "Don Lorenzo de Mendoza, first Count of Coruña.", "anchor": {"selectorMap": "/1"}}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/8/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/34/8/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/8"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/34/8"}
 				},
 				{
 					"type": "listitem",
@@ -677,14 +599,10 @@
 									"anchor": {"selectorMap": "/1"}
 								}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/10/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/34/10/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/10"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/34/10"}
 				},
 				{
 					"type": "listitem",
@@ -694,14 +612,10 @@
 							"content": [
 								{"text": "Don Juan de Mendoza, Lord of Colmenar.", "anchor": {"selectorMap": "/1"}}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/12/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/34/12/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/12"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/34/12"}
 				},
 				{
 					"type": "listitem",
@@ -711,14 +625,10 @@
 							"content": [
 								{"text": "Don Pedro de Mendoza, Lord of Sazedon.", "anchor": {"selectorMap": "/1"}}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/14/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/34/14/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/14"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/34/14"}
 				},
 				{
 					"type": "listitem",
@@ -731,14 +641,10 @@
 									"anchor": {"selectorMap": "/1"}
 								}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/16/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/34/16/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/16"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/34/16"}
 				},
 				{
 					"type": "listitem",
@@ -748,14 +654,10 @@
 							"content": [
 								{"text": "Doña Maria, married to Don Ajan de Ribero.", "anchor": {"selectorMap": "/1"}}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/18/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/34/18/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/18"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/34/18"}
 				},
 				{
 					"type": "listitem",
@@ -773,19 +675,13 @@
 									"anchor": {"selectorMap": "/3"}
 								}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/20/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/34/20/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34/20"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/34/20"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/34"
-			},
+			"anchor": {"selectorMap": "/6/6!/4/2/4/34"},
 			"ordered": true
 		},
 		{
@@ -796,9 +692,7 @@
 					"anchor": {"selectorMap": "66 /1\n4 /2/1\n144 /3"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/36"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/36"}
 		},
 		{
 			"type": "list",
@@ -814,14 +708,10 @@
 									"anchor": {"selectorMap": "/1"}
 								}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/2/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/38/2/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/2"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/38/2"}
 				},
 				{
 					"type": "listitem",
@@ -831,14 +721,10 @@
 							"content": [
 								{"text": "Don Diego de Mendoza, Archbishop of Seville.", "anchor": {"selectorMap": "/1"}}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/4/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/38/4/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/4"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/38/4"}
 				},
 				{
 					"type": "listitem",
@@ -851,14 +737,10 @@
 									"anchor": {"selectorMap": "/1"}
 								}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/6/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/38/6/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/6"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/38/6"}
 				},
 				{
 					"type": "listitem",
@@ -871,14 +753,10 @@
 									"anchor": {"selectorMap": "/1"}
 								}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/8/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/38/8/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/8"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/38/8"}
 				},
 				{
 					"type": "listitem",
@@ -891,19 +769,13 @@
 									"anchor": {"selectorMap": "/1"}
 								}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/10/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/38/10/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38/10"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/38/10"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/38"
-			},
+			"anchor": {"selectorMap": "/6/6!/4/2/4/38"},
 			"ordered": true
 		},
 		{
@@ -914,9 +786,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/40"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/40"}
 		},
 		{
 			"type": "list",
@@ -932,14 +802,10 @@
 									"anchor": {"selectorMap": "/1"}
 								}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/2/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/42/2/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/2"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/42/2"}
 				},
 				{
 					"type": "listitem",
@@ -953,14 +819,10 @@
 								{"text": "1557", "anchor": {"selectorMap": "/4/1"}},
 								{"text": ".", "anchor": {"selectorMap": "/5"}}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/4/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/42/4/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/4"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/42/4"}
 				},
 				{
 					"type": "listitem",
@@ -972,14 +834,10 @@
 								{"text": "1550", "anchor": {"selectorMap": "/2/1"}},
 								{"text": ".", "anchor": {"selectorMap": "/3"}}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/6/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/42/6/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/6"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/42/6"}
 				},
 				{
 					"type": "listitem",
@@ -989,14 +847,10 @@
 							"content": [
 								{"text": "Don Francisco de Mendoza, Bishop of Jaen.", "anchor": {"selectorMap": "/1"}}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/8/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/42/8/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/8"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/42/8"}
 				},
 				{
 					"type": "listitem",
@@ -1006,14 +860,10 @@
 							"content": [
 								{"text": "Don Diego Hurtado de Mendoza, of whom we treat.", "anchor": {"selectorMap": "/1"}}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/10/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/42/10/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/10"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/42/10"}
 				},
 				{
 					"type": "listitem",
@@ -1026,14 +876,10 @@
 									"anchor": {"selectorMap": "/1"}
 								}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/12/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/42/12/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/12"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/42/12"}
 				},
 				{
 					"type": "listitem",
@@ -1046,14 +892,10 @@
 									"anchor": {"selectorMap": "/1"}
 								}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/14/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/42/14/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/14"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/42/14"}
 				},
 				{
 					"type": "listitem",
@@ -1066,19 +908,13 @@
 									"anchor": {"selectorMap": "/1"}
 								}
 							],
-							"anchor": {
-								"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/16/2"
-							}
+							"anchor": {"selectorMap": "/6/6!/4/2/4/42/16/2"}
 						}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42/16"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/42/16"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/42"
-			},
+			"anchor": {"selectorMap": "/6/6!/4/2/4/42"},
 			"ordered": true
 		},
 		{
@@ -1107,21 +943,15 @@
 						{"text": "Tan notable antiguedad.", "anchor": {"selectorMap": "/18/1"}},
 						{"text": " ", "anchor": {"selectorMap": "/19"}}
 					],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/44/2"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/44/2"}
 				},
 				{
 					"type": "paragraph",
 					"content": [{"text": "Lope de Vega.", "anchor": {"selectorMap": "/1"}}],
-					"anchor": {
-						"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/44/4"
-					}
+					"anchor": {"selectorMap": "/6/6!/4/2/4/44/4"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/4[introduction-the-family-of-mendoza]/44"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/4/44"}
 		},
 		{
 			"type": "heading",
@@ -1129,9 +959,7 @@
 				{"text": "Don Diego Hurtado de Mendoza, Author of ", "anchor": {"selectorMap": "/1"}},
 				{"text": "Lazarillo de Tormes", "style": {"italic": true}, "anchor": {"selectorMap": "/2/1"}}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/2"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/6/2"}
 		},
 		{
 			"type": "paragraph",
@@ -1141,9 +969,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/4"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/6/4"}
 		},
 		{
 			"type": "paragraph",
@@ -1153,9 +979,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/6"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/6/6"}
 		},
 		{
 			"type": "paragraph",
@@ -1165,9 +989,7 @@
 					"anchor": {"selectorMap": "238 /1\n4 /2/1\n239 /3"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/8"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/6/8"}
 		},
 		{
 			"type": "paragraph",
@@ -1179,9 +1001,7 @@
 				{"text": "Lazarillo de Tormes", "style": {"italic": true}, "anchor": {"selectorMap": "/2/1"}},
 				{"text": ".", "anchor": {"selectorMap": "/3"}}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/10"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/6/10"}
 		},
 		{
 			"type": "paragraph",
@@ -1191,9 +1011,7 @@
 					"anchor": {"selectorMap": "212 /1\n1 /2/1\n50 /3\n4 /4/1\n400 /5\n3 /6/1\n15 /7"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/12"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/6/12"}
 		},
 		{
 			"type": "paragraph",
@@ -1203,9 +1021,7 @@
 					"anchor": {"selectorMap": "50 /1\n4 /2/1\n55 /3\n2 /4/1\n86 /5"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/14"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/6/14"}
 		},
 		{
 			"type": "paragraph",
@@ -1222,9 +1038,7 @@
 					}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/16"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/6/16"}
 		},
 		{
 			"type": "paragraph",
@@ -1234,9 +1048,7 @@
 					"anchor": {"selectorMap": "324 /1\n4 /2/1\n81 /3\n2 /4/1\n32 /5"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/18"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/6/18"}
 		},
 		{
 			"type": "paragraph",
@@ -1246,9 +1058,7 @@
 					"anchor": {"selectorMap": "28 /1\n10 /2/1\n10 /3"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/6[introduction-don-diego-hurtado-de-mendoza]/20"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/6/20"}
 		},
 		{
 			"type": "heading",
@@ -1256,15 +1066,13 @@
 				{"text": "The Book, ", "anchor": {"selectorMap": "/1"}},
 				{"text": "Lazarillo de Tormes", "style": {"italic": true}, "anchor": {"selectorMap": "/2/1"}}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/2"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/8/2"}
 		},
 		{
 			"type": "paragraph",
 			"content": [
 				{"text": "Ticknor", "anchor": {"selectorMap": "/1"}},
-				{"text": "3", "anchor": {"selectorMap": "/2[noteref-3]/1"}, "refs": [[199]]},
+				{"text": "3", "anchor": {"selectorMap": "/2/1"}, "refs": [[199]]},
 				{"text": " describes ", "anchor": {"selectorMap": "/3"}},
 				{"text": "Lazarillo de Tormes", "style": {"italic": true}, "anchor": {"selectorMap": "/4/1"}},
 				{
@@ -1274,9 +1082,7 @@
 				{"text": "Index Expurgatorius", "style": {"italic": true}, "anchor": {"selectorMap": "/8/1"}},
 				{"text": " of 1667.", "anchor": {"selectorMap": "4 /9\n4 /10/1\n1 /11"}}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/4"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/8/4"}
 		},
 		{
 			"type": "paragraph",
@@ -1285,7 +1091,7 @@
 					"text": "The first edition in Spain was published at Burgos in 1554.",
 					"anchor": {"selectorMap": "54 /1\n4 /2/1\n1 /3"}
 				},
-				{"text": "4", "anchor": {"selectorMap": "/4[noteref-4]/1"}, "refs": [[200]]},
+				{"text": "4", "anchor": {"selectorMap": "/4/1"}, "refs": [[200]]},
 				{
 					"text": " It is excessively rare. There is a copy at Chatsworth, but none in the British Museum. The Duke of Devonshire allowed the late Mr. H. Butler Clarke to transcribe his copy of the first edition. This was done with great care, exactly as it was printed. In 1897 Mr. Butler Clarke printed 250 copies at Oxford, with a facsimile of the old titlepage.",
 					"anchor": {
@@ -1293,9 +1099,7 @@
 					}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/6"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/8/6"}
 		},
 		{
 			"type": "paragraph",
@@ -1304,7 +1108,7 @@
 					"text": "Many other editions followed the first of 1554.",
 					"anchor": {"selectorMap": "42 /1\n4 /2/1\n1 /3"}
 				},
-				{"text": "5", "anchor": {"selectorMap": "/4[noteref-5]/1"}, "refs": [[201]]},
+				{"text": "5", "anchor": {"selectorMap": "/4/1"}, "refs": [[201]]},
 				{
 					"text": " In Mr. Grenville’s library there is an Antwerp edition (12mo) of 1555, for which he paid seven guineas. Colonel Stanley’s copy fetched £31 10s.; Mr. Hanroth’s, £20 10s. The Paris editor of 1827 could only find a 1595 edition.",
 					"anchor": {
@@ -1312,9 +1116,7 @@
 					}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/8"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/8/8"}
 		},
 		{
 			"type": "paragraph",
@@ -1324,9 +1126,7 @@
 					"anchor": {"selectorMap": "135 /1\n4 /2/1\n472 /3"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/10"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/8/10"}
 		},
 		{
 			"type": "paragraph",
@@ -1338,16 +1138,12 @@
 				{"text": "Lazarillo de Tormes", "style": {"italic": true}, "anchor": {"selectorMap": "/2/1"}},
 				{"text": " as an authority for the meaning of words.", "anchor": {"selectorMap": "/3"}}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/12"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/8/12"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "English Translations", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/2"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/8/14/2"}
 		},
 		{
 			"type": "paragraph",
@@ -1367,9 +1163,7 @@
 					"anchor": {"selectorMap": "286 /5\n4 /6/1\n52 /7\n4 /8/1\n1 /9"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/4"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/8/14/4"}
 		},
 		{
 			"type": "paragraph",
@@ -1384,9 +1178,7 @@
 					"anchor": {"selectorMap": "/5"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/6"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/8/14/6"}
 		},
 		{
 			"type": "paragraph",
@@ -1402,9 +1194,7 @@
 				},
 				{"text": ".", "anchor": {"selectorMap": "/9"}}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/8"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/8/14/8"}
 		},
 		{
 			"type": "paragraph",
@@ -1420,9 +1210,7 @@
 					"anchor": {"selectorMap": "5 /5\n4 /6/1\n133 /7"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/10"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/8/14/10"}
 		},
 		{
 			"type": "paragraph",
@@ -1432,9 +1220,7 @@
 					"anchor": {"selectorMap": "48 /1\n4 /2/1\n269 /3"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/12"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/8/14/12"}
 		},
 		{
 			"type": "paragraph",
@@ -1444,16 +1230,12 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/8[introduction-the-book-lazarillo-de-tormes]/14[introduction-don-diego-hurtado-de-mendoza-english-translations]/14"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/8/14/14"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Notes on the Character of Lazaro", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/2"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/10/2"}
 		},
 		{
 			"type": "paragraph",
@@ -1463,9 +1245,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/4"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/10/4"}
 		},
 		{
 			"type": "paragraph",
@@ -1474,15 +1254,13 @@
 					"text": "The author himself was a boy at the time, or at least a very young man, a student at Salamanca. He had no model, and the conception was quite original. He makes Lazarillo de Tormes a boy of his own age. Don Diego was born in 1503. Assuming Lazarillo to have been born in 1503,",
 					"anchor": {"selectorMap": "225 /1\n4 /2/1\n42 /3\n4 /4/1\n1 /5"}
 				},
-				{"text": "6", "anchor": {"selectorMap": "/6[noteref-6]/1"}, "refs": [[202]]},
+				{"text": "6", "anchor": {"selectorMap": "/6/1"}, "refs": [[202]]},
 				{
 					"text": " he was about ten years old when he took service with the blind man, three years with his first three masters, and fourteen years old when he took service with the seller of Indulgences. He carried on the business of water-carrier from the ages of fifteen to nineteen, and was twenty when he married. That would bring him to 1523. The next year, when the Cortes met at Toledo, is made to be the year when Lazarillo de Tormes wrote the story of his life. Doubtless it was the year when Don Diego really completed his little romance, also aged twenty-one.",
 					"anchor": {"selectorMap": "325 /7\n4 /8/1\n224 /9"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/6"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/10/6"}
 		},
 		{
 			"type": "paragraph",
@@ -1491,15 +1269,13 @@
 					"text": "In conceiving the character of Lazaro it is likely that the young student had in his mind what he himself might have been, if he had been born in the same obscurity. “The two destinies”",
 					"anchor": {"selectorMap": "/1"}
 				},
-				{"text": "7", "anchor": {"selectorMap": "/2[noteref-7]/1"}, "refs": [[203]]},
+				{"text": "7", "anchor": {"selectorMap": "/2/1"}, "refs": [[203]]},
 				{
 					"text": " were framed out of a noble and an ignoble birth, success in the latter case being far more meritorious than in the former. We find this reflection in the last sentence of the Prologue, where Don Diego points out how much more those have done who, not being favoured by noble birth, have, nevertheless, by cleverness and force of character, arrived at a good estate. If this idea of a boy such as the author, but without his noble birth and other advantages, was in Don Diego’s mind, we should expect to find Lazaro portrayed as a boy of a naturally good disposition and fine instincts, whose bad qualities were due to his lowly birth and vicious surroundings. It is just such a boy as this that Don Diego presents to us.",
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/8"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/10/8"}
 		},
 		{
 			"type": "paragraph",
@@ -1509,9 +1285,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/10"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/10/10"}
 		},
 		{
 			"type": "paragraph",
@@ -1526,9 +1300,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/12"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/10/12"}
 		},
 		{
 			"type": "paragraph",
@@ -1538,9 +1310,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/14"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/10/14"}
 		},
 		{
 			"type": "paragraph",
@@ -1550,9 +1320,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/16"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/10/16"}
 		},
 		{
 			"type": "paragraph",
@@ -1562,9 +1330,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/18"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/10/18"}
 		},
 		{
 			"type": "paragraph",
@@ -1574,9 +1340,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/20"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/10/20"}
 		},
 		{
 			"type": "paragraph",
@@ -1586,9 +1350,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/22"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/10/22"}
 		},
 		{
 			"type": "paragraph",
@@ -1598,19 +1360,17 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {
-				"selectorMap": "/6/6[introduction.xhtml]!/4/2[introduction]/10[introduction-notes-on-the-character-of-lazaro]/24"
-			}
+			"anchor": {"selectorMap": "/6/6!/4/2/10/24"}
 		},
 		{
 			"type": "paragraph",
 			"content": [{"text": "     ", "anchor": {"selectorMap": "1 /1\n1 /2/1\n1 /2/3\n1 /2/5\n1 /3"}}],
-			"anchor": {"selectorMap": "/6/8[halftitlepage.xhtml]!/4/2[halftitlepage]"}
+			"anchor": {"selectorMap": "/6/8!/4/2"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Prologue", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/10[prologue.xhtml]!/4/2[prologue]/2"}
+			"anchor": {"selectorMap": "/6/10!/4/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -1619,13 +1379,13 @@
 					"text": "I hold it to be good that such remarkable things as have happened to me, perhaps never before seen or heard of, should not be buried in the tomb of oblivion. It may be that someone who reads may find something that pleases him. For those who do not go very deep into the matter there is a saying of Pliny “that there is no book so bad that it does not contain something that is good.”",
 					"anchor": {"selectorMap": "306 /1\n77 /2/1\n1 /3"}
 				},
-				{"text": "8", "anchor": {"selectorMap": "/4[noteref-8]/1"}, "refs": [[204]]},
+				{"text": "8", "anchor": {"selectorMap": "/4/1"}, "refs": [[204]]},
 				{
 					"text": " Moreover, all tastes are not the same, and what one does not eat another will. Thus we see things that are thought much of by some, depreciated by others. Hence no circumstance ought to be omitted, how insignificant soever it may be, but all should be made known, especially as some fruit might be plucked from such a tree.",
 					"anchor": {"selectorMap": "/5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/10[prologue.xhtml]!/4/2[prologue]/4"}
+			"anchor": {"selectorMap": "/6/10!/4/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -1635,7 +1395,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/10[prologue.xhtml]!/4/2[prologue]/6"}
+			"anchor": {"selectorMap": "/6/10!/4/2/6"}
 		},
 		{
 			"type": "paragraph",
@@ -1645,7 +1405,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/10[prologue.xhtml]!/4/2[prologue]/8"}
+			"anchor": {"selectorMap": "/6/10!/4/2/8"}
 		},
 		{
 			"type": "paragraph",
@@ -1655,12 +1415,12 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/10[prologue.xhtml]!/4/2[prologue]/10"}
+			"anchor": {"selectorMap": "/6/10!/4/2/10"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "I", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/2/2"}
+			"anchor": {"selectorMap": "/6/12!/4/2/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -1670,7 +1430,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/2/4"}
+			"anchor": {"selectorMap": "/6/12!/4/2/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -1679,18 +1439,18 @@
 					"text": "Well! your Honour must know, before anything else, that they call me Lazarillo de Tormes, and that I am the son of Thomé Gonçales and Antonia Perez, natives of Tejares,",
 					"anchor": {"selectorMap": "/1"}
 				},
-				{"text": "9", "anchor": {"selectorMap": "/2[noteref-9]/1"}, "refs": [[205]]},
+				{"text": "9", "anchor": {"selectorMap": "/2/1"}, "refs": [[205]]},
 				{
 					"text": " a village near Salamanca. My birth was in the river Tormes,",
 					"anchor": {"selectorMap": "/3"}
 				},
-				{"text": "10", "anchor": {"selectorMap": "/4[noteref-10]/1"}, "refs": [[206]]},
+				{"text": "10", "anchor": {"selectorMap": "/4/1"}, "refs": [[206]]},
 				{
 					"text": " for which reason I have the river for a surname, and it was in this manner.",
 					"anchor": {"selectorMap": "/5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/4"}
+			"anchor": {"selectorMap": "/6/12!/4/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -1700,7 +1460,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/6"}
+			"anchor": {"selectorMap": "/6/12!/4/2/6"}
 		},
 		{
 			"type": "paragraph",
@@ -1709,13 +1469,13 @@
 					"text": "When I was a child of eight years old, they accused my father of certain misdeeds done to the sacks of those who came to have their corn ground. He was taken into custody, and confessed and denied not, suffering persecution for justice’s sake. So I trust in God that he is in glory, for the Evangelist tells us that such are blessed. At that time there was a certain expedition against the Moors",
 					"anchor": {"selectorMap": "/1"}
 				},
-				{"text": "11", "anchor": {"selectorMap": "/2[noteref-11]/1"}, "refs": [[207]]},
+				{"text": "11", "anchor": {"selectorMap": "/2/1"}, "refs": [[207]]},
 				{
 					"text": " and among the adventurers was my father, who was banished for the affair already mentioned. He went in the position of attendant on a knight who also went, and, with his master, like a loyal servant, he ended his life.",
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/8"}
+			"anchor": {"selectorMap": "/6/12!/4/2/8"}
 		},
 		{
 			"type": "paragraph",
@@ -1724,13 +1484,13 @@
 					"text": "My widowed mother, finding herself without husband or home, determined to betake herself to the good things so as to be among them; so she went to live in the city. She hired a small house, and was employed to prepare victuals for certain students. She also washed the clothes of the stable-boys who had charge of the horses of the Comendador de la Magdalena.",
 					"anchor": {"selectorMap": "/1"}
 				},
-				{"text": "12", "anchor": {"selectorMap": "/2[noteref-12]/1"}, "refs": [[208]]},
+				{"text": "12", "anchor": {"selectorMap": "/2/1"}, "refs": [[208]]},
 				{
 					"text": " Thus she frequented the stables, she and a dark-coloured man, who was one of those who had the care of the horses. They came to know each other. Sometimes he came to our house late, and went away in the morning. At other times he came to the door in the daytime, with the excuse that he wanted to buy eggs, and walked into the house. At first I did not like him, for I was afraid of his colour and his ugly face. But when I saw that his coming was the sign of better living, I began to like him, for he always brought pieces of meat, bread, and in the winter, fuel to warm us.",
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/10"}
+			"anchor": {"selectorMap": "/6/12!/4/2/10"}
 		},
 		{
 			"type": "paragraph",
@@ -1740,7 +1500,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/12"}
+			"anchor": {"selectorMap": "/6/12!/4/2/12"}
 		},
 		{
 			"type": "paragraph",
@@ -1750,7 +1510,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/14"}
+			"anchor": {"selectorMap": "/6/12!/4/2/14"}
 		},
 		{
 			"type": "paragraph",
@@ -1760,7 +1520,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/16"}
+			"anchor": {"selectorMap": "/6/12!/4/2/16"}
 		},
 		{
 			"type": "paragraph",
@@ -1770,19 +1530,19 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/12[chapter-1.xhtml]!/4/2[chapter-1]/18"}
+			"anchor": {"selectorMap": "/6/12!/4/2/18"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "First Master", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/2/2"}
+			"anchor": {"selectorMap": "/6/14!/4/2/2/2"}
 		},
 		{
 			"type": "paragraph",
 			"content": [
 				{"text": "How Lazaro Took Service with a Blind Man", "anchor": {"selectorMap": "/1"}}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/2/4"}
+			"anchor": {"selectorMap": "/6/14!/4/2/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -1791,13 +1551,13 @@
 					"text": "At that time a blind man came to lodge at the inn, who, seeing that I would do to lead him, asked for me from my mother. She gave me to him, saying that I was the son of a good father, and boasting that he had been killed at the Island of Gelves.",
 					"anchor": {"selectorMap": "/1"}
 				},
-				{"text": "13", "anchor": {"selectorMap": "/2[noteref-13]/1"}, "refs": [[209]]},
+				{"text": "13", "anchor": {"selectorMap": "/2/1"}, "refs": [[209]]},
 				{
 					"text": " She told the blind man that she trusted in God that I would not turn out a worse man than my father, and she begged him to treat me well and look after me, as I was an orphan. He answered that he would do so, and that he received me not as his servant but as his son. Thus it was that I began to serve and to lead my new master. We were in Salamanca for some days, but, as the earnings were not to my master’s liking, he determined to go somewhere else. When we were about to depart, I went to see my mother, and, both weeping, she gave me her blessing and said, “I shall see you no more. Strive to be good, and may God direct your ways. You have been brought up, and are now put with a good master. Farewell!” And so I went away to my master who was waiting for me.",
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/4"}
+			"anchor": {"selectorMap": "/6/14!/4/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -1806,13 +1566,13 @@
 					"text": "We went out of Salamanca and came to the bridge. There is, at the entrance of it, an animal of stone",
 					"anchor": {"selectorMap": "/1"}
 				},
-				{"text": "14", "anchor": {"selectorMap": "/2[noteref-14]/1"}, "refs": [[210]]},
+				{"text": "14", "anchor": {"selectorMap": "/2/1"}, "refs": [[210]]},
 				{
 					"text": " which almost has the shape of a bull. The blind man told me to go near this animal, and, being there, he said, “Lazaro, put your ear against this bull, and you will hear a great noise inside.” I did so, like a simpleton, believing it to be as he said. When he felt that my head was against the stone, he raised his hand and gave me a tremendous blow against the devil of a bull, so that I felt the pain for more than three days. Then he said to me, “This will teach you that a blind man’s boy ought to be one point more knowing than the devil himself”; and he laughed heartily at his joke. It seemed to me that, in an instant, I awoke from my simplicity in which I had reposed from childhood. I said to myself, “This man says truly that it behoves me to keep my eyes open, for I am alone and have to think for myself.”",
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/6"}
+			"anchor": {"selectorMap": "/6/14!/4/2/6"}
 		},
 		{
 			"type": "paragraph",
@@ -1822,7 +1582,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/8"}
+			"anchor": {"selectorMap": "/6/14!/4/2/8"}
 		},
 		{
 			"type": "paragraph",
@@ -1832,7 +1592,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/10"}
+			"anchor": {"selectorMap": "/6/14!/4/2/10"}
 		},
 		{
 			"type": "paragraph",
@@ -1842,7 +1602,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/12"}
+			"anchor": {"selectorMap": "/6/14!/4/2/12"}
 		},
 		{
 			"type": "paragraph",
@@ -1852,7 +1612,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/14"}
+			"anchor": {"selectorMap": "/6/14!/4/2/14"}
 		},
 		{
 			"type": "paragraph",
@@ -1887,13 +1647,13 @@
 				{"text": " or even a ", "anchor": {"selectorMap": "/13"}},
 				{"text": "maravedi", "style": {"italic": true}, "anchor": {"selectorMap": "/14/1"}},
 				{"text": " that they gave me?", "anchor": {"selectorMap": "/15"}},
-				{"text": "15", "anchor": {"selectorMap": "/16[noteref-15]/1"}, "refs": [[211]]},
+				{"text": "15", "anchor": {"selectorMap": "/16/1"}, "refs": [[211]]},
 				{
 					"text": " The ill-luck has come with you.” So he shortened up the prayers and did not give them more than half, ordering me to remind him to stop by pulling his sleeve. Then he began to cry out that they had called for such and such a prayer from him, such as he used to recite, and that he had given it.",
 					"anchor": {"selectorMap": "/17"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/16"}
+			"anchor": {"selectorMap": "/6/14!/4/2/16"}
 		},
 		{
 			"type": "paragraph",
@@ -1903,7 +1663,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/18"}
+			"anchor": {"selectorMap": "/6/14!/4/2/18"}
 		},
 		{
 			"type": "paragraph",
@@ -1913,7 +1673,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/20"}
+			"anchor": {"selectorMap": "/6/14!/4/2/20"}
 		},
 		{
 			"type": "paragraph",
@@ -1923,7 +1683,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/22"}
+			"anchor": {"selectorMap": "/6/14!/4/2/22"}
 		},
 		{
 			"type": "paragraph",
@@ -1933,7 +1693,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/24"}
+			"anchor": {"selectorMap": "/6/14!/4/2/24"}
 		},
 		{
 			"type": "paragraph",
@@ -1942,13 +1702,13 @@
 					"text": "In order that your Honour may judge of the cleverness of this knowing old man I will relate one thing out of many that happened while I was with him. When we left Salamanca his intention was to go to Toledo, for he said that the people there were richer, though not very charitable. He repeated this saying, “The hard man gives more than the penniless man.” We took the road by the best places, where we were well received. It happened that we came to a place called Almorox",
 					"anchor": {"selectorMap": "/1"}
 				},
-				{"text": "16", "anchor": {"selectorMap": "/2[noteref-16]/1"}, "refs": [[212]]},
+				{"text": "16", "anchor": {"selectorMap": "/2/1"}, "refs": [[212]]},
 				{
 					"text": " at the time of the vintage. A grape-gatherer gave us a bunch out of charity. As the baskets are knocked about, and the grapes at that time are very hard, the blind man kept the bunch in his hand and, to content me, he determined to have a banquet with it, instead of putting it in his bag. For on that day he had given me many blows and kicks.",
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/26"}
+			"anchor": {"selectorMap": "/6/14!/4/2/26"}
 		},
 		{
 			"type": "paragraph",
@@ -1958,7 +1718,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/28"}
+			"anchor": {"selectorMap": "/6/14!/4/2/28"}
 		},
 		{
 			"type": "paragraph",
@@ -1968,19 +1728,19 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/30"}
+			"anchor": {"selectorMap": "/6/14!/4/2/30"}
 		},
 		{
 			"type": "paragraph",
 			"content": [
 				{"text": "We were at Escalona,", "anchor": {"selectorMap": "/1"}},
-				{"text": "17", "anchor": {"selectorMap": "/2[noteref-17]/1"}, "refs": [[213]]},
+				{"text": "17", "anchor": {"selectorMap": "/2/1"}, "refs": [[213]]},
 				{
 					"text": " a town belonging to the Duke of that name, lodging at an inn.",
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/32"}
+			"anchor": {"selectorMap": "/6/14!/4/2/32"}
 		},
 		{
 			"type": "paragraph",
@@ -1994,13 +1754,13 @@
 					"text": " out of his bag and sent me to fetch wine from a tavern. The devil put the temptation before my eyes, which, as they say, is how a thief is made. There was also a long piece of colewort",
 					"anchor": {"selectorMap": "/3"}
 				},
-				{"text": "18", "anchor": {"selectorMap": "/4[noteref-18]/1"}, "refs": [[214]]},
+				{"text": "18", "anchor": {"selectorMap": "/4/1"}, "refs": [[214]]},
 				{
 					"text": " on the fire, which, being unfit for the pot, ought to have been thrown away. There was nobody but the blind man and myself, and I became very greedy under the delicious smell of the sausage. I only thought of present enjoyment, without considering what might happen afterwards. As the blind man took the money out of his bag, I took the sausage, and quickly put the colewort to be cooked in its place. When my master handed the money to me I took it, and went for the wine, not failing to eat the sausage.",
 					"anchor": {"selectorMap": "/5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/34"}
+			"anchor": {"selectorMap": "/6/14!/4/2/34"}
 		},
 		{
 			"type": "paragraph",
@@ -2010,7 +1770,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/36"}
+			"anchor": {"selectorMap": "/6/14!/4/2/36"}
 		},
 		{
 			"type": "paragraph",
@@ -2020,7 +1780,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/38"}
+			"anchor": {"selectorMap": "/6/14!/4/2/38"}
 		},
 		{
 			"type": "paragraph",
@@ -2030,7 +1790,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/40"}
+			"anchor": {"selectorMap": "/6/14!/4/2/40"}
 		},
 		{
 			"type": "paragraph",
@@ -2040,7 +1800,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/42"}
+			"anchor": {"selectorMap": "/6/14!/4/2/42"}
 		},
 		{
 			"type": "paragraph",
@@ -2049,13 +1809,13 @@
 					"text": "Those who were washing me laughed a good deal at what the old man said, though I dissented. However, the prognostications of the blind rascal did not turn out false, and afterwards I often thought of that man, who certainly had the spirit of prophecy.",
 					"anchor": {"selectorMap": "/1"}
 				},
-				{"text": "19", "anchor": {"selectorMap": "/2[noteref-19]/1"}, "refs": [[215]]},
+				{"text": "19", "anchor": {"selectorMap": "/2/1"}, "refs": [[215]]},
 				{
 					"text": " The evil things he did to me made me sad, though I paid him back, as your Honour will presently hear.",
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/44"}
+			"anchor": {"selectorMap": "/6/14!/4/2/44"}
 		},
 		{
 			"type": "paragraph",
@@ -2065,7 +1825,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/46"}
+			"anchor": {"selectorMap": "/6/14!/4/2/46"}
 		},
 		{
 			"type": "paragraph",
@@ -2074,14 +1834,14 @@
 					"text": "As the rain continued and he was getting wet, we were in a hurry to get shelter from the water that was falling upon us. The principal thing was (seeing that God blinded my understanding in that hour) to be avenged. The old man believed in me and said, “Put me in the right place while you jump over the stream.” So I put him just in front of the pillar, and placed myself behind it. I then said, “Jump with all your might so as to clear the stream.” I had hardly finished speaking, when the poor old man, balancing himself like a goat, gave one step backwards, and then sprang with all his force. His head came with such a noise against the pillar that it sounded like a great calabash. He fell down half dead. “How was it you could smell the sausage and not the post? Oh! Oh!” I shouted. I left him among several people who ran to help him, while I made for the gate of the town at a sharp trot, so that before nightfall I might be in Torrijos, not knowing nor caring what afterwards happened to my blind man.",
 					"anchor": {"selectorMap": "/1"}
 				},
-				{"text": "20", "anchor": {"selectorMap": "/2[noteref-20]/1"}, "refs": [[216]]}
+				{"text": "20", "anchor": {"selectorMap": "/2/1"}, "refs": [[216]]}
 			],
-			"anchor": {"selectorMap": "/6/14[chapter-2.xhtml]!/4/2[chapter-2]/48"}
+			"anchor": {"selectorMap": "/6/14!/4/2/48"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Second Master", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/2/2"}
+			"anchor": {"selectorMap": "/6/16!/4/2/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -2091,7 +1851,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/2/4"}
+			"anchor": {"selectorMap": "/6/16!/4/2/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2100,21 +1860,21 @@
 					"text": "Next day, as I did not feel that I should be quite safe at Torrijos,",
 					"anchor": {"selectorMap": "/1"}
 				},
-				{"text": "21", "anchor": {"selectorMap": "/2[noteref-21]/1"}, "refs": [[217]]},
+				{"text": "21", "anchor": {"selectorMap": "/2/1"}, "refs": [[217]]},
 				{"text": " I stopped at a place called Maqueda,", "anchor": {"selectorMap": "/3"}},
-				{"text": "22", "anchor": {"selectorMap": "/4[noteref-22]/1"}, "refs": [[218]]},
+				{"text": "22", "anchor": {"selectorMap": "/4/1"}, "refs": [[218]]},
 				{
 					"text": " where for my sins I took service with a clergyman. Going to him to ask for alms, he inquired whether I knew how to assist at Mass. I said yes, which was true, for though the blind man ill-treated me, he taught me many useful things, and one of them was this. Finally the clergyman took me as his servant. I had escaped from the thunder to fall under the lightning. For compared with this priest, the blind man was an Alexander the Great. I will say no more than that all the avarice in the world was combined in this man, but I know not whether it was naturally born in him or whether it was put on with the priestly habit. He had an old chest closed with a key which he carried with him, fastened to the belt of his gown. When he brought the ",
 					"anchor": {"selectorMap": "/5"}
 				},
 				{"text": "bodigos", "style": {"italic": true}, "anchor": {"selectorMap": "/6/1"}},
-				{"text": "23", "anchor": {"selectorMap": "/8[noteref-23]/1"}, "refs": [[219]]},
+				{"text": "23", "anchor": {"selectorMap": "/8/1"}, "refs": [[219]]},
 				{
 					"text": " from the church, they were quickly locked up in the chest, and there was nothing to eat in the house such as is to be seen in other houses, a piece of bacon, some bits of cheese on a shelf or in a cupboard, or a few pieces of bread that may have remained over from the table. It seemed to me that the sight of such things, even if I could not have them, would have been a consolation.",
 					"anchor": {"selectorMap": "/9"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/4"}
+			"anchor": {"selectorMap": "/6/16!/4/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2124,7 +1884,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/6"}
+			"anchor": {"selectorMap": "/6/16!/4/2/6"}
 		},
 		{
 			"type": "paragraph",
@@ -2139,7 +1899,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/8"}
+			"anchor": {"selectorMap": "/6/16!/4/2/8"}
 		},
 		{
 			"type": "paragraph",
@@ -2163,7 +1923,7 @@
 					"anchor": {"selectorMap": "/9"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/10"}
+			"anchor": {"selectorMap": "/6/16!/4/2/10"}
 		},
 		{
 			"type": "paragraph",
@@ -2173,7 +1933,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/12"}
+			"anchor": {"selectorMap": "/6/16!/4/2/12"}
 		},
 		{
 			"type": "paragraph",
@@ -2183,7 +1943,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/14"}
+			"anchor": {"selectorMap": "/6/16!/4/2/14"}
 		},
 		{
 			"type": "paragraph",
@@ -2193,7 +1953,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/16"}
+			"anchor": {"selectorMap": "/6/16!/4/2/16"}
 		},
 		{
 			"type": "paragraph",
@@ -2203,7 +1963,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/18"}
+			"anchor": {"selectorMap": "/6/16!/4/2/18"}
 		},
 		{
 			"type": "paragraph",
@@ -2213,7 +1973,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/20"}
+			"anchor": {"selectorMap": "/6/16!/4/2/20"}
 		},
 		{
 			"type": "paragraph",
@@ -2223,7 +1983,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/22"}
+			"anchor": {"selectorMap": "/6/16!/4/2/22"}
 		},
 		{
 			"type": "paragraph",
@@ -2233,7 +1993,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/24"}
+			"anchor": {"selectorMap": "/6/16!/4/2/24"}
 		},
 		{
 			"type": "paragraph",
@@ -2243,7 +2003,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/26"}
+			"anchor": {"selectorMap": "/6/16!/4/2/26"}
 		},
 		{
 			"type": "paragraph",
@@ -2253,7 +2013,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/28"}
+			"anchor": {"selectorMap": "/6/16!/4/2/28"}
 		},
 		{
 			"type": "paragraph",
@@ -2263,7 +2023,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/30"}
+			"anchor": {"selectorMap": "/6/16!/4/2/30"}
 		},
 		{
 			"type": "paragraph",
@@ -2273,7 +2033,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/32"}
+			"anchor": {"selectorMap": "/6/16!/4/2/32"}
 		},
 		{
 			"type": "paragraph",
@@ -2295,7 +2055,7 @@
 					"anchor": {"selectorMap": "/7"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/34"}
+			"anchor": {"selectorMap": "/6/16!/4/2/34"}
 		},
 		{
 			"type": "paragraph",
@@ -2305,7 +2065,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/36"}
+			"anchor": {"selectorMap": "/6/16!/4/2/36"}
 		},
 		{
 			"type": "paragraph",
@@ -2315,12 +2075,12 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/16[chapter-3.xhtml]!/4/2[chapter-3]/38"}
+			"anchor": {"selectorMap": "/6/16!/4/2/38"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Third Master", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/2/2"}
+			"anchor": {"selectorMap": "/6/18!/4/2/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -2330,7 +2090,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/2/4"}
+			"anchor": {"selectorMap": "/6/18!/4/2/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2340,7 +2100,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/4"}
+			"anchor": {"selectorMap": "/6/18!/4/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2349,13 +2109,13 @@
 					"text": "I was wandering about from door to door, without any settled purpose, when I came upon an esquire,",
 					"anchor": {"selectorMap": "/1"}
 				},
-				{"text": "24", "anchor": {"selectorMap": "/2[noteref-24]/1"}, "refs": [[220]]},
+				{"text": "24", "anchor": {"selectorMap": "/2/1"}, "refs": [[220]]},
 				{
 					"text": " who was walking down the street, fairly well dressed and groomed. He looked at me and I at him. He then said, “Boy! are you seeking for a master?” I replied, “Yes, sir!” “Then come along behind me,” he said, “for God has shown mercy to you by letting you meet with me.” So I followed him, giving thanks to God. Judging from his dress and manner I thought he was the sort of master of whom I stood in need.",
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/6"}
+			"anchor": {"selectorMap": "/6/18!/4/2/6"}
 		},
 		{
 			"type": "paragraph",
@@ -2365,7 +2125,7 @@
 					"anchor": {"selectorMap": "475 /1\n22 /2/1\n524 /3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/8"}
+			"anchor": {"selectorMap": "/6/18!/4/2/8"}
 		},
 		{
 			"type": "paragraph",
@@ -2375,7 +2135,7 @@
 					"anchor": {"selectorMap": "1036 /1\n28 /2/1\n81 /3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/10"}
+			"anchor": {"selectorMap": "/6/18!/4/2/10"}
 		},
 		{
 			"type": "paragraph",
@@ -2385,7 +2145,7 @@
 					"anchor": {"selectorMap": "361 /1\n13 /2/1\n656 /3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/12"}
+			"anchor": {"selectorMap": "/6/18!/4/2/12"}
 		},
 		{
 			"type": "paragraph",
@@ -2395,7 +2155,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/14"}
+			"anchor": {"selectorMap": "/6/18!/4/2/14"}
 		},
 		{
 			"type": "paragraph",
@@ -2405,7 +2165,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/16"}
+			"anchor": {"selectorMap": "/6/18!/4/2/16"}
 		},
 		{
 			"type": "paragraph",
@@ -2415,7 +2175,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/18"}
+			"anchor": {"selectorMap": "/6/18!/4/2/18"}
 		},
 		{
 			"type": "paragraph",
@@ -2425,7 +2185,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/20"}
+			"anchor": {"selectorMap": "/6/18!/4/2/20"}
 		},
 		{
 			"type": "paragraph",
@@ -2435,7 +2195,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/22"}
+			"anchor": {"selectorMap": "/6/18!/4/2/22"}
 		},
 		{
 			"type": "paragraph",
@@ -2445,7 +2205,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/24"}
+			"anchor": {"selectorMap": "/6/18!/4/2/24"}
 		},
 		{
 			"type": "paragraph",
@@ -2454,13 +2214,13 @@
 					"text": "He then marched down the street with such a contained and noble air that anyone who did not know the contrary would have thought that he was a very near relation to the Count of Arcos,",
 					"anchor": {"selectorMap": "/1"}
 				},
-				{"text": "25", "anchor": {"selectorMap": "/2[noteref-25]/1"}, "refs": [[221]]},
+				{"text": "25", "anchor": {"selectorMap": "/2/1"}, "refs": [[221]]},
 				{
 					"text": " or at least his chamberlain who had been clothed by him. “A blessing on you, my lord,” I was left saying, “who gives the disease and provides the remedy.” Who would meet my master, and, judging from his satisfied look, not suppose that he had supped well and slept in a comfortable bed, and that in the morning he had had a good breakfast? Great secrets, sir, are those which you keep and of which the world is ignorant. Who would not be deceived by that fair presence and decent cloak? And who would think that the same gentleman passed all that day without eating anything but the bit of bread which his servant Lazaro had carried all day in his bosom, where it was not likely to find much cleanliness? Today, washing his hands and face, he had to wipe them with the end of his cloak for want of a towel. Certainly no one would have suspected it. O Lord! how many such as him must be scattered over the world, who suffer for the jade they call honour that which they would not suffer for a friend.",
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/26"}
+			"anchor": {"selectorMap": "/6/18!/4/2/26"}
 		},
 		{
 			"type": "paragraph",
@@ -2470,7 +2230,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/28"}
+			"anchor": {"selectorMap": "/6/18!/4/2/28"}
 		},
 		{
 			"type": "paragraph",
@@ -2480,7 +2240,7 @@
 					"anchor": {"selectorMap": "202 /1\n4 /2/1\n116 /3\n11 /4/1\n154 /5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/30"}
+			"anchor": {"selectorMap": "/6/18!/4/2/30"}
 		},
 		{
 			"type": "paragraph",
@@ -2490,7 +2250,7 @@
 					"anchor": {"selectorMap": "488 /1\n4 /2/1\n248 /3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/32"}
+			"anchor": {"selectorMap": "/6/18!/4/2/32"}
 		},
 		{
 			"type": "paragraph",
@@ -2500,7 +2260,7 @@
 					"anchor": {"selectorMap": "285 /1\n3 /2/1\n645 /3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/34"}
+			"anchor": {"selectorMap": "/6/18!/4/2/34"}
 		},
 		{
 			"type": "paragraph",
@@ -2510,7 +2270,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/36"}
+			"anchor": {"selectorMap": "/6/18!/4/2/36"}
 		},
 		{
 			"type": "paragraph",
@@ -2520,7 +2280,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/38"}
+			"anchor": {"selectorMap": "/6/18!/4/2/38"}
 		},
 		{
 			"type": "paragraph",
@@ -2530,7 +2290,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/40"}
+			"anchor": {"selectorMap": "/6/18!/4/2/40"}
 		},
 		{
 			"type": "paragraph",
@@ -2540,7 +2300,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/42"}
+			"anchor": {"selectorMap": "/6/18!/4/2/42"}
 		},
 		{
 			"type": "paragraph",
@@ -2560,7 +2320,7 @@
 					"anchor": {"selectorMap": "/5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/44"}
+			"anchor": {"selectorMap": "/6/18!/4/2/44"}
 		},
 		{
 			"type": "paragraph",
@@ -2570,7 +2330,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/46"}
+			"anchor": {"selectorMap": "/6/18!/4/2/46"}
 		},
 		{
 			"type": "paragraph",
@@ -2580,7 +2340,7 @@
 					"anchor": {"selectorMap": "647 /1\n4 /2/1\n567 /3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/48"}
+			"anchor": {"selectorMap": "/6/18!/4/2/48"}
 		},
 		{
 			"type": "paragraph",
@@ -2590,7 +2350,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/50"}
+			"anchor": {"selectorMap": "/6/18!/4/2/50"}
 		},
 		{
 			"type": "paragraph",
@@ -2600,7 +2360,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/52"}
+			"anchor": {"selectorMap": "/6/18!/4/2/52"}
 		},
 		{
 			"type": "paragraph",
@@ -2610,7 +2370,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/54"}
+			"anchor": {"selectorMap": "/6/18!/4/2/54"}
 		},
 		{
 			"type": "paragraph",
@@ -2620,7 +2380,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/56"}
+			"anchor": {"selectorMap": "/6/18!/4/2/56"}
 		},
 		{
 			"type": "paragraph",
@@ -2630,7 +2390,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/58"}
+			"anchor": {"selectorMap": "/6/18!/4/2/58"}
 		},
 		{
 			"type": "paragraph",
@@ -2645,7 +2405,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/60"}
+			"anchor": {"selectorMap": "/6/18!/4/2/60"}
 		},
 		{
 			"type": "paragraph",
@@ -2655,7 +2415,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/62"}
+			"anchor": {"selectorMap": "/6/18!/4/2/62"}
 		},
 		{
 			"type": "paragraph",
@@ -2665,7 +2425,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/64"}
+			"anchor": {"selectorMap": "/6/18!/4/2/64"}
 		},
 		{
 			"type": "paragraph",
@@ -2675,7 +2435,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/66"}
+			"anchor": {"selectorMap": "/6/18!/4/2/66"}
 		},
 		{
 			"type": "paragraph",
@@ -2685,7 +2445,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/68"}
+			"anchor": {"selectorMap": "/6/18!/4/2/68"}
 		},
 		{
 			"type": "paragraph",
@@ -2695,7 +2455,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/70"}
+			"anchor": {"selectorMap": "/6/18!/4/2/70"}
 		},
 		{
 			"type": "paragraph",
@@ -2705,7 +2465,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/72"}
+			"anchor": {"selectorMap": "/6/18!/4/2/72"}
 		},
 		{
 			"type": "paragraph",
@@ -2715,7 +2475,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/74"}
+			"anchor": {"selectorMap": "/6/18!/4/2/74"}
 		},
 		{
 			"type": "paragraph",
@@ -2725,7 +2485,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/76"}
+			"anchor": {"selectorMap": "/6/18!/4/2/76"}
 		},
 		{
 			"type": "paragraph",
@@ -2735,12 +2495,12 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/18[chapter-4.xhtml]!/4/2[chapter-4]/78"}
+			"anchor": {"selectorMap": "/6/18!/4/2/78"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Fourth Master", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/20[chapter-5.xhtml]!/4/2[chapter-5]/2/2"}
+			"anchor": {"selectorMap": "/6/20!/4/2/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -2750,7 +2510,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/20[chapter-5.xhtml]!/4/2[chapter-5]/2/4"}
+			"anchor": {"selectorMap": "/6/20!/4/2/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2760,12 +2520,12 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/20[chapter-5.xhtml]!/4/2[chapter-5]/4"}
+			"anchor": {"selectorMap": "/6/20!/4/2/4"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Fifth Master", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/2/2"}
+			"anchor": {"selectorMap": "/6/22!/4/2/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -2775,7 +2535,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/2/4"}
+			"anchor": {"selectorMap": "/6/22!/4/2/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2784,13 +2544,13 @@
 					"text": "My fifth master chanced to be a man engaged in the sale of Papal Indulgences.",
 					"anchor": {"selectorMap": "/1"}
 				},
-				{"text": "26", "anchor": {"selectorMap": "/2[noteref-26]/1"}, "refs": [[222]]},
+				{"text": "26", "anchor": {"selectorMap": "/2/1"}, "refs": [[222]]},
 				{
 					"text": " He was the most shameless and impudent distributor of them that ever I saw or hope to see, nor do I believe that anyone else ever saw one like him. For he had and sought out his own modes and methods, and very cunning inventions. Coming to the place where he wanted to effect the sales, he began by making trifling presents to the clergy, but nothing of any great value: a lettuce of Murcia if it was the season, a couple of lemons or oranges, a peach, a couple of nectarines, or some green pears. In this way he got them into good humour for favouring his business, and inducing their parishioners to buy his Indulgences.",
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/4"}
+			"anchor": {"selectorMap": "/6/22!/4/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2800,7 +2560,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/6"}
+			"anchor": {"selectorMap": "/6/22!/4/2/6"}
 		},
 		{
 			"type": "paragraph",
@@ -2809,13 +2569,13 @@
 					"text": "He had preached for two or three days in a village near Toledo, using all his accustomed arts, but no one had bought an Indulgence, nor was there any sign of an intention to do so. He had devoted them all to the Devil, and was meditating what to do next, when he determined to call the parishioners together the next morning and make a last effort. That night he and the constable,",
 					"anchor": {"selectorMap": "/1"}
 				},
-				{"text": "27", "anchor": {"selectorMap": "/2[noteref-27]/1"}, "refs": [[223]]},
+				{"text": "27", "anchor": {"selectorMap": "/2/1"}, "refs": [[223]]},
 				{
 					"text": " after supper, sat down to play at cards, and they began to quarrel over the game, and make use of bad language. The seller of Indulgences called the constable a thief, and the constable called him a liar. On this my master took up a lance which was in the doorway. The constable put his hand on his sword. At the row they were making the guests and neighbours came and got between them. In great fury the combatants struggled to free themselves and get at each other. But as the place was full of people they saw that they would be prevented from fighting, so they again resorted to abusive language. Among other things the constable said to my master that he was a liar, and that the Indulgences about which he preached were false. At last the people, as they could not pacify the disputants, determined to take the constable away. Thus my master was left in a great rage. Later on the guests and neighbours entreated him to moderate his anger and go to bed, which in the end we all did.",
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/8"}
+			"anchor": {"selectorMap": "/6/22!/4/2/8"}
 		},
 		{
 			"type": "paragraph",
@@ -2825,7 +2585,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/10"}
+			"anchor": {"selectorMap": "/6/22!/4/2/10"}
 		},
 		{
 			"type": "paragraph",
@@ -2835,7 +2595,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/12"}
+			"anchor": {"selectorMap": "/6/22!/4/2/12"}
 		},
 		{
 			"type": "paragraph",
@@ -2845,7 +2605,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/14"}
+			"anchor": {"selectorMap": "/6/22!/4/2/14"}
 		},
 		{
 			"type": "paragraph",
@@ -2855,7 +2615,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/16"}
+			"anchor": {"selectorMap": "/6/22!/4/2/16"}
 		},
 		{
 			"type": "paragraph",
@@ -2865,7 +2625,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/18"}
+			"anchor": {"selectorMap": "/6/22!/4/2/18"}
 		},
 		{
 			"type": "paragraph",
@@ -2875,7 +2635,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/20"}
+			"anchor": {"selectorMap": "/6/22!/4/2/20"}
 		},
 		{
 			"type": "paragraph",
@@ -2885,12 +2645,12 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/22[chapter-6.xhtml]!/4/2[chapter-6]/22"}
+			"anchor": {"selectorMap": "/6/22!/4/2/22"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Sixth Master", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/24[chapter-7.xhtml]!/4/2[chapter-7]/2/2"}
+			"anchor": {"selectorMap": "/6/24!/4/2/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -2900,7 +2660,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/24[chapter-7.xhtml]!/4/2[chapter-7]/2/4"}
+			"anchor": {"selectorMap": "/6/24!/4/2/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2920,12 +2680,12 @@
 					"anchor": {"selectorMap": "/5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/24[chapter-7.xhtml]!/4/2[chapter-7]/4"}
+			"anchor": {"selectorMap": "/6/24!/4/2/4"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Seventh Master", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/2/2"}
+			"anchor": {"selectorMap": "/6/26!/4/2/2/2"}
 		},
 		{
 			"type": "paragraph",
@@ -2935,7 +2695,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/2/4"}
+			"anchor": {"selectorMap": "/6/26!/4/2/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2945,7 +2705,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/4"}
+			"anchor": {"selectorMap": "/6/26!/4/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -2955,7 +2715,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/6"}
+			"anchor": {"selectorMap": "/6/26!/4/2/6"}
 		},
 		{
 			"type": "paragraph",
@@ -2964,13 +2724,13 @@
 					"text": "At this time his Honour the Archpriest of St. Saviour’s,",
 					"anchor": {"selectorMap": "42 /1\n3 /2/1\n11 /3"}
 				},
-				{"text": "28", "anchor": {"selectorMap": "/4[noteref-28]/1"}, "refs": [[224]]},
+				{"text": "28", "anchor": {"selectorMap": "/4/1"}, "refs": [[224]]},
 				{
 					"text": " my lord and the friend of your worship, seeing my cleverness and noticing my presentable appearance when employed by him in announcing his wines, made an arrangement that I should marry one of his servant girls. Seeing myself that this would bring me benefits and favours, I gave my consent. I was married to her, and to this day I have had no reason to repent it, for I found her to be a good girl and diligent in service. I have favour and help from my lord the Archpriest. He always gives us during the year a load of wheat, meat on festivals, sometimes loaves of fine bread, and the shoes he has left off wearing. He arranged for us to rent a small house near his own. On almost every Sunday and on feast days we dine in his house.",
 					"anchor": {"selectorMap": "/5"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/8[chapter-8-p-3]"}
+			"anchor": {"selectorMap": "/6/26!/4/2/8"}
 		},
 		{
 			"type": "paragraph",
@@ -2980,7 +2740,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/10"}
+			"anchor": {"selectorMap": "/6/26!/4/2/10"}
 		},
 		{
 			"type": "paragraph",
@@ -2990,7 +2750,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/12"}
+			"anchor": {"selectorMap": "/6/26!/4/2/12"}
 		},
 		{
 			"type": "paragraph",
@@ -2999,20 +2759,20 @@
 					"text": "This was in the same year that our victorious Emperor entered into this famous city of Toledo, and held the Cortes here,",
 					"anchor": {"selectorMap": "/1"}
 				},
-				{"text": "29", "anchor": {"selectorMap": "/2[noteref-29]/1"}, "refs": [[225]]},
+				{"text": "29", "anchor": {"selectorMap": "/2/1"}, "refs": [[225]]},
 				{
 					"text": " and there were great rejoicings as your Worship will have heard. At this time I was prosperous and at the summit of all good fortune.",
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/26[chapter-8.xhtml]!/4/2[chapter-8]/14"}
+			"anchor": {"selectorMap": "/6/26!/4/2/14"}
 		},
 		{
 			"type": "heading",
 			"content": [
 				{"text": "Sketch Map of the Route from Salamanca to Toledo", "anchor": {"selectorMap": "/1"}}
 			],
-			"anchor": {"selectorMap": "/6/28[appendix.xhtml]!/4/2[appendix]/2"}
+			"anchor": {"selectorMap": "/6/28!/4/2/2"}
 		},
 		{
 			"type": "image",
@@ -3021,12 +2781,12 @@
 					"text": "A map entitled “Sketch Map of the Route from Salamanca to Toledo.” The route highlighted is in southern Spain, and goes via Calvarasa, Albe de Tormes, Horcaja, Piedrahita, Navalacruz, S. Martin de Val de iglesia, Almorox, Escalona, Magueda, and Torrijos."
 				}
 			],
-			"anchor": {"selectorMap": "/6/28[appendix.xhtml]!/4/2[appendix]/4[illustration-1]/2"}
+			"anchor": {"selectorMap": "/6/28!/4/2/4/2"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Endnotes", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/2"}
+			"anchor": {"selectorMap": "/6/30!/4/2/2"}
 		},
 		{
 			"type": "note",
@@ -3046,10 +2806,10 @@
 						{"text": " 291. ", "anchor": {"selectorMap": "/5"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/6/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/2[note-1]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/2/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/2[note-1]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/2"},
 			"backRefs": [[11]]
 		},
 		{
@@ -3071,10 +2831,10 @@
 								{"text": " life and mount on mine.", "anchor": {"selectorMap": "/6/3"}},
 								{"text": " ", "anchor": {"selectorMap": "/7"}}
 							],
-							"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/4[note-2]/2/2"}
+							"anchor": {"selectorMap": "/6/30!/4/2/4/4/2/2"}
 						}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/4[note-2]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/4/2"}
 				},
 				{
 					"type": "paragraph",
@@ -3083,10 +2843,10 @@
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}},
 						{"text": " ", "anchor": {"selectorMap": "/3"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/4[note-2]/4"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/4/4"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/4[note-2]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/4"},
 			"backRefs": [[17]]
 		},
 		{
@@ -3105,10 +2865,10 @@
 						{"text": " 469 – 71. ", "anchor": {"selectorMap": "/5"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/6/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/6[note-3]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/6/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/6[note-3]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/6"},
 			"backRefs": [[43]]
 		},
 		{
@@ -3122,10 +2882,10 @@
 						{"text": ". ", "anchor": {"selectorMap": "/3"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/8[note-4]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/8/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/8[note-4]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/8"},
 			"backRefs": [[44]]
 		},
 		{
@@ -3152,10 +2912,10 @@
 						{"text": ", with the second parts. ", "anchor": {"selectorMap": "/13"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/14/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/10[note-5]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/10/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/10[note-5]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/10"},
 			"backRefs": [[45]]
 		},
 		{
@@ -3172,10 +2932,10 @@
 						{"text": ". ", "anchor": {"selectorMap": "/3"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/12[note-6]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/12/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/12[note-6]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/12"},
 			"backRefs": [[57]]
 		},
 		{
@@ -3187,10 +2947,10 @@
 						{"text": "See Sir Francis Doyle’s poem. ", "anchor": {"selectorMap": "/1"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/14[note-7]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/14/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/14[note-7]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/14"},
 			"backRefs": [[58]]
 		},
 		{
@@ -3207,10 +2967,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/16[note-8]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/16/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/16[note-8]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/16"},
 			"backRefs": [[69]]
 		},
 		{
@@ -3225,10 +2985,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/18[note-9]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/18/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/18[note-9]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/18"},
 			"backRefs": [[75]]
 		},
 		{
@@ -3243,10 +3003,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/20[note-10]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/20/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/20[note-10]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/20"},
 			"backRefs": [[75]]
 		},
 		{
@@ -3271,10 +3031,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/6/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/22[note-11]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/22/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/22[note-11]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/22"},
 			"backRefs": [[77], [209]]
 		},
 		{
@@ -3289,10 +3049,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/24[note-12]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/24/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/24[note-12]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/24"},
 			"backRefs": [[78]]
 		},
 		{
@@ -3306,10 +3066,10 @@
 						{"text": ". ", "anchor": {"selectorMap": "/3"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/26[note-13]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/26/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/26[note-13]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/26"},
 			"backRefs": [[85]]
 		},
 		{
@@ -3324,10 +3084,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/28[note-14]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/28/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/28[note-14]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/28"},
 			"backRefs": [[86]]
 		},
 		{
@@ -3374,10 +3134,10 @@
 						{"text": ", or farthing. ", "anchor": {"selectorMap": "/23"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/24/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/30[note-15]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/30/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/30[note-15]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/30"},
 			"backRefs": [[91]]
 		},
 		{
@@ -3392,10 +3152,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/32[note-16]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/32/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/32[note-16]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/32"},
 			"backRefs": [[96]]
 		},
 		{
@@ -3437,10 +3197,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/14/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/34[note-17]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/34/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/34[note-17]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/34"},
 			"backRefs": [[99]]
 		},
 		{
@@ -3460,10 +3220,10 @@
 						{"text": " 185) calls “navet,” a sort of small turnip. ", "anchor": {"selectorMap": "/7"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/8/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/36[note-18]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/36/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/36[note-18]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/36"},
 			"backRefs": [[100]]
 		},
 		{
@@ -3477,10 +3237,10 @@
 						{"text": ". ", "anchor": {"selectorMap": "/3"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/38[note-19]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/38/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/38[note-19]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/38"},
 			"backRefs": [[105]]
 		},
 		{
@@ -3495,10 +3255,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/40[note-20]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/40/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/40[note-20]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/40"},
 			"backRefs": [[107]]
 		},
 		{
@@ -3518,10 +3278,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/42[note-21]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/42/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/42[note-21]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/42"},
 			"backRefs": [[110]]
 		},
 		{
@@ -3545,10 +3305,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/8/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/44[note-22]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/44/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/44[note-22]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/44"},
 			"backRefs": [[110]]
 		},
 		{
@@ -3563,10 +3323,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/46[note-23]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/46/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/46[note-23]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/46"},
 			"backRefs": [[110]]
 		},
 		{
@@ -3597,10 +3357,10 @@
 						{"text": " (esquires). ", "anchor": {"selectorMap": "/15"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/16/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/48[note-24]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/48/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/48[note-24]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/48"},
 			"backRefs": [[131]]
 		},
 		{
@@ -3620,10 +3380,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/50[note-25]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/50/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/50[note-25]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/50"},
 			"backRefs": [[141]]
 		},
 		{
@@ -3640,10 +3400,10 @@
 						{"text": ", a century and a half earlier. ", "anchor": {"selectorMap": "/3"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/4/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/52[note-26]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/52/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/52[note-26]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/52"},
 			"backRefs": [[173]]
 		},
 		{
@@ -3658,10 +3418,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/2/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/54[note-27]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/54/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/54[note-27]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/54"},
 			"backRefs": [[175]]
 		},
 		{
@@ -3698,10 +3458,10 @@
 						},
 						{"text": "↩︎", "anchor": {"selectorMap": "/12/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/56[note-28]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/56/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/56[note-28]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/56"},
 			"backRefs": [[190]]
 		},
 		{
@@ -3724,16 +3484,16 @@
 						{"text": " ", "anchor": {"selectorMap": "/7"}},
 						{"text": "↩︎", "anchor": {"selectorMap": "/8/1"}}
 					],
-					"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/58[note-29]/2"}
+					"anchor": {"selectorMap": "/6/30!/4/2/4/58/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/30[endnotes.xhtml]!/4/2[endnotes]/4/58[note-29]"},
+			"anchor": {"selectorMap": "/6/30!/4/2/4/58"},
 			"backRefs": [[193]]
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "List of Illustrations", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/32[loi.xhtml]!/4/2[loi]/2"}
+			"anchor": {"selectorMap": "/6/32!/4/2/2"}
 		},
 		{
 			"type": "list",
@@ -3756,24 +3516,24 @@
 								},
 								{"text": " ", "anchor": {"selectorMap": "/3"}}
 							],
-							"anchor": {"selectorMap": "/6/32[loi.xhtml]!/4/2[loi]/4/2/2"}
+							"anchor": {"selectorMap": "/6/32!/4/2/4/2/2"}
 						}
 					],
-					"anchor": {"selectorMap": "/6/32[loi.xhtml]!/4/2[loi]/4/2"}
+					"anchor": {"selectorMap": "/6/32!/4/2/4/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/32[loi.xhtml]!/4/2[loi]/4"},
+			"anchor": {"selectorMap": "/6/32!/4/2/4"},
 			"ordered": true
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Colophon", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/4/2[colophon]/2/2"}
+			"anchor": {"selectorMap": "/6/34!/4/2/2/2"}
 		},
 		{
 			"type": "image",
 			"content": [{"text": "The Standard Ebooks logo."}],
-			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/4/2[colophon]/2/4"}
+			"anchor": {"selectorMap": "/6/34!/4/2/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -3799,7 +3559,7 @@
 				},
 				{"text": ".", "anchor": {"selectorMap": "/15"}}
 			],
-			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/4/2[colophon]/4"}
+			"anchor": {"selectorMap": "/6/34!/4/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -3858,7 +3618,7 @@
 				},
 				{"text": ".", "anchor": {"selectorMap": "/35"}}
 			],
-			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/4/2[colophon]/6"}
+			"anchor": {"selectorMap": "/6/34!/4/2/6"}
 		},
 		{
 			"type": "paragraph",
@@ -3906,7 +3666,7 @@
 				},
 				{"text": ".", "anchor": {"selectorMap": "/31"}}
 			],
-			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/4/2[colophon]/8"}
+			"anchor": {"selectorMap": "/6/34!/4/2/8"}
 		},
 		{
 			"type": "paragraph",
@@ -3945,7 +3705,7 @@
 				},
 				{"text": ".", "anchor": {"selectorMap": "/23"}}
 			],
-			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/4/2[colophon]/10"}
+			"anchor": {"selectorMap": "/6/34!/4/2/10"}
 		},
 		{
 			"type": "paragraph",
@@ -3961,12 +3721,12 @@
 				},
 				{"text": ".", "anchor": {"selectorMap": "/3"}}
 			],
-			"anchor": {"selectorMap": "/6/34[colophon.xhtml]!/4/2[colophon]/12"}
+			"anchor": {"selectorMap": "/6/34!/4/2/12"}
 		},
 		{
 			"type": "heading",
 			"content": [{"text": "Uncopyright", "anchor": {"selectorMap": "/1"}}],
-			"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/4/2[uncopyright]/2"}
+			"anchor": {"selectorMap": "/6/36!/4/2/2"}
 		},
 		{
 			"type": "blockquote",
@@ -3992,10 +3752,10 @@
 						},
 						{"text": " ", "anchor": {"selectorMap": "/11"}}
 					],
-					"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/4/2[uncopyright]/4/2"}
+					"anchor": {"selectorMap": "/6/36!/4/2/4/2"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/4/2[uncopyright]/4"}
+			"anchor": {"selectorMap": "/6/36!/4/2/4"}
 		},
 		{
 			"type": "paragraph",
@@ -4007,7 +3767,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/4/2[uncopyright]/6"}
+			"anchor": {"selectorMap": "/6/36!/4/2/6"}
 		},
 		{
 			"type": "paragraph",
@@ -4017,7 +3777,7 @@
 					"anchor": {"selectorMap": "/1"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/4/2[uncopyright]/8"}
+			"anchor": {"selectorMap": "/6/36!/4/2/8"}
 		},
 		{
 			"type": "paragraph",
@@ -4036,7 +3796,7 @@
 					"anchor": {"selectorMap": "/3"}
 				}
 			],
-			"anchor": {"selectorMap": "/6/36[uncopyright.xhtml]!/4/2[uncopyright]/10"}
+			"anchor": {"selectorMap": "/6/36!/4/2/10"}
 		}
 	],
 	"pageMappingType": "locations",

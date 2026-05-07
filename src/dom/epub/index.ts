@@ -104,7 +104,7 @@ export function getEpubStructure(arrayBuffer: ArrayBuffer): StructuredDocumentTe
 		}
 
 		let doc = parseXML(xhtml);
-		let { blocks, idMap, links, pageMarkers } = convertSection(doc, spineStep, i, idref);
+		let { blocks, idMap, links, pageMarkers } = convertSection(doc, spineStep, i);
 
 		blocksBySection.push(blocks);
 		markersBySection.push(pageMarkers);

@@ -57,13 +57,13 @@ export interface ConvertResult {
 /**
  * Convert an XHTML document (htmlparser2 tree) into structured text blocks.
  */
-export function convertSection(doc: Document, spineStep: number, spineIndex: number, idref: string): ConvertResult {
+export function convertSection(doc: Document, spineStep: number, spineIndex: number): ConvertResult {
 	let body = queryTag(doc, 'body');
 	if (!body) {
 		return { blocks: [], idMap: new Map(), links: [], pageMarkers: [] };
 	}
 
-	let cfiBase = generateCFIBase(spineStep, spineIndex, idref);
+	let cfiBase = generateCFIBase(spineStep, spineIndex);
 	let idMap = new Map<string, IdInfo>();
 	let links: LinkRecord[] = [];
 	let pageMarkers: PageMarker[] = [];
