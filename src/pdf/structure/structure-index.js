@@ -149,14 +149,14 @@ class StructureIndex {
 
 		let topLevels = [];
 		let seenTopLevels = new Set();
-		let page = this.structure?.pages?.[pageIndex];
+		let page = this.structure?.catalog?.pages?.[pageIndex];
 		for (let range of page?.contentRanges || []) {
-			if (!range.start?.ref || !range.end?.ref) {
+			let startTopLevel = range?.[0]?.[0];
+			let endTopLevel = range?.[1]?.[0];
+			if (!Number.isInteger(startTopLevel) || !Number.isInteger(endTopLevel)) {
 				continue;
 			}
 
-			let startTopLevel = range.start.ref[0];
-			let endTopLevel = range.end.ref[0];
 			if (Number.isInteger(startTopLevel) && !seenTopLevels.has(startTopLevel)) {
 				seenTopLevels.add(startTopLevel);
 				topLevels.push(startTopLevel);

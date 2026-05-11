@@ -1,35 +1,39 @@
 (async function () {
   try {
-    function assertStructure(result, type) {
-      assert(result, type + ' should return a result');
-      assert(result.processor && result.processor.type === type, type + ' processor type');
-      assert(result.schemaVersion, type + ' should have schemaVersion');
-      assert(Array.isArray(result.pages), type + ' pages should be array');
-      assert(result.pages.length > 0, type + ' should have pages');
-      assert(Array.isArray(result.content), type + ' content should be array');
-      assert(result.content.length > 0, type + ' should have content blocks');
-      assert(result.content[0].type, type + ' block should have type');
+    var TEST_SOURCE_HASH = '00000000000000000000000000000000';
+
+    function assertSdtPack(result, type) {
+      assert(result && result.buf, type + ' should return a packed result');
+      assert(result.buf.byteLength > 100, type + ' pack should be non-empty');
+      var bytes = new Uint8Array(result.buf, 0, 8);
+      var magic = [0x89, 0x53, 0x44, 0x54, 0x0d, 0x0a, 0x1a, 0x0a];
+      for (var i = 0; i < magic.length; i++) {
+        assert(bytes[i] === magic[i], type + ' should return SDT pack');
+      }
     }
 
     var pdf = loadPDF('test/fixtures/pdf/full/1.pdf');
     var pdfResult = await worker.getStructuredDocumentText(pdf, {
       contentType: 'application/pdf',
       password: '',
-      dataProvider
+      dataProvider,
+      sourceHash: TEST_SOURCE_HASH
     });
-    assertStructure(pdfResult, 'pdf');
+    assertSdtPack(pdfResult, 'pdf');
 
     var epub = loadBytes('test/fixtures/epub/1.epub');
     var epubResult = await worker.getStructuredDocumentText(epub, {
-      contentType: 'application/epub+zip'
+      contentType: 'application/epub+zip',
+      sourceHash: TEST_SOURCE_HASH
     });
-    assertStructure(epubResult, 'epub');
+    assertSdtPack(epubResult, 'epub');
 
     var snapshot = loadBytes('test/fixtures/snapshot/1.html');
     var snapshotResult = await worker.getStructuredDocumentText(snapshot, {
-      contentType: 'text/html'
+      contentType: 'text/html',
+      sourceHash: TEST_SOURCE_HASH
     });
-    assertStructure(snapshotResult, 'snapshot');
+    assertSdtPack(snapshotResult, 'snapshot');
 
     reportPass();
   }

@@ -2,6 +2,7 @@ import '../../../scripts/pdfjs-setup.js';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import * as worker from 'document-worker';
+import { openStructuredDocumentTextPack } from '../../../structured-document-text/src/pack/reader.js';
 import {
 	mainAbsentExportNames,
 	mainExportNames,
@@ -17,6 +18,7 @@ import {
 import { dataProvider } from '../../helpers/data-provider.js';
 import {
 	readFixtureArrayBuffer,
+	readFixtureSourceHash,
 	sampleCitaviAnnotations,
 	sampleMendeleyAnnotations,
 	sampleRenderableAnnotations,
@@ -34,6 +36,14 @@ function pdf1() {
 
 function pdf2() {
 	return readFixtureArrayBuffer('pdf', 'full', '2.pdf');
+}
+
+async function assertPackedStructuredDocumentText(result, type) {
+	assert.ok(result.buf instanceof ArrayBuffer);
+	let reader = await openStructuredDocumentTextPack(result.buf);
+	let structure = await reader.materialize();
+	assertStructuredDocumentText(structure, type);
+	return structure;
 }
 
 // This runtime suite assumes `npm run build` has populated build/ with worker assets.
@@ -125,19 +135,47 @@ describe('package main export in Node.js', { timeout: 120000 }, () => {
 			contentType: 'application/pdf',
 			password: '',
 			dataProvider,
+			sourceHash: readFixtureSourceHash('pdf', 'full', '1.pdf'),
 		});
-		assertStructuredDocumentText(pdfResult, 'pdf');
+		await assertPackedStructuredDocumentText(pdfResult, 'pdf');
 
 		let epubResult = await worker.getStructuredDocumentText(
 			readFixtureArrayBuffer('epub', '1.epub'),
-			{ contentType: 'application/epub+zip' }
+			{
+				contentType: 'application/epub+zip',
+				sourceHash: readFixtureSourceHash('epub', '1.epub'),
+			}
 		);
-		assertStructuredDocumentText(epubResult, 'epub');
+		await assertPackedStructuredDocumentText(epubResult, 'epub');
 
 		let snapshotResult = await worker.getStructuredDocumentText(
 			readFixtureArrayBuffer('snapshot', '1.html'),
-			{ contentType: 'text/html' }
+			{
+				contentType: 'text/html',
+				sourceHash: readFixtureSourceHash('snapshot', '1.html'),
+			}
 		);
-		assertStructuredDocumentText(snapshotResult, 'snapshot');
+		await assertPackedStructuredDocumentText(snapshotResult, 'snapshot');
+
+		let snapshotXhtmlStructure = await assertPackedStructuredDocumentText(
+			await worker.getStructuredDocumentText(
+				readFixtureArrayBuffer('snapshot', '1.html'),
+				{
+					contentType: 'application/xhtml+xml',
+					sourceHash: readFixtureSourceHash('snapshot', '1.html'),
+				}
+			),
+			'snapshot'
+		);
+		assert.equal(snapshotXhtmlStructure.metadata.source.contentType, 'application/xhtml+xml');
+
+		await assert.rejects(
+			() => worker.getStructuredDocumentText(
+				readFixtureArrayBuffer('snapshot', '1.html'),
+				{ contentType: 'text/html' }
+			),
+			/sourceHash/
+		);
+
 	});
 });

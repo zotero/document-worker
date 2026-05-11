@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { Buffer } from 'node:buffer';
 import {
+	readFixtureSourceHash,
 	sampleCitaviAnnotations,
 	sampleMendeleyAnnotations,
 	sampleRenderableAnnotations,
@@ -11,16 +12,6 @@ import {
 	pdfTextCropRenderContract,
 } from '../../helpers/render-assertions.js';
 import { close, createStaticServer, listen } from './server.js';
-
-function assertStructure(result, type) {
-	expect(result.processor?.type).toBe(type);
-	expect(result.schemaVersion).toBe('1.0.0-draft');
-	expect(Array.isArray(result.pages)).toBe(true);
-	expect(result.pages.length).toBeGreaterThan(0);
-	expect(Array.isArray(result.content)).toBe(true);
-	expect(result.content.length).toBeGreaterThan(0);
-	expect(result.content[0].type).toBeTruthy();
-}
 
 // This runtime suite assumes `npm run build` has populated build/ with worker assets.
 test('browser Web Worker protocol supports public document APIs', async ({ page }) => {
@@ -36,6 +27,11 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 			mendeleyAnnotations: sampleMendeleyAnnotations(),
 			renderableAnnotations: sampleRenderableAnnotations(),
 			zoteroAnnotations: sampleZoteroAnnotations(),
+			sourceHashes: {
+				pdf: readFixtureSourceHash('pdf', 'full', '1.pdf'),
+				epub: readFixtureSourceHash('epub', '1.epub'),
+				snapshot: readFixtureSourceHash('snapshot', '1.html'),
+			},
 		};
 
 		let result = await page.evaluate(async (samples) => {
@@ -84,8 +80,12 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 				if (!pendingCall) {
 					return;
 				}
-				pending.delete(message.responseID);
+				if (message.isPartial) {
+					pendingCall.onPartial?.(message.data);
+					return;
+				}
 
+				pending.delete(message.responseID);
 				if (message.error) {
 					pendingCall.reject(new Error(message.error.message || String(message.error)));
 				}
@@ -94,10 +94,10 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 				}
 			};
 
-			function callWorker(action, data, transfer = []) {
+			function callWorker(action, data, transfer = [], onPartial = null) {
 				return new Promise((resolve, reject) => {
 					const id = ++nextID;
-					pending.set(id, { resolve, reject });
+					pending.set(id, { resolve, reject, onPartial });
 					worker.postMessage({ id, action, data }, transfer);
 				});
 			}
@@ -105,6 +105,18 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 			function callWorkerWithBuffer(action, sourceBuf, data = {}) {
 				const buf = sourceBuf.slice(0);
 				return callWorker(action, { buf, ...data }, [buf]);
+			}
+
+			async function callWorkerStreamingWithBuffer(action, sourceBuf, data = {}) {
+				const buf = sourceBuf.slice(0);
+				const partials = [];
+				const final = await callWorker(
+					action,
+					{ buf, ...data },
+					[buf],
+					chunk => partials.push(chunk)
+				);
+				return { final, partials };
 			}
 
 			async function fetchArrayBuffer(path) {
@@ -119,10 +131,19 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 				return new TextDecoder().decode(new Uint8Array(buf, 0, 4)) === '%PDF';
 			}
 
+			function isSdtBuffer(buf) {
+				const bytes = new Uint8Array(buf, 0, 8);
+				const magic = [0x89, 0x53, 0x44, 0x54, 0x0d, 0x0a, 0x1a, 0x0a];
+				return magic.every((value, index) => bytes[index] === value);
+			}
+
 			const pdf = await fetchArrayBuffer('/test/fixtures/pdf/full/1.pdf');
 			const pdf2 = await fetchArrayBuffer('/test/fixtures/pdf/full/2.pdf');
 			const epub = await fetchArrayBuffer('/test/fixtures/epub/1.epub');
 			const snapshot = await fetchArrayBuffer('/test/fixtures/snapshot/1.html');
+			const pdfHash = samples.sourceHashes.pdf;
+			const epubHash = samples.sourceHashes.epub;
+			const snapshotHash = samples.sourceHashes.snapshot;
 
 			const imported = await callWorkerWithBuffer('pdf.importAnnotations', pdf, {
 				existingAnnotations: [],
@@ -165,18 +186,30 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 				password: '',
 			});
 
-			const pdfStructure = await callWorkerWithBuffer('getStructuredDocumentText', pdf, {
+			const packedPdfStructure = await callWorkerWithBuffer('getStructuredDocumentText', pdf, {
 				contentType: 'application/pdf',
 				password: '',
+				sourceHash: pdfHash,
 			});
 
-			const epubStructure = await callWorkerWithBuffer('getStructuredDocumentText', epub, {
+			const packedEpubStructure = await callWorkerWithBuffer('getStructuredDocumentText', epub, {
 				contentType: 'application/epub+zip',
+				sourceHash: epubHash,
 			});
 
-			const snapshotStructure = await callWorkerWithBuffer('getStructuredDocumentText', snapshot, {
+			const packedSnapshotStructure = await callWorkerWithBuffer('getStructuredDocumentText', snapshot, {
 				contentType: 'text/html',
+				sourceHash: snapshotHash,
 			});
+
+			const streamedPdfJSON = await callWorkerStreamingWithBuffer('getStructuredDocumentTextJSON', pdf, {
+				contentType: 'application/pdf',
+				password: '',
+				sourceHash: pdfHash,
+				streaming: true,
+				batchSize: 1,
+			});
+			const streamedFinalChunk = streamedPdfJSON.partials[streamedPdfJSON.partials.length - 1];
 
 			const renderedAnnotationCount = await callWorkerWithBuffer('pdf.renderAnnotations', pdf, {
 				libraryID: 1,
@@ -205,9 +238,15 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 				recognizerData,
 				mendeleyAnnotations,
 				citaviAnnotations,
-				pdfStructure,
-				epubStructure,
-				snapshotStructure,
+				packedPdfIsSdt: isSdtBuffer(packedPdfStructure.buf),
+				packedPdfByteLength: packedPdfStructure.buf.byteLength,
+				packedEpubIsSdt: isSdtBuffer(packedEpubStructure.buf),
+				packedEpubByteLength: packedEpubStructure.buf.byteLength,
+				packedSnapshotIsSdt: isSdtBuffer(packedSnapshotStructure.buf),
+				packedSnapshotByteLength: packedSnapshotStructure.buf.byteLength,
+				jsonStreamingFinalIsNull: streamedPdfJSON.final === null,
+				jsonStreamingKinds: streamedPdfJSON.partials.map(chunk => chunk.kind),
+				jsonStreamingProcessor: streamedFinalChunk?.structure?.metadata?.processor?.type,
 				renderedAnnotationCount,
 				renderedAnnotationPNGs,
 				renderedAreaPNG: arrayBufferToBase64(renderedArea.buf),
@@ -229,9 +268,16 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 		expect(result.mendeleyAnnotations.length).toBeGreaterThan(0);
 		expect(Array.isArray(result.citaviAnnotations)).toBe(true);
 		expect(result.citaviAnnotations.length).toBeGreaterThan(0);
-		assertStructure(result.pdfStructure, 'pdf');
-		assertStructure(result.epubStructure, 'epub');
-		assertStructure(result.snapshotStructure, 'snapshot');
+		expect(result.packedPdfIsSdt).toBe(true);
+		expect(result.packedPdfByteLength).toBeGreaterThan(100);
+		expect(result.packedEpubIsSdt).toBe(true);
+		expect(result.packedEpubByteLength).toBeGreaterThan(100);
+		expect(result.packedSnapshotIsSdt).toBe(true);
+		expect(result.packedSnapshotByteLength).toBeGreaterThan(100);
+		expect(result.jsonStreamingFinalIsNull).toBe(true);
+		expect(result.jsonStreamingKinds).toContain('partial');
+		expect(result.jsonStreamingKinds[result.jsonStreamingKinds.length - 1]).toBe('final');
+		expect(result.jsonStreamingProcessor).toBe('pdf');
 		expect(result.renderedAnnotationCount).toBe(1);
 		expect(result.renderedAnnotationPNGs).toHaveLength(1);
 		await assertRenderedTextCropPNG(Buffer.from(result.renderedAnnotationPNGs[0], 'base64'));

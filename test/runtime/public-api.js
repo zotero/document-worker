@@ -6,6 +6,7 @@ export const mainExportNames = [
 export const mainAbsentExportNames = [
 	'getFulltext',
 	'getStructure',
+	'getStructuredDocumentTextJSON',
 	'getEpubFulltext',
 	'getSnapshotFulltext',
 ];
@@ -34,6 +35,7 @@ export const workerActionNames = [
 	'pdf.getFulltext',
 	'pdf.getRecognizerData',
 	'getStructuredDocumentText',
+	'getStructuredDocumentTextJSON',
 	'pdf.renderAnnotations',
 	'pdf.renderArea',
 	'pdf.hasAnnotations',

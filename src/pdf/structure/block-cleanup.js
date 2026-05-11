@@ -227,7 +227,7 @@ export function mergeParagraphs(structure, mergeBlocks) {
 
 	const isDegradedExtractionPage = (pageIndex) => {
 		return Number.isInteger(pageIndex)
-			&& structure.pages?.[pageIndex]?.extractionDegraded === true;
+			&& structure.catalog.pages?.[pageIndex]?.extractionDegraded === true;
 	};
 
 	const canMergeParagraphs = (first, second) => {

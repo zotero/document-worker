@@ -1,124 +1,138 @@
 {
-	"schemaVersion": "1.0.0-draft",
-	"processor": {"type": "pdf", "version": "1.0.0-draft"},
-	"sourceContentType": "application/pdf",
-	"sourceHash": "",
+	"schemaVersion": "1.0.0",
 	"metadata": {
-		"PDFFormatVersion": "1.7",
-		"Creator": "TeX",
-		"Producer": "Zotero",
-		"CreationDate": "D:20090401163925-07'00'",
-		"ModDate": "D:20200213131800+02'00'"
-	},
-	"pages": [
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [0, 0]}, "end": {"ref": [15, 0]}},
-				{"start": {"ref": [238, 0]}, "end": {"ref": [238, 3]}},
-				{"start": {"ref": [13, 0], "offset": 331}, "end": {"ref": [13, 0], "offset": 651}},
-				{"start": {"ref": [16, 0]}, "end": {"ref": [19, 0]}}
-			],
-			"label": "1"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [20, 0]}, "end": {"ref": [32, 0]}},
-				{"start": {"ref": [28, 0], "offset": 647}, "end": {"ref": [28, 0], "offset": 778}},
-				{"start": {"ref": [33, 0]}, "end": {"ref": [36, 0]}}
-			],
-			"label": "2"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [37, 0]}, "end": {"ref": [43, 0], "offset": 191}},
-				{"start": {"ref": [43, 0], "offset": 192}, "end": {"ref": [44, 0]}}
-			],
-			"label": "3"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [{"start": {"ref": [45, 0]}, "end": {"ref": [65, 25]}}],
-			"label": "4"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [{"start": {"ref": [66, 0]}, "end": {"ref": [83, 0]}}],
-			"label": "5"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [84, 0]}, "end": {"ref": [98, 0]}},
-				{"start": {"ref": [94, 3], "offset": 224}, "end": {"ref": [94, 3], "offset": 339}},
-				{"start": {"ref": [99, 0]}, "end": {"ref": [100, 0]}}
-			],
-			"label": "6"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [101, 0]}, "end": {"ref": [112, 0]}},
-				{"start": {"ref": [109, 0], "offset": 139}, "end": {"ref": [109, 2], "offset": 103}},
-				{"start": {"ref": [113, 0]}, "end": {"ref": [119, 0]}}
-			],
-			"label": "7"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [120, 0]}, "end": {"ref": [133, 0]}},
-				{"start": {"ref": [131, 0], "offset": 202}, "end": {"ref": [131, 0], "offset": 331}},
-				{"start": {"ref": [134, 0]}, "end": {"ref": [144, 0]}}
-			],
-			"label": "8"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [{"start": {"ref": [145, 0]}, "end": {"ref": [166, 0]}}],
-			"label": "9"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [167, 0]}, "end": {"ref": [182, 3]}},
-				{"start": {"ref": [180, 0], "offset": 379}, "end": {"ref": [180, 0], "offset": 510}},
-				{"start": {"ref": [183, 0]}, "end": {"ref": [188, 26]}}
-			],
-			"label": "10"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [{"start": {"ref": [189, 0]}, "end": {"ref": [197, 0], "offset": 249}}],
-			"label": "11"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [198, 0]}, "end": {"ref": [200, 0]}},
-				{"start": {"ref": [197, 0], "offset": 250}, "end": {"ref": [197, 4], "offset": 516}},
-				{"start": {"ref": [201, 0]}, "end": {"ref": [204, 0], "offset": 190}},
-				{"start": {"ref": [204, 0], "offset": 191}, "end": {"ref": [211, 2], "offset": 140}}
-			],
-			"label": "12"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [212, 0]}, "end": {"ref": [213, 0]}},
-				{"start": {"ref": [211, 2], "offset": 141}, "end": {"ref": [211, 2], "offset": 212}},
-				{"start": {"ref": [214, 0]}, "end": {"ref": [235, 0], "offset": 254}}
-			],
-			"label": "13"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [{"start": {"ref": [235, 0], "offset": 255}, "end": {"ref": [237, 18, 0]}}],
-			"label": "14"
+		"processor": {"type": "pdf", "version": "1.0.0"},
+		"dateCreated": "2000-01-01T00:00:00.000Z",
+		"source": {
+			"contentType": "application/pdf",
+			"hash": "4b3eba8b56059fd5c4b90ff1974970aa",
+			"properties": {
+				"PDFFormatVersion": "1.7",
+				"Creator": "TeX",
+				"Producer": "Zotero",
+				"CreationDate": "D:20090401163925-07'00'",
+				"ModDate": "D:20200213131800+02'00'"
+			}
 		}
-	],
+	},
+	"catalog": {
+		"pages": [
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [
+					[[0, 0], [15, 0]],
+					[[238, 0], [238, 3]],
+					[[13, 0, 331], [13, 0, 651]],
+					[[16, 0], [19, 0]]
+				],
+				"label": "1"
+			},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [[[20, 0], [32, 0]], [[28, 0, 647], [28, 0, 778]], [[33, 0], [36, 0]]],
+				"label": "2"
+			},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [[[37, 0], [43, 0, 191]], [[43, 0, 192], [44, 0]]],
+				"label": "3"
+			},
+			{"viewRect": [0, 0, 612, 792], "contentRanges": [[[45, 0], [65, 25]]], "label": "4"},
+			{"viewRect": [0, 0, 612, 792], "contentRanges": [[[66, 0], [83, 0]]], "label": "5"},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [[[84, 0], [98, 0]], [[94, 3, 224], [94, 3, 339]], [[99, 0], [100, 0]]],
+				"label": "6"
+			},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [[[101, 0], [112, 0]], [[109, 0, 139], [109, 2, 103]], [[113, 0], [119, 0]]],
+				"label": "7"
+			},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [[[120, 0], [133, 0]], [[131, 0, 202], [131, 0, 331]], [[134, 0], [144, 0]]],
+				"label": "8"
+			},
+			{"viewRect": [0, 0, 612, 792], "contentRanges": [[[145, 0], [166, 0]]], "label": "9"},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [[[167, 0], [182, 3]], [[180, 0, 379], [180, 0, 510]], [[183, 0], [188, 26]]],
+				"label": "10"
+			},
+			{"viewRect": [0, 0, 612, 792], "contentRanges": [[[189, 0], [197, 0, 249]]], "label": "11"},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [
+					[[198, 0], [200, 0]],
+					[[197, 0, 250], [197, 4, 516]],
+					[[201, 0], [204, 0, 190]],
+					[[204, 0, 191], [211, 2, 140]]
+				],
+				"label": "12"
+			},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [
+					[[212, 0], [213, 0]],
+					[[211, 2, 141], [211, 2, 212]],
+					[[214, 0], [235, 0, 254]]
+				],
+				"label": "13"
+			},
+			{"viewRect": [0, 0, 612, 792], "contentRanges": [[[235, 0, 255], [237, 18, 0]]], "label": "14"}
+		],
+		"outline": [
+			{"title": "Trace-based Just-in-Time Type Specialization for Dynamic Languages", "ref": [0]},
+			{"title": "Abstract", "ref": [7]},
+			{"title": "1. Introduction", "ref": [12]},
+			{"title": "2. Overview: Example Tracing Run", "ref": [33]},
+			{
+				"title": "3. Trace Trees",
+				"ref": [49],
+				"children": [
+					{"title": "3.1 Traces", "ref": [51]},
+					{"title": "3.2 Trace Trees", "ref": [72]},
+					{"title": "3.3 Blacklisting", "ref": [85]}
+				]
+			},
+			{
+				"title": "4. Nested Trace Tree Formation",
+				"ref": [93],
+				"children": [
+					{"title": "4.1 Nesting Algorithm", "ref": [105]},
+					{"title": "4.2 Blacklisting with Nesting", "ref": [114]}
+				]
+			},
+			{
+				"title": "5. Trace Tree Optimization",
+				"ref": [118],
+				"children": [{"title": "5.1 Optimizations", "ref": [120]}]
+			},
+			{
+				"title": "6. Implementation",
+				"ref": [135],
+				"children": [
+					{"title": "6.1 Calling Compiled Traces", "ref": [141]},
+					{"title": "5.2 Register Allocation", "ref": [129]},
+					{"title": "6.2 Trace Stitching", "ref": [147]},
+					{"title": "6.3 Trace Recording", "ref": [152]},
+					{"title": "6.4 Preemption", "ref": [163]},
+					{"title": "6.5 Calling External Functions", "ref": [167]}
+				]
+			},
+			{
+				"title": "7. Evaluation",
+				"ref": [183],
+				"children": [{"title": "6.6 Correctness", "ref": [178]}]
+			},
+			{"title": "8. Related Work", "ref": [205]},
+			{"title": "9. Conclusions", "ref": [227]},
+			{"title": "10. Future Work", "ref": [230]},
+			{"title": "Acknowledgments", "ref": [233]},
+			{"title": "References", "ref": [236]}
+		]
+	},
 	"content": [
 		{
 			"type": "heading",
@@ -5081,55 +5095,5 @@
 				}
 			]
 		}
-	],
-	"outline": [
-		{"title": "Trace-based Just-in-Time Type Specialization for Dynamic Languages", "ref": [0]},
-		{"title": "Abstract", "ref": [7]},
-		{"title": "1. Introduction", "ref": [12]},
-		{"title": "2. Overview: Example Tracing Run", "ref": [33]},
-		{
-			"title": "3. Trace Trees",
-			"ref": [49],
-			"children": [
-				{"title": "3.1 Traces", "ref": [51]},
-				{"title": "3.2 Trace Trees", "ref": [72]},
-				{"title": "3.3 Blacklisting", "ref": [85]}
-			]
-		},
-		{
-			"title": "4. Nested Trace Tree Formation",
-			"ref": [93],
-			"children": [
-				{"title": "4.1 Nesting Algorithm", "ref": [105]},
-				{"title": "4.2 Blacklisting with Nesting", "ref": [114]}
-			]
-		},
-		{
-			"title": "5. Trace Tree Optimization",
-			"ref": [118],
-			"children": [{"title": "5.1 Optimizations", "ref": [120]}]
-		},
-		{
-			"title": "6. Implementation",
-			"ref": [135],
-			"children": [
-				{"title": "6.1 Calling Compiled Traces", "ref": [141]},
-				{"title": "5.2 Register Allocation", "ref": [129]},
-				{"title": "6.2 Trace Stitching", "ref": [147]},
-				{"title": "6.3 Trace Recording", "ref": [152]},
-				{"title": "6.4 Preemption", "ref": [163]},
-				{"title": "6.5 Calling External Functions", "ref": [167]}
-			]
-		},
-		{
-			"title": "7. Evaluation",
-			"ref": [183],
-			"children": [{"title": "6.6 Correctness", "ref": [178]}]
-		},
-		{"title": "8. Related Work", "ref": [205]},
-		{"title": "9. Conclusions", "ref": [227]},
-		{"title": "10. Future Work", "ref": [230]},
-		{"title": "Acknowledgments", "ref": [233]},
-		{"title": "References", "ref": [236]}
 	]
 }

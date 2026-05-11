@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -16,6 +17,10 @@ export function readFixture(...parts) {
 export function readFixtureArrayBuffer(...parts) {
 	let buf = readFixture(...parts);
 	return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+}
+
+export function readFixtureSourceHash(...parts) {
+	return crypto.createHash('md5').update(readFixture(...parts)).digest('hex');
 }
 
 export function sampleZoteroAnnotations() {

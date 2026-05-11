@@ -6,14 +6,26 @@ import { fileURLToPath } from 'node:url';
 import stringify from 'json-stringify-pretty-compact';
 import { parseDocument } from 'htmlparser2';
 import { getSnapshotStructure, getSnapshotFulltext } from '../../src/dom/snapshot/index';
+import { readFixtureSourceHash } from '../helpers/fixtures.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const snapshotsDir = path.join(__dirname, '..', 'fixtures', 'snapshot');
+const NORMALIZED_DATE_CREATED = '2000-01-01T00:00:00.000Z';
 
 function load(name) {
 	let filePath = path.join(snapshotsDir, name);
 	let buf = fs.readFileSync(filePath);
 	return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+}
+
+function extractSnapshotStructure(name, contentType = 'text/html') {
+	let buf = load(name);
+	return getSnapshotStructure(buf, contentType, { sourceHash: readFixtureSourceHash('snapshot', name) });
+}
+
+function extractSnapshotFulltext(name, contentType = 'text/html', options = {}) {
+	let buf = load(name);
+	return getSnapshotFulltext(buf, contentType, options);
 }
 
 // Flatten an outline tree into an array of titles (in pre-order).
@@ -128,43 +140,43 @@ function forEachBlock(blocks, fn) {
 describe('Snapshot SDT: document shape', () => {
 	let structure;
 	before(() => {
-		structure = getSnapshotStructure(load('2.html'), 'text/html');
+		structure = extractSnapshotStructure('2.html');
 	});
 
 	it('identifies as a snapshot processor result', () => {
-		assert.equal(structure.processor.type, 'snapshot');
-		assert.equal(typeof structure.processor.version, 'string');
+		assert.equal(structure.metadata.processor.type, 'snapshot');
+		assert.equal(typeof structure.metadata.processor.version, 'string');
 	});
 
 	it('records the source content type', () => {
-		assert.equal(structure.sourceContentType, 'text/html');
+		assert.equal(structure.metadata.source.contentType, 'text/html');
 	});
 
 	it('contains a single page with at least one content range', () => {
-		assert.equal(structure.pages.length, 1);
-		assert.ok(structure.pages[0].contentRanges.length > 0);
+		assert.equal(structure.catalog.pages.length, 1);
+		assert.ok(structure.catalog.pages[0].contentRanges.length > 0);
 	});
 
 	it('reports file size and character count', () => {
-		assert.ok(structure.fileSize > 0);
-		assert.ok(structure.characterCount > 0);
+		assert.ok(structure.metadata.source.fileSize > 0);
+		assert.ok(structure.metadata.characterCount > 0);
 	});
 
 	it('extracts <title> and <meta name="author"> into metadata', () => {
-		assert.equal(structure.metadata.title, 'A Long-Form Article About Widgets');
-		assert.equal(structure.metadata.author, 'Jane Doe');
+		assert.equal(structure.metadata.source.properties.title, 'A Long-Form Article About Widgets');
+		assert.equal(structure.metadata.source.properties.author, 'Jane Doe');
 	});
 
 	it('accepts application/xhtml+xml', () => {
-		let xhtml = getSnapshotStructure(load('2.html'), 'application/xhtml+xml');
-		assert.equal(xhtml.sourceContentType, 'application/xhtml+xml');
+		let xhtml = extractSnapshotStructure('2.html', 'application/xhtml+xml');
+		assert.equal(xhtml.metadata.source.contentType, 'application/xhtml+xml');
 	});
 });
 
 describe('Snapshot SDT: block types', () => {
 	let structure;
 	before(() => {
-		structure = getSnapshotStructure(load('1.html'), 'text/html');
+		structure = extractSnapshotStructure('1.html');
 	});
 
 	it('emits headings for h1-h6', () => {
@@ -237,30 +249,30 @@ describe('Snapshot SDT: block types', () => {
 describe('Snapshot SDT: outline', () => {
 	let structure;
 	before(() => {
-		structure = getSnapshotStructure(load('2.html'), 'text/html');
+		structure = extractSnapshotStructure('2.html');
 	});
 
 	it('builds a hierarchy from heading levels', () => {
-		assert.equal(structure.outline[0].title, 'A Deep Dive Into Widgets');
-		let h2s = structure.outline[0].children.map(c => c.title);
+		assert.equal(structure.catalog.outline[0].title, 'A Deep Dive Into Widgets');
+		let h2s = structure.catalog.outline[0].children.map(c => c.title);
 		assert.deepEqual(
 			h2s,
 			['The History of Widgets', 'Construction', 'Applications', 'Looking Forward'],
 		);
-		let construction = structure.outline[0].children.find(c => c.title === 'Construction');
+		let construction = structure.catalog.outline[0].children.find(c => c.title === 'Construction');
 		assert.equal(construction.children[0].title, 'Finishing and Quality Control');
 		assert.equal(construction.children[0].level, 3);
 	});
 
 	it('points each outline entry at its heading block by index', () => {
-		let top = structure.outline[0];
+		let top = structure.catalog.outline[0];
 		let block = structure.content[top.ref[0]];
 		assert.equal(block.type, 'heading');
 		assert.equal(allText([block]).trim(), 'A Deep Dive Into Widgets');
 	});
 
 	it('omits headings that Readability filtered out of the article', () => {
-		let titles = outlineTitles(structure.outline);
+		let titles = outlineTitles(structure.catalog.outline);
 		// <aside class="related-posts"><h2>Related Articles</h2>
 		assert.ok(!titles.includes('Related Articles'));
 		// <section class="comments" id="comments"><h2>Comments (42)</h2>
@@ -273,7 +285,7 @@ describe('Snapshot SDT: outline', () => {
 describe('Snapshot SDT: Readability filtering', () => {
 	let structure;
 	before(() => {
-		structure = getSnapshotStructure(load('2.html'), 'text/html');
+		structure = extractSnapshotStructure('2.html');
 	});
 
 	it('preserves the entire article body verbatim', () => {
@@ -327,7 +339,7 @@ describe('Snapshot SDT: selectors resolve against the original document', () => 
 	let structure;
 	let body;
 	before(() => {
-		structure = getSnapshotStructure(load('2.html'), 'text/html');
+		structure = extractSnapshotStructure('2.html');
 		body = parseBody('2.html');
 	});
 
@@ -400,11 +412,11 @@ describe('Snapshot SDT: short document fallback', () => {
 	// The tests below exercise what ships out of that path.
 	let structure;
 	before(() => {
-		structure = getSnapshotStructure(load('1.html'), 'text/html');
+		structure = extractSnapshotStructure('1.html');
 	});
 
 	it('still surfaces the article-level outline', () => {
-		let titles = outlineTitles(structure.outline);
+		let titles = outlineTitles(structure.catalog.outline);
 		assert.ok(titles.includes('Main Title'));
 		assert.ok(titles.includes('Section One'));
 		assert.ok(titles.includes('Section Two'));
@@ -430,21 +442,21 @@ describe('Snapshot SDT: short document fallback', () => {
 
 describe('Snapshot SDT: fulltext extraction', () => {
 	it('concatenates article text', () => {
-		let r = getSnapshotFulltext(load('2.html'), 'text/html');
+		let r = extractSnapshotFulltext('2.html');
 		assert.match(r.text, /A Deep Dive Into Widgets/);
 		assert.match(r.text, /The first widgets emerged/);
 		assert.equal(r.totalPages, 1);
 	});
 
 	it('omits filtered-out boilerplate', () => {
-		let r = getSnapshotFulltext(load('2.html'), 'text/html');
+		let r = extractSnapshotFulltext('2.html');
 		assert.doesNotMatch(r.text, /SPONSORED/);
 		assert.doesNotMatch(r.text, /All rights reserved/);
 	});
 
-	it('accepts a precomputed structure', () => {
+	it('accepts a precomputed structure without sourceHash', () => {
 		let buf = load('2.html');
-		let s = getSnapshotStructure(buf, 'text/html');
+		let s = extractSnapshotStructure('2.html');
 		let r = getSnapshotFulltext(buf, 'text/html', { structure: s });
 		assert.match(r.text, /A Deep Dive Into Widgets/);
 	});
@@ -461,8 +473,8 @@ describe('Snapshot SDT: golden fixture comparison', () => {
 		let snapshotPath = path.join(snapshotsDir, name + '.json');
 
 		it(file, () => {
-			let result = getSnapshotStructure(load(file), 'text/html');
-			delete result.dateCreated;
+			let result = extractSnapshotStructure(file);
+			result.metadata.dateCreated = NORMALIZED_DATE_CREATED;
 			let json = stringify(result, { indent: '\t', maxLength: 100 });
 
 			if (process.env.UPDATE_FIXTURES) {

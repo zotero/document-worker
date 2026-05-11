@@ -339,8 +339,8 @@ export function findPageForBlock(pages: PageInfo[], content: ContentBlockNode[],
 	for (let i = pages.length - 1; i >= 0; i--) {
 		let ranges = pages[i].contentRanges;
 		if (ranges && ranges.length > 0) {
-			let startRef = ranges[0].start.ref[0];
-			if (startRef <= globalBlockIdx) {
+			let startRef = ranges[0]?.[0]?.[0];
+			if (typeof startRef === 'number' && startRef <= globalBlockIdx) {
 				return i;
 			}
 		}

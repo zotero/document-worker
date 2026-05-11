@@ -17,28 +17,58 @@ import type { StructuredDocumentText, OutlineItem } from '../../../structured-do
 import { cssEscape } from "./cssEscape";
 import { filterForReadability, isInKeptSetIncludingAncestors } from './readability';
 
-const SCHEMA_VERSION = '1.0.0-draft';
-const PROCESSOR_VERSION = '1.0.0-draft';
+const SCHEMA_VERSION = '1.0.0';
+const PROCESSOR_VERSION = '1.0.0';
 
 interface FulltextOptions {
 	structure?: StructuredDocumentText;
 }
+
+interface StructureOptions {
+	sourceHash: string;
+}
+
+type InternalStructuredDocumentText = Omit<StructuredDocumentText, 'metadata'> & {
+	metadata: Omit<StructuredDocumentText['metadata'], 'source'> & {
+		source: Omit<StructuredDocumentText['metadata']['source'], 'hash'> & {
+			hash?: string;
+		};
+	};
+};
 
 // Entry points:
 
 export function getSnapshotStructure(
 	buf: ArrayBuffer,
 	contentType: string,
+	options: StructureOptions,
 ): StructuredDocumentText {
-    let sourceContentType = ensureValidContentType(contentType);
+	return buildSnapshotStructure(buf, contentType, options.sourceHash);
+}
 
-    let decoder = new TextDecoder('utf-8');
+function buildSnapshotStructure(
+	buf: ArrayBuffer,
+	contentType: string,
+	sourceHash: string,
+): StructuredDocumentText;
+function buildSnapshotStructure(
+	buf: ArrayBuffer,
+	contentType: string,
+): InternalStructuredDocumentText;
+function buildSnapshotStructure(
+	buf: ArrayBuffer,
+	contentType: string,
+	sourceHash?: string,
+): InternalStructuredDocumentText {
+	let sourceContentType = ensureValidContentType(contentType);
+
+	let decoder = new TextDecoder('utf-8');
 	let html = decoder.decode(new Uint8Array(buf));
 	let doc = parseXML(html, { xmlMode: false });
 
 	let body = queryTag(doc, 'body');
 	if (!body) {
-		return emptyStructure(contentType, buf.byteLength);
+		return emptyStructure(sourceContentType, buf.byteLength, sourceHash);
 	}
 
 	let kept: Set<Element> | null;
@@ -67,7 +97,7 @@ export function getSnapshotStructure(
 			if (!value) return undefined;
 
 			// Compute relative textMap, storing a suffix after the block's
-            // CSS selector.
+			// CSS selector.
 			// Text parent selector always starts with the block selector
 			// (since it walks up through the same ancestors), unless an
 			// inline element or intermediate ancestor has an id attribute
@@ -114,17 +144,23 @@ export function getSnapshotStructure(
 
 	return {
 		schemaVersion: SCHEMA_VERSION,
-		processor: { type: 'snapshot' as const, version: PROCESSOR_VERSION },
-		dateCreated: new Date().toISOString(),
-		sourceContentType,
-		sourceHash: '',
-		metadata: extractMetadata(doc),
-		pages: [{ contentRanges }],
+		metadata: {
+			processor: { type: 'snapshot' as const, version: PROCESSOR_VERSION },
+			dateCreated: new Date().toISOString(),
+			source: {
+				contentType: sourceContentType,
+				...(typeof sourceHash === 'string' ? { hash: sourceHash } : {}),
+				properties: extractMetadata(doc),
+				fileSize: buf.byteLength,
+			},
+			...(charCount > 0 ? { characterCount: charCount } : {}),
+		},
+		catalog: {
+			pages: [{ contentRanges }],
+			outline,
+		},
 		content: blocks,
-		...(outline.length > 0 ? { outline } : {}),
-		...(charCount > 0 ? { characterCount: charCount } : {}),
-		fileSize: buf.byteLength,
-	} satisfies StructuredDocumentText;
+	};
 }
 
 export function getSnapshotFulltext(
@@ -132,7 +168,9 @@ export function getSnapshotFulltext(
 	contentType: string,
 	options: FulltextOptions = {},
 ): { text: string; totalPages: number } {
-	let structure = options.structure || getSnapshotStructure(buf, contentType);
+	let structure = options.structure
+		? options.structure
+		: buildSnapshotStructure(buf, contentType);
 	let text = getFulltextFromStructuredText(structure, [0]);
 	return { text, totalPages: 1 };
 }
@@ -344,25 +382,35 @@ function getUniqueSelector(el: Element, body: Element): string | null {
 	return selector || null;
 }
 
-function emptyStructure(contentType: string, fileSize: number): StructuredDocumentText {
-    let sourceContentType = ensureValidContentType(contentType);
+function emptyStructure(
+	sourceContentType: 'text/html' | 'application/xhtml+xml',
+	fileSize: number,
+	sourceHash?: string,
+): InternalStructuredDocumentText {
 	return {
 		schemaVersion: SCHEMA_VERSION,
-		processor: { type: 'snapshot' as const, version: PROCESSOR_VERSION },
-		dateCreated: new Date().toISOString(),
-		sourceContentType,
-		sourceHash: '',
-		metadata: {},
-		pages: [{ contentRanges: [] }],
+		metadata: {
+			processor: { type: 'snapshot' as const, version: PROCESSOR_VERSION },
+			dateCreated: new Date().toISOString(),
+			source: {
+				contentType: sourceContentType,
+				...(typeof sourceHash === 'string' ? { hash: sourceHash } : {}),
+				properties: {},
+				fileSize,
+			},
+		},
+		catalog: {
+			pages: [{ contentRanges: [] }],
+			outline: [],
+		},
 		content: [],
-		fileSize,
-	} satisfies StructuredDocumentText;
+	};
 }
 
 function ensureValidContentType(contentType: string): 'text/html' | 'application/xhtml+xml' {
-    if (contentType !== 'text/html' && contentType !== 'application/xhtml+xml') {
-        console.warn(`contentType should be text/html or application/xhtml+xml for snapshot; got ${contentType}`);
-        return 'text/html';
-    }
-    return contentType;
+	if (contentType !== 'text/html' && contentType !== 'application/xhtml+xml') {
+		console.warn(`contentType should be text/html or application/xhtml+xml for snapshot; got ${contentType}`);
+		return 'text/html';
+	}
+	return contentType;
 }

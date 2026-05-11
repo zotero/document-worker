@@ -10,8 +10,8 @@ import { getFulltextFromStructuredText } from '../../../structured-document-text
 import { getNestedBlockPlainText, mergeNodesWithSelectorMap } from '../../../structured-document-text/src/text.js';
 import type { StructuredDocumentText, OutlineItem, PageInfo, ContentBlockNode } from '../../../structured-document-text/schema';
 
-const SCHEMA_VERSION = '1.0.0-draft';
-const PROCESSOR_VERSION = '1.0.0-draft';
+const SCHEMA_VERSION = '1.0.0';
+const PROCESSOR_VERSION = '1.0.0';
 
 const XHTML_MEDIA_TYPES = new Set([
 	'application/xhtml+xml',
@@ -23,10 +23,28 @@ interface FulltextOptions {
 	structure?: StructuredDocumentText;
 }
 
+interface StructureOptions {
+	sourceHash: string;
+}
+
+type InternalStructuredDocumentText = Omit<StructuredDocumentText, 'metadata'> & {
+	metadata: Omit<StructuredDocumentText['metadata'], 'source'> & {
+		source: Omit<StructuredDocumentText['metadata']['source'], 'hash'> & {
+			hash?: string;
+		};
+	};
+};
+
 /**
  * Extract structured text from an EPUB file.
  */
-export function getEpubStructure(arrayBuffer: ArrayBuffer): StructuredDocumentText {
+export function getEpubStructure(arrayBuffer: ArrayBuffer, options: StructureOptions): StructuredDocumentText {
+	return buildEpubStructure(arrayBuffer, options.sourceHash);
+}
+
+function buildEpubStructure(arrayBuffer: ArrayBuffer, sourceHash: string): StructuredDocumentText;
+function buildEpubStructure(arrayBuffer: ArrayBuffer): InternalStructuredDocumentText;
+function buildEpubStructure(arrayBuffer: ArrayBuffer, sourceHash?: string): InternalStructuredDocumentText {
 	let entries = readZipEntries(arrayBuffer);
 	let decoder = new TextDecoder('utf-8');
 
@@ -50,17 +68,24 @@ export function getEpubStructure(arrayBuffer: ArrayBuffer): StructuredDocumentTe
 	}
 
 	// 4. Build structure object
-	let structure: any = {
+	let structure: InternalStructuredDocumentText = {
 		schemaVersion: SCHEMA_VERSION,
-		processor: {
-			type: 'epub',
-			version: PROCESSOR_VERSION,
+		metadata: {
+			processor: {
+				type: 'epub',
+				version: PROCESSOR_VERSION,
+			},
+			dateCreated: new Date().toISOString(),
+			source: {
+				contentType: 'application/epub+zip',
+				...(typeof sourceHash === 'string' ? { hash: sourceHash } : {}),
+				properties: metadata,
+			},
 		},
-		dateCreated: new Date().toISOString(),
-		sourceContentType: 'application/epub+zip',
-		sourceHash: '',
-		metadata,
-		pages: [],
+		catalog: {
+			pages: [],
+			outline: [],
+		},
 		content: [],
 	};
 
@@ -145,12 +170,12 @@ export function getEpubStructure(arrayBuffer: ArrayBuffer): StructuredDocumentTe
 		hrefToSpineIndex,
 		globalIdMap,
 	);
-	structure.pages = pages;
-	structure.pageMappingType = isPhysical ? 'physical' : 'locations';
+	structure.catalog.pages = pages;
+	structure.catalog.pageMappingType = isPhysical ? 'physical' : 'locations';
 
 	// 11. Build outline with block-level refs
 	if (tocItems.length > 0) {
-		structure.outline = buildOutline(tocItems, hrefToSpineIndex, globalIdMap, sectionOffsets, structure.pages, structure.content);
+		structure.catalog.outline = buildOutline(tocItems, hrefToSpineIndex, globalIdMap, sectionOffsets, structure.catalog.pages, structure.content);
 	}
 
 	// 12. Compute character count
@@ -159,13 +184,13 @@ export function getEpubStructure(arrayBuffer: ArrayBuffer): StructuredDocumentTe
 		charCount += getNestedBlockPlainText(block).length;
 	}
 	if (charCount > 0) {
-		structure.characterCount = charCount;
+		structure.metadata.characterCount = charCount;
 	}
 
 	// 13. Compute file size
-	structure.fileSize = arrayBuffer.byteLength;
+	structure.metadata.source.fileSize = arrayBuffer.byteLength;
 
-	return structure as StructuredDocumentText;
+	return structure;
 }
 
 /**
@@ -175,8 +200,10 @@ export function getEpubFulltext(
 	arrayBuffer: ArrayBuffer,
 	options: FulltextOptions = {},
 ): { text: string; totalSections: number } {
-	let structure = options.structure || getEpubStructure(arrayBuffer);
-	let pages = structure.pages!;
+	let structure = options.structure
+		? options.structure
+		: buildEpubStructure(arrayBuffer);
+	let pages = structure.catalog.pages;
 	let pageIndexes = Array.from({ length: pages.length }, (_, i) => i);
 	let text = getFulltextFromStructuredText(structure, pageIndexes);
 
@@ -312,4 +339,3 @@ function resolveSpineIndex(filePart: string, hrefToSpineIndex: Map<string, numbe
 
 	return undefined;
 }
-

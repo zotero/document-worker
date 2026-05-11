@@ -10,10 +10,11 @@ export function assertFulltextResult(result) {
 }
 
 export function assertStructuredDocumentText(result, type) {
-	assert.equal(result.processor?.type, type);
-	assert.equal(result.schemaVersion, '1.0.0-draft');
-	assert.ok(Array.isArray(result.pages));
-	assert.ok(result.pages.length > 0);
+	assert.equal(result.metadata?.processor?.type, type);
+	assert.equal(result.schemaVersion, '1.0.0');
+	assert.match(result.metadata?.source?.hash, /^[0-9a-f]{32}$/u);
+	assert.ok(Array.isArray(result.catalog?.pages));
+	assert.ok(result.catalog.pages.length > 0);
 	assert.ok(Array.isArray(result.content));
 	assert.ok(result.content.length > 0);
 	assert.ok(result.content[0].type);

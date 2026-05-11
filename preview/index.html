@@ -258,6 +258,7 @@ let activeBlockId = null;
 let currentFilePath = null;
 let currentPdfDoc = null;
 let currentPages = null;
+const PREVIEW_SOURCE_HASH = '00000000000000000000000000000000';
 
 // ── URL hash helpers ──
 
@@ -363,7 +364,7 @@ async function loadFromPath(filePath, savedScroll) {
     ]);
 
     currentPdfDoc = pdfDoc;
-    currentPages = structure.pages;
+    currentPages = structure.catalog.pages;
     console.log('Structure:', structure);
     statusEl.textContent = 'Rendering...';
 
@@ -373,7 +374,7 @@ async function loadFromPath(filePath, savedScroll) {
     renderOverlays(structure);
 
     const name = filePath.split('/').pop();
-    defaultStatusText = `${name} — ${structure.pages.length} pages, ${structure.content.length} blocks`;
+    defaultStatusText = `${name} — ${structure.catalog.pages.length} pages, ${structure.content.length} blocks`;
     statusEl.textContent = defaultStatusText;
 
     if (savedScroll.pdf || savedScroll.html) {
@@ -432,7 +433,7 @@ async function loadFile(file) {
     ]);
 
     currentPdfDoc = pdfDoc;
-    currentPages = structure.pages;
+    currentPages = structure.catalog.pages;
     console.log('Structure:', structure);
     statusEl.textContent = 'Rendering...';
 
@@ -441,7 +442,7 @@ async function loadFile(file) {
     renderHtml(structure);
     renderOverlays(structure);
 
-    defaultStatusText = `${file.name} — ${structure.pages.length} pages, ${structure.content.length} blocks`;
+    defaultStatusText = `${file.name} — ${structure.catalog.pages.length} pages, ${structure.content.length} blocks`;
     statusEl.textContent = defaultStatusText;
   } catch (err) {
     console.error(err);
@@ -455,7 +456,9 @@ async function extractStructure(buf) {
     if (!resp.ok) throw new Error(`Failed to fetch ${path}: ${resp.status}`);
     return new Uint8Array(await resp.arrayBuffer());
   }
-  return getStructure(buf, '', dataProvider);
+  return getStructure(buf, '', dataProvider, {
+    sourceHash: PREVIEW_SOURCE_HASH
+  });
 }
 
 // ── Page rendering (fit-to-width, retina-aware) ──
@@ -468,8 +471,8 @@ function renderPages(pdfDoc, structure) {
   const availableWidth = pdfPanel.clientWidth - 2 * padding;
   const dpr = window.devicePixelRatio || 1;
 
-  for (let i = 0; i < structure.pages.length; i++) {
-    const vr = structure.pages[i].viewRect;
+  for (let i = 0; i < structure.catalog.pages.length; i++) {
+    const vr = structure.catalog.pages[i].viewRect;
     const pageWidthPt = vr[2] - vr[0];
     const pageHeightPt = vr[3] - vr[1];
     const cssScale = availableWidth / pageWidthPt;
@@ -730,7 +733,7 @@ function renderTextContent(parent, content) {
 function renderOverlays(structure) {
   blockIdCounter = 0;
   for (const block of structure.content) {
-    renderBlockOverlay(block, structure.pages);
+    renderBlockOverlay(block, structure.catalog.pages);
   }
 }
 

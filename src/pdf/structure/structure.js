@@ -24,8 +24,8 @@ import { createStructureIndex } from './structure-index.js';
 // import { getNextChunk } from '../../../structured-document-text/src/chunker.js';
 // import { getContent, getRefRangesFromPageRects } from '../../../structured-document-text/src/pdf/content.js';
 
-const SCHEMA_VERSION = '1.0.0-draft';
-const PROCESSOR_VERSION = '1.0.0-draft';
+const SCHEMA_VERSION = '1.0.0';
+const PROCESSOR_VERSION = '1.0.0';
 const DEGRADED_EXTRACTION_FALLBACK_REASONS = new Set([
 	'inference_error',
 	'too_many_lines',
@@ -55,6 +55,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	const onChunk = typeof options.onChunk === 'function' ? options.onChunk : null;
 	const batchSize = Math.max(1, options.batchSize || 5);
 	const shouldAbort = typeof options.shouldAbort === 'function' ? options.shouldAbort : null;
+	const sourceHash = options.sourceHash;
 
 	function checkAbort() {
 		if (shouldAbort?.()) throw new StructureAbortError();
@@ -62,15 +63,22 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 	let structure = {
 		schemaVersion: SCHEMA_VERSION,
-		processor: {
-			type: 'pdf',
-			version: PROCESSOR_VERSION
+		metadata: {
+			processor: {
+				type: 'pdf',
+				version: PROCESSOR_VERSION
+			},
+			dateCreated: new Date().toISOString(),
+			source: {
+				contentType: 'application/pdf',
+				hash: sourceHash,
+				properties: {}
+			}
 		},
-		dateCreated: new Date().toISOString(),
-		sourceContentType: 'application/pdf',
-		sourceHash: '',
-		metadata: {},
-		pages: [],
+		catalog: {
+			pages: [],
+			outline: []
+		},
 		content: []
 	};
 
@@ -100,7 +108,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 			}
 		}
 	}
-	structure.metadata = metadata;
+	structure.metadata.source.properties = metadata;
 
 	// internal and external links
 	let linkMap = new Map();
@@ -113,21 +121,21 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 	async function emitPartialChunkIfDue(pageIndex, force = false) {
 		if (!onChunk) return;
-		let pagesInBatch = structure.pages.length - lastEmittedPageCount;
+		let pagesInBatch = structure.catalog.pages.length - lastEmittedPageCount;
 		if (!force && pagesInBatch < batchSize) return;
 		if (pagesInBatch === 0) return;
 		let pageIndexOffset = lastEmittedPageCount;
 		let contentIndexOffset = lastEmittedContentCount;
 		let chunk = {
 			kind: 'partial',
-			pages: structure.pages.slice(pageIndexOffset),
+			pages: structure.catalog.pages.slice(pageIndexOffset),
 			content: structure.content.slice(contentIndexOffset),
 			pageIndexOffset,
 			contentIndexOffset,
 			pageIndexRange: [pageIndexOffset, pageIndex],
 			totalPageCount: pageCount,
 		};
-		lastEmittedPageCount = structure.pages.length;
+		lastEmittedPageCount = structure.catalog.pages.length;
 		lastEmittedContentCount = structure.content.length;
 		await onChunk(chunk);
 	}
@@ -280,7 +288,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 			newPage.contentRanges.push(contentRange);
 		}
 
-		structure.pages.push(newPage);
+		structure.catalog.pages.push(newPage);
 
 		await emitPartialChunkIfDue(i);
 	}
@@ -328,7 +336,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 	let outline = await getOutline(structure.content, [], pdfDocument);
 	if (outline.length) {
-		structure.outline = outline;
+		structure.catalog.outline = outline;
 	}
 
 	cleanupBlockMetrics(structure);

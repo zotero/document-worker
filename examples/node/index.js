@@ -1,87 +1,30 @@
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
+import crypto from 'crypto';
 import fs from 'fs';
+import { dirname, resolve } from 'path';
+import { fileURLToPath } from 'url';
 
-// Define __dirname
+import { getStructuredDocumentText } from '../../src/index.js';
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
-// const pdfWorker = require('../../build/worker');
-
-import * as pdfWorker from '../../src/index.js';
 
 function dataProvider(path) {
-	return fs.readFileSync(__dirname + '/../../build/' + path);
+	return fs.readFileSync(resolve(__dirname, '../../build', path));
+}
+
+function sourceHash(buf) {
+	return crypto.createHash('md5').update(buf).digest('hex');
 }
 
 async function main() {
+	let buf = fs.readFileSync(resolve(__dirname, '../../test/fixtures/pdf/full/2.pdf'));
+	let result = await getStructuredDocumentText(buf, {
+		contentType: 'application/pdf',
+		password: '',
+		dataProvider,
+		sourceHash: sourceHash(buf),
+	});
 
-	// let buf = fs.readFileSync(__dirname + '/../pdf/problems_with_perichoresis.pdf');
-	let buf = fs.readFileSync(__dirname + '/../../test/pdfs/full/2.pdf');
-	// let fulltext = await pdfWorker.getFulltext(buf, [9, 10], '', cmapProvider, standardFontProvider);
-
-	let ft = await pdfWorker.getFulltext(buf, null, '', dataProvider);
-fs.writeFileSync(__dirname + '/fulltext-old.txt', ft.text)
-	// console.log(ft);
-
-
-	await pdfWorker.getStructure(buf, null, dataProvider);
-	// return;
-
-	// let res = await pdfWorker.importAnnotations(buf, [], '', true, cmapProvider);
-// console.log(res);
-	return;
-	// console.log(res);
-	// buf = res.buf;
-
-	// let fulltext = await pdfWorker.getFulltext(buf, [9, 10], '', cmapProvider, standardFontProvider);
-	let fulltext = await pdfWorker.getPages(buf, '', dataProvider);
-	console.log(fulltext);
-
-
-	// let recognizerData = await pdfWorker.getRecognizerData(buf, '', cmapProvider, standardFontProvider);
-	// console.log(recognizerData);
-return;
-	let annotations = [{
-		"type": "text",
-		"color": "#ffd400",
-		"pageLabel": "1",
-		"sortIndex": "00000|000464|00245",
-		"position": {
-			"pageIndex": 0,
-			"fontSize": 18.5,
-			"rotation": 328.9872719314574,
-			"rects": [
-				[
-					35.85954071661243,
-					479.12782811804556,
-					286.252035830619,
-					546.8241628664496
-				]
-			]
-		},
-		"text": "",
-		"comment": "Testing text annotations with multiple lines to\n\n see if they work as expected ąčęėįšųūž",
-		"tags": [],
-		"id": "MFPF9KZI",
-		"dateCreated": "2024-01-23T02:35:16.418Z",
-		"dateModified": "2024-01-23T02:38:42.478Z",
-		"authorName": "John",
-		"isAuthorNameAuthoritative": true
-	}];
-
-
-
-	annotations = [{"id":"SMGSFNW7","type":"text","authorName":"","comment":"\"...for each \\underline{w} > 0 and \\overline{w} \\geq \\underline{w}...\"","color":"#ff6666","position":{"pageIndex":0,"fontSize":3.5,"rotation":0,"rects":[[383.6201561033265,526.7326286033914,510.8705367360796,539.4576666666667]]},"dateModified":"2024-12-17T00:35:17Z","tags":[]},{"id":"KMSLP9I5","type":"ink","authorName":"","comment":"","color":"#ff6666","position":{"pageIndex":7,"width":2,"paths":[[516.538,558.845,517.68,558.845,518.662,558.645,519.443,557.924,520.345,556.962,521.026,556.161,521.306,555.159,521.867,554.278,522.248,553.236,522.568,552.194,522.628,551.073,522.628,549.951,522.628,548.829,522.628,547.667,522.628,546.465,522.628,545.404,522.628,544.342,522.628,543.22,522.628,542.098,522.628,541.097,522.628,540.035,522.628,538.893]]},"dateModified":"2024-12-16T21:57:10Z","tags":[]},{"id":"S84FKSZM","type":"text","authorName":"","comment":"\"...there exist u \\in (0, \\underline{w}) and v > \\overline{w}....\"","color":"#ff6666","position":{"pageIndex":7,"fontSize":4.5,"rotation":0,"rects":[[388.333,523.645,528.333,529.645]]},"dateModified":"2024-12-16T23:46:46Z","tags":[]},{"id":"A3WNNZFZ","type":"note","authorName":"","comment":"Move this earlier, before the definitions of \\underline w and \\overline w.\nOnce you have this general implication, which applies for any \\undeline w and \\overline w, then we can say, \"in particular, we pick \\underline w:= sup{...} and \\overline w := max ....\"","color":"#ffd400","position":{"pageIndex":7,"rects":[[540.026,509.063,562.026,531.063]]},"dateModified":"2024-12-16T21:58:54Z","tags":[]},{"id":"CDL6FV3Q","type":"highlight","authorName":"","comment":"","color":"#ffd400","position":{"pageIndex":7,"rects":[[96.582,472.596,167.513,481.413]]},"dateModified":"2024-12-16T21:56:49Z","tags":[]},{"id":"N7DMNKDD","type":"image","authorName":"","comment":"","color":"#ff6666","position":{"pageIndex":7,"rects":[[320.207,471.735,439.896,483.781]]},"dateModified":"2024-12-16T22:03:46Z","tags":[]},{"id":"ZKP5XYG5","type":"ink","authorName":"","comment":"","color":"#ff6666","position":{"pageIndex":7,"width":2,"paths":[[351.917,487.512]]},"dateModified":"2024-12-16T23:10:18Z","tags":[]},{"id":"M4VF5TWG","type":"image","authorName":"","comment":"","color":"#ff6666","position":{"pageIndex":7,"rects":[[239.767,459.688,355.959,471.735]]},"dateModified":"2024-12-16T22:05:18Z","tags":[]},{"id":"WKFN57CN","type":"note","authorName":"","comment":"Once you label the individual lines in (5), say as (5a) and (5b), then you can change this definition to\n\n   sup{u ... : each solution x to H satisfies (5a)}\nNote that I changed u' to just u.","color":"#ffd400","position":{"pageIndex":7,"rects":[[466.047,430.035,488.047,452.035]]},"dateModified":"2024-12-16T22:58:06Z","tags":[]},{"id":"DJKWDJL5","type":"note","authorName":"","comment":"I might use \\overline{u} instead of \\mathfrak{u}, to indicate it is the \"largest\" u.","color":"#ffd400","position":{"pageIndex":7,"rects":[[48.4560932642487,424.9835906735752,70.4560932642487,446.9835906735752]]},"dateModified":"2024-12-17T00:43:25Z","tags":[]},{"id":"EXA5L5GF","type":"ink","authorName":"","comment":"","color":"#ff6666","position":{"pageIndex":7,"width":2,"paths":[[86.891,414.066,87.984,414.066,89.369,414.066,90.826,414.066,91.87,414.066,93.012,414.066,94.542,414.066,96.558,414.066,97.602,414.066,98.622,414.066,100.589,414.066,102.314,414.066,103.747,414.066,104.888,414.066,106.2,414.066,107.341,414.066,108.58,414.066,109.819,414.066,111.276,414.066,112.66,414.066,114.336,414.066,115.793,414.066,116.862,414.066,118.028,414.066,119.048,414.066,120.262,414.066,121.355,414.066,122.4,414.066,123.42,414.066]]},"dateModified":"2024-12-16T23:26:19Z","tags":[]},{"id":"YBRPLPKQ","type":"text","authorName":"","comment":"The function s \\mapsto u(s) is ....","color":"#ff6666","position":{"pageIndex":7,"fontSize":5.5,"rotation":0,"rects":[[76.451,418.833,174.71502827856827,427.6065739534436]]},"dateModified":"2024-12-16T23:26:40Z","tags":[]},{"id":"N4X49YD6","type":"ink","authorName":"","comment":"","color":"#ff6666","position":{"pageIndex":7,"width":2,"paths":[[359.456,408.937,357.999,408.937,355.74,408.864,354.064,408.791,352.024,408.694,350.348,408.621,349.037,408.572,347.506,408.548,345.612,408.548,344.301,408.548,342.746,408.548,341.265,408.548,339.856,408.548,338.52,408.548,337.257,408.548,336.164,408.548,334.488,408.548,333.347,408.548,332.302,408.548,330.772,408.548,329.631,408.548,328.465,408.548,327.494,408.305,326.231,407.819,324.385,407.625,323.025,407.528,321.713,407.455,320.45,407.407,319.236,407.382,318.07,407.382,317.001,407.431,315.155,407.674,313.552,408.062,311.755,408.451,309.885,408.839,308.306,409.228,306.873,409.617,305.149,410.005,303.279,410.345,301.7,410.491,300.389,410.515,299.271,410.637,297.887,410.855,296.648,410.928,295.628,411.171,294.584,411.511,293.54,411.171,292.252,410.345,291.062,409.714,289.508,408.937,287.953,408.281,286.399,407.747,284.845,407.334,283.29,407.042,281.833,406.824,280.473,406.678,279.21,406.605,278.044,406.605,276.903,406.605,275.785,406.605,274.692,406.605,273.624,406.605,272.555,406.605,271.486,406.605,270.418,406.605,269.349,406.605,267.649,406.605,266.532,406.605,265.22,406.605,263.836,406.678,262.549,406.848,261.116,407.042,259.585,407.237,258.541,407.358,257.302,407.382,255.699,407.164,254.388,406.945,252.736,406.654,251.133,406.459,249.579,406.362,248.073,406.362,246.616,406.459,245.11,406.654,243.556,406.945,241.953,407.334,240.301,407.819,238.747,408.257,237.29,408.645,235.929,408.985,234.666,409.277,233.452,409.544,232.286,409.787,231.169,410.005,230.1,410.2,228.473,410.515,227.089,410.831,226.069,411.025,224.976,411.195,223.883,411.268,222.28,411.268,220.75,411.293,219.317,411.414,217.932,411.584,216.451,411.657,214.994,411.681,213.925,411.803,212.613,412.021,211.496,412.045,210.185,412.191,208.873,412.628,207.27,413.163,206.201,413.527,204.938,413.964,203.481,414.474,201.83,415.057,200.372,415.567,199.109,416.004,198.041,416.369,196.171,416.976,195.053,417.316,193.815,417.68,192.455,418.069,191.24,418.433,190.172,418.773,188.472,419.38,187.136,419.963,186.091,420.546,185.12,420.983,184.148,421.226,183.177,421.493,182.205,421.858,180.894,422.149,179.655,422.149,178.246,422.149,177.008,422.149,175.696,422.149,174.458,422.149,173.267,422.149,171.956,422.149,170.79,422.076,169.697,421.809,168.604,421.372,167.584,421.08,166.661,420.303,165.495,419.817,164.524,419.575,163.674,418.773,162.605,418.287,161.707,417.583,160.687,417,159.666,416.636,158.841,415.591,158.063,414.669,157.456,413.721,157.141,412.483,156.995,411.39,156.995,410.2,156.995,409.034,156.995,407.892,156.995,406.872,156.995,405.779],[156.995,401.942,156.023,402.233,155.198,403.302,154.323,404.468,153.667,405.391,152.915,406.508,152.186,407.382,153.935,406.459,155.003,405.585,155.926,404.783,156.703,404.055,157.821,402.816,158.646,401.942],[162.047,410.491,161.682,409.398,160.978,408.329,160.225,407.504,159.472,406.751,158.889,405.731,158.403,404.759,158.015,403.836,157.626,402.816,157.383,401.82]]},"dateModified":"2024-12-16T22:08:56Z","tags":[]},{"id":"8IWHKHL5","type":"image","authorName":"","comment":"","color":"#ff6666","position":{"pageIndex":7,"rects":[[362.176,408.548,490.026,421.76]]},"dateModified":"2024-12-16T22:08:35Z","tags":[]},{"id":"NKGFRAUC","type":"note","authorName":"","comment":"Clarify why the limit is zero.","color":"#ffd400","position":{"pageIndex":7,"rects":[[55.062,387.444,77.062,409.444]]},"dateModified":"2024-12-16T22:10:30Z","tags":[]},{"id":"LNQIFNVZ","type":"ink","authorName":"","comment":"","color":"#ff6666","position":{"pageIndex":7,"width":2,"paths":[[273.133,397.979,274.05,398.625,275.175,399.062,276.05,399.687,276.967,400.437,278.05,400.771,279.092,401.187,280.092,401.521,281.071,401.937,282.133,402.354,283.092,402.854,284.092,403,285.092,403.312,286.071,403.646]]},"dateModified":"2024-12-16T23:50:45Z","tags":[]},{"id":"GR47I4N4","type":"note","authorName":"","comment":"We don't need to specify that w^\\star is finite.","color":"#ffd400","position":{"pageIndex":7,"rects":[[521.772207253886,396.38201036269436,543.772207253886,418.38201036269436]]},"dateModified":"2024-12-16T23:22:30Z","tags":[]},{"id":"M9H7J6W7","type":"image","authorName":"","comment":"","color":"#ff6666","position":{"pageIndex":7,"rects":[[375.389,372.408,389.378,384.066]]},"dateModified":"2024-12-16T22:14:17Z","tags":[]},{"id":"PA37L8BZ","type":"note","authorName":"","comment":"I would say, \"....there exists a class-\\calK function \\xi such that....\"\n\nWe should justify why such a function exists.\n\nAlso, rather than having separate symbols for \\alpha and \\xi, I would just use \\alpha^{-1}, (or apply \\alpha to both sides of equations, so that you cancel alpha^{-1}).\n\nIf you keep \"\\xi\", then I would use it only  to define \\underline{\\alpha}, and thereafter not use it again. Going back and forth puts an extra mental load on the reader/me.","color":"#ffd400","position":{"pageIndex":7,"rects":[[520.6065025906736,372.6773575129534,542.6065025906736,394.6773575129534]]},"dateModified":"2024-12-16T23:23:33Z","tags":[]},{"id":"TLEICF2J","type":"note","authorName":"","comment":"I might say this as, \"Then, let x be any solution to \\calH with ...\"","color":"#ffd400","position":{"pageIndex":7,"rects":[[52.731,364.517,74.731,386.517]]},"dateModified":"2024-12-16T22:15:29Z","tags":[]},{"id":"97WK9UVD","type":"note","authorName":"","comment":"If this is a different \\overline{w} from before, we should use a new symbol.\nSee https://paulwintz.com/dont-reuse-symbols\n\n\nIt might not be worthwhile to define a symbol for \\underline{alpha(|x(0, 0)|_A  at all.","color":"#ffd400","position":{"pageIndex":7,"rects":[[383.0418031088083,349.74998445595855,405.0418031088083,371.74998445595855]]},"dateModified":"2024-12-17T00:00:19Z","tags":[]},{"id":"UVUADHTX","type":"note","authorName":"","comment":"I think we can define \\underline \\alpha simply by saying, \"Let \\underline{\\alpha} = \\xi^{-1}, which is also class-\\calK.\"","color":"#ffd400","position":{"pageIndex":7,"rects":[[524.1037772020726,350.5269430051813,546.1037772020726,372.5269430051813]]},"dateModified":"2024-12-16T23:22:26Z","tags":[]},{"id":"R3PTDSVS","type":"ink","authorName":"","comment":"","color":"#ff6666","position":{"pageIndex":7,"width":2,"paths":[[73.057,317.46,74.15,317.46,75.51,317.46,76.749,317.46,78.06,317.46,79.08,317.46,80.295,317.46,81.606,317.46,82.723,317.46,84.181,317.46,85.614,317.46,86.852,317.46,88.31,317.46,89.403,317.46,90.495,317.46,91.661,317.46,92.681,317.46,93.75,317.46,94.722,317.849,95.863,317.873,96.762,318.577,97.733,318.99,98.462,319.792,99.166,320.544,98.073,320.569,96.956,320.569,95.863,320.569,94.722,320.569,93.701,320.569],[101.036,319.403,101.012,318.359,100.502,317.411,100.016,316.44,99.846,315.323,99.239,314.497,99.093,313.428]]},"dateModified":"2024-12-16T22:25:07Z","tags":[]},{"id":"84KZPX49","type":"image","authorName":"","comment":"","color":"#ff6666","position":{"pageIndex":7,"rects":[[100.259,319.17,179.145,330.439]]},"dateModified":"2024-12-16T22:20:42Z","tags":[]},{"id":"XJAC6R9L","type":"note","authorName":"","comment":"We have already proven that |x(0,0)| \\leq u(\\overline w), so it doesn't make sense to include it as the LHS of the implication in (6).\nInstead of writing (6) as an implication, I would simply say, \n\"Therefore,\n $$ |x(t,j)| \\leq \\overline w = ..... for all (t,j) in dom x. $$\"","color":"#ffd400","position":{"pageIndex":7,"rects":[[111.021,331.097,133.021,353.097]]},"dateModified":"2024-12-16T22:20:27Z","tags":[]},{"id":"ET3D5Z55","type":"note","authorName":"","comment":"I don't follow this sentence, but once we have the inequality on the RHS of the implication in (6) (and drop the implication b/c the LHS is already shown to be true), we have proven (4) holds except that we only have a class-K function instead of class-K_\\infty.","color":"#ffd400","position":{"pageIndex":7,"rects":[[529.5441917098445,306.77097927461136,551.5441917098445,328.77097927461136]]},"dateModified":"2024-12-16T22:30:17Z","tags":[]},{"id":"CMBU9LH5","type":"ink","authorName":"","comment":"","color":"#ffd400","position":{"pageIndex":7,"width":2,"paths":[[516.062,326.009],[516.062,326.009,517.277,326.009,518.369,326.009,519.414,326.009,520.361,325.621,520.653,324.6,520.725,323.483,520.725,322.39,520.725,321.297,520.725,320.204,520.725,319.16,520.725,318.043,520.725,316.974,521.648,317.46,522.717,317.46,523.761,317.46,523.106,316.586,521.988,316.221,521.017,315.954,520.288,315.225,519.414,314.74,519.171,313.72,520.142,313.112,520.677,312.19,521.09,311.145,521.357,309.979,521.891,309.056,521.891,307.988,521.891,306.919,521.891,305.778,521.867,304.709,520.798,304.612,519.778,304.223,518.734,303.859,517.568,303.713,516.548,303.47,515.382,303.47]]},"dateModified":"2024-12-16T22:24:54Z","tags":[]},{"id":"FG8QMS3W","type":"note","authorName":"","comment":"Which inequality?\nSee https://paulwintz.com/permalink/precise-references","color":"#ffd400","position":{"pageIndex":7,"rects":[[48.067,312.056,70.067,334.056]]},"dateModified":"2024-12-16T22:21:16Z","tags":[]},{"id":"LIQAKCL4","type":"note","authorName":"","comment":"Add a sentence along these lines at the start of this paragraph","color":"#ffd400","position":{"pageIndex":7,"rects":[[57.472,279.413,79.472,301.413]]},"dateModified":"2024-12-16T22:29:35Z","tags":[]},{"id":"W2NZBTND","type":"image","authorName":"","comment":"","color":"#ff6666","position":{"pageIndex":7,"rects":[[251.503,283.963,335.44,294.455]]},"dateModified":"2024-12-16T22:30:40Z","tags":[]},{"id":"KS3VWXII","type":"text","authorName":"","comment":"\"{v' \\geq \\underline{w} : ...}\"","color":"#ff6666","position":{"pageIndex":7,"fontSize":5.5,"rotation":0,"rects":[[195.467,247.312,275.467,256.312]]},"dateModified":"2024-12-16T23:52:11Z","tags":[]},{"id":"6YQIMSDG","type":"note","authorName":"","comment":"I didn't check this carefully, but the","color":"#ffd400","position":{"pageIndex":7,"rects":[[534,189.312,556,211.312]]},"dateModified":"2024-12-17T00:02:27Z","tags":[]},{"id":"LZT5MCHI","type":"ink","authorName":"","comment":"","color":"#ff6666","position":{"pageIndex":8,"width":0.8,"paths":[[432.622,719.818,432.205,718.887,431.898,717.93,432.939,718.426,433.979,718.768,432.631,719.184,431.611,719.461,432.711,718.733,433.598,718.252,433.464,719.422,433.177,720.393],[397.659,719.897,397.074,719.015,396.613,718.123,397.976,717.727,399.006,717.757,400.077,717.787,399.254,718.406,398.238,718.842,397.213,719.382,396.241,719.655,396.975,718.817,397.51,717.886,398.05,716.974,398.342,718.014,398.372,719.025,398.372,720.135]]},"dateModified":"2024-12-17T00:06:45Z","tags":[]},{"id":"7G8VFTFE","type":"ink","authorName":"","comment":"","color":"#ff6666","position":{"pageIndex":8,"width":1.5,"paths":[[462.193,717.123],[462.273,715.141],[459.577,721.324,458.997,720.492,459.964,720.195,461.183,720.522,462.228,720.695,461.079,721.369,460.107,721.8,459.26,722.395,460.053,721.627,460.945,720.745,461.579,719.838,461.767,721.067,461.797,722.167]]},"dateModified":"2024-12-17T00:06:26Z","tags":[]},{"id":"MIK56HNR","type":"note","authorName":"","comment":"I would define s^* earlier in this sentence and use it when saying \"for all s \\in [0, s^*]\" and \"for all s\\in [s^*, \\infty)\"","color":"#ffd400","position":{"pageIndex":8,"rects":[[521.572,711.467,543.572,733.467]]},"dateModified":"2024-12-17T00:08:39Z","tags":[]},{"id":"UFVFDQCB","type":"note","authorName":"","comment":"You can construct \\underline \\alpha' explicitly by simply multiplying \\underline {\\alpha} by a constant \\geq 1 (similarly, for \\overline \\alpha').\n\nIn fact, I think the following definition works:\n\ns \\mapsto \\underline{\\alpha}'(s) := \\overline{\\alpha}(s^*)/\\underline{\\alpha}(s^*) \\cdot \\underline{\\alpha}(s)\n\nwith \\overline \\alpha' = \\overline \\alpha.","color":"#ff6666","position":{"pageIndex":8,"rects":[[550.058,706.779,572.058,728.779]]},"dateModified":"2024-12-17T00:13:54Z","tags":[]},{"id":"7NIVCCAD","type":"text","authorName":"","comment":"😌","color":"#ff6666","position":{"pageIndex":8,"fontSize":10,"rotation":0,"rects":[[419.352,577.641,439.352,592.641]]},"dateModified":"2024-12-16T22:03:18Z","tags":[]}];
-
-
-
-
-		// try {
-		// buf = await pdfWorker.writeAnnotations(buf, annotations, '', cmapProvider, standardFontProvider);
-	// }
-	// catch (e) {
-	// 	console.log(e);
-	// }
-	fs.writeFileSync(__dirname + '/../example-out.pdf', Buffer.from(buf), 'binary');
+	console.log(`SDT pack: ${result.buf.byteLength} bytes`);
 }
 
 main();

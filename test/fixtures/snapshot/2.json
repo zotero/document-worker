@@ -1,10 +1,37 @@
 {
-	"schemaVersion": "1.0.0-draft",
-	"processor": {"type": "snapshot", "version": "1.0.0-draft"},
-	"sourceContentType": "text/html",
-	"sourceHash": "",
-	"metadata": {"title": "A Long-Form Article About Widgets", "author": "Jane Doe"},
-	"pages": [{"contentRanges": [{"start": {"ref": [0, 0]}, "end": {"ref": [14, 0]}}]}],
+	"schemaVersion": "1.0.0",
+	"metadata": {
+		"processor": {"type": "snapshot", "version": "1.0.0"},
+		"dateCreated": "2000-01-01T00:00:00.000Z",
+		"source": {
+			"contentType": "text/html",
+			"hash": "d21d0d1642092d2eacb3fd7dc6dd646a",
+			"properties": {"title": "A Long-Form Article About Widgets", "author": "Jane Doe"},
+			"fileSize": 5157
+		},
+		"characterCount": 3559
+	},
+	"catalog": {
+		"pages": [{"contentRanges": [[[0, 0], [14, 0]]]}],
+		"outline": [
+			{
+				"title": "A Deep Dive Into Widgets",
+				"ref": [0],
+				"level": 1,
+				"children": [
+					{"title": "The History of Widgets", "ref": [3], "level": 2},
+					{
+						"title": "Construction",
+						"ref": [6],
+						"level": 2,
+						"children": [{"title": "Finishing and Quality Control", "ref": [8], "level": 3}]
+					},
+					{"title": "Applications", "ref": [10], "level": 2},
+					{"title": "Looking Forward", "ref": [13], "level": 2}
+				]
+			}
+		]
+	},
 	"content": [
 		{
 			"type": "heading",
@@ -123,25 +150,5 @@
 			],
 			"anchor": {"selectorMap": "article > p:last-child"}
 		}
-	],
-	"outline": [
-		{
-			"title": "A Deep Dive Into Widgets",
-			"ref": [0],
-			"level": 1,
-			"children": [
-				{"title": "The History of Widgets", "ref": [3], "level": 2},
-				{
-					"title": "Construction",
-					"ref": [6],
-					"level": 2,
-					"children": [{"title": "Finishing and Quality Control", "ref": [8], "level": 3}]
-				},
-				{"title": "Applications", "ref": [10], "level": 2},
-				{"title": "Looking Forward", "ref": [13], "level": 2}
-			]
-		}
-	],
-	"characterCount": 3559,
-	"fileSize": 5157
+	]
 }

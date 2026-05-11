@@ -1,7 +1,12 @@
 import { mergePageRects } from './util.js';
+import {
+	setContentRangeEnd,
+	setContentRangeStart,
+	splitContentRange,
+} from '../../../structured-document-text/src/range.js';
 
 // wrap continous 'listitem' blocks into 'list' block
-// you also need to update structure.pages.contentRanges accordingly
+// you also need to update structure.catalog.pages.contentRanges accordingly
 export function wrapListItems(structure) {
 	if (!structure || !Array.isArray(structure.content) || structure.content.length === 0) {
 		return structure;
@@ -109,21 +114,20 @@ export function wrapListItems(structure) {
 		updateNodeRefs(block);
 	}
 
-	if (structure.outline) {
-		updateNodeRefs(structure.outline);
-	}
-
-	if (Array.isArray(structure.pages)) {
-		for (const page of structure.pages) {
+	if (Array.isArray(structure.catalog.pages)) {
+		for (const page of structure.catalog.pages) {
 			if (!page || !Array.isArray(page.contentRanges)) {
 				continue;
 			}
 			for (const range of page.contentRanges) {
-				if (range?.start?.ref) {
-					updateRefPath(range.start.ref);
+				let { start, end } = splitContentRange(range, originalContent);
+				if (start.ref) {
+					updateRefPath(start.ref);
+					setContentRangeStart(range, start.ref, start.offset);
 				}
-				if (range?.end?.ref) {
-					updateRefPath(range.end.ref);
+				if (end.ref) {
+					updateRefPath(end.ref);
+					setContentRangeEnd(range, end.ref, end.offset);
 				}
 			}
 		}
@@ -132,7 +136,7 @@ export function wrapListItems(structure) {
 	return structure;
 }
 
-// Merge continuous lists, and ofcourse update structure.pages.contentRanges
+// Merge continuous lists, and ofcourse update structure.catalog.pages.contentRanges
 export function mergeLists(structure) {
 	if (!structure || !Array.isArray(structure.content) || structure.content.length === 0) {
 		return structure;
@@ -276,21 +280,20 @@ export function mergeLists(structure) {
 		updateNodeRefs(block);
 	}
 
-	if (structure.outline) {
-		updateNodeRefs(structure.outline);
-	}
-
-	if (Array.isArray(structure.pages)) {
-		for (const page of structure.pages) {
+	if (Array.isArray(structure.catalog.pages)) {
+		for (const page of structure.catalog.pages) {
 			if (!page || !Array.isArray(page.contentRanges)) {
 				continue;
 			}
 			for (const range of page.contentRanges) {
-				if (range?.start?.ref) {
-					updateRefPath(range.start.ref);
+				let { start, end } = splitContentRange(range, originalContent);
+				if (start.ref) {
+					updateRefPath(start.ref);
+					setContentRangeStart(range, start.ref, start.offset);
 				}
-				if (range?.end?.ref) {
-					updateRefPath(range.end.ref);
+				if (end.ref) {
+					updateRefPath(end.ref);
+					setContentRangeEnd(range, end.ref, end.offset);
 				}
 			}
 		}

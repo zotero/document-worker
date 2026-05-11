@@ -1,76 +1,145 @@
 {
-	"schemaVersion": "1.0.0-draft",
-	"processor": {"type": "epub", "version": "1.0.0-draft"},
-	"sourceContentType": "application/epub+zip",
-	"sourceHash": "",
+	"schemaVersion": "1.0.0",
 	"metadata": {
-		"title": "The Life of Lazarillo de Tormes",
-		"creator": "Anonymous",
-		"language": "en-GB",
-		"identifier": "https://standardebooks.org/ebooks/anonymous/the-life-of-lazarillo-de-tormes/clements-markham",
-		"publisher": "Standard Ebooks",
-		"date": "2026-03-02T22:16:44Z",
-		"description": "An itinerant Spanish boy serves under a series of masters as he travels the countryside.",
-		"subject": "Spanish fiction -- Translations into English",
-		"rights": "The source text and artwork in this ebook are believed to be in the United States public domain; that is, they are believed to be free of copyright restrictions in the United States. They may still be copyrighted in other countries, so users located outside of the United States must check their local laws before using this ebook. The creators of, and contributors to, this ebook dedicate their contributions to the worldwide public domain via the terms in the [CC0 1.0 Universal Public Domain Dedication](https://creativecommons.org/publicdomain/zero/1.0/)."
+		"processor": {"type": "epub", "version": "1.0.0"},
+		"dateCreated": "2000-01-01T00:00:00.000Z",
+		"source": {
+			"contentType": "application/epub+zip",
+			"hash": "373a85762b85165f8b915ab35113b89d",
+			"properties": {
+				"title": "The Life of Lazarillo de Tormes",
+				"creator": "Anonymous",
+				"language": "en-GB",
+				"identifier": "https://standardebooks.org/ebooks/anonymous/the-life-of-lazarillo-de-tormes/clements-markham",
+				"publisher": "Standard Ebooks",
+				"date": "2026-03-02T22:16:44Z",
+				"description": "An itinerant Spanish boy serves under a series of masters as he travels the countryside.",
+				"subject": "Spanish fiction -- Translations into English",
+				"rights": "The source text and artwork in this ebook are believed to be in the United States public domain; that is, they are believed to be free of copyright restrictions in the United States. They may still be copyrighted in other countries, so users located outside of the United States must check their local laws before using this ebook. The creators of, and contributors to, this ebook dedicate their contributions to the worldwide public domain via the terms in the [CC0 1.0 Universal Public Domain Dedication](https://creativecommons.org/publicdomain/zero/1.0/)."
+			},
+			"fileSize": 614906
+		},
+		"characterCount": 121382
 	},
-	"pages": [
-		{"label": "1", "contentRanges": [{"start": {"ref": [0, 0]}, "end": {"ref": [13, 0]}}]},
-		{"label": "2", "contentRanges": [{"start": {"ref": [14, 0]}, "end": {"ref": [23, 3, 14]}}]},
-		{"label": "3", "contentRanges": [{"start": {"ref": [24, 0]}, "end": {"ref": [28, 4, 0, 0]}}]},
-		{"label": "4", "contentRanges": [{"start": {"ref": [29, 0]}, "end": {"ref": [35, 0]}}]},
-		{"label": "5", "contentRanges": [{"start": {"ref": [36, 0]}, "end": {"ref": [40, 0]}}]},
-		{"label": "6", "contentRanges": [{"start": {"ref": [41, 0]}, "end": {"ref": [46, 0]}}]},
-		{"label": "7", "contentRanges": [{"start": {"ref": [47, 0]}, "end": {"ref": [53, 0]}}]},
-		{"label": "8", "contentRanges": [{"start": {"ref": [54, 0]}, "end": {"ref": [58, 2]}}]},
-		{"label": "9", "contentRanges": [{"start": {"ref": [59, 0]}, "end": {"ref": [62, 0]}}]},
-		{"label": "10", "contentRanges": [{"start": {"ref": [63, 0]}, "end": {"ref": [66, 0]}}]},
-		{"label": "11", "contentRanges": [{"start": {"ref": [67, 0]}, "end": {"ref": [71, 0]}}]},
-		{"label": "12", "contentRanges": [{"start": {"ref": [72, 0]}, "end": {"ref": [78, 2]}}]},
-		{"label": "13", "contentRanges": [{"start": {"ref": [79, 0]}, "end": {"ref": [82, 0]}}]},
-		{"label": "14", "contentRanges": [{"start": {"ref": [83, 0]}, "end": {"ref": [86, 2]}}]},
-		{"label": "15", "contentRanges": [{"start": {"ref": [87, 0]}, "end": {"ref": [88, 0]}}]},
-		{"label": "16", "contentRanges": [{"start": {"ref": [89, 0]}, "end": {"ref": [91, 16]}}]},
-		{"label": "17", "contentRanges": [{"start": {"ref": [92, 0]}, "end": {"ref": [92, 0]}}]},
-		{"label": "18", "contentRanges": [{"start": {"ref": [93, 0]}, "end": {"ref": [96, 2]}}]},
-		{"label": "19", "contentRanges": [{"start": {"ref": [97, 0]}, "end": {"ref": [100, 4]}}]},
-		{"label": "20", "contentRanges": [{"start": {"ref": [101, 0]}, "end": {"ref": [103, 0]}}]},
-		{"label": "21", "contentRanges": [{"start": {"ref": [104, 0]}, "end": {"ref": [106, 0]}}]},
-		{"label": "22", "contentRanges": [{"start": {"ref": [107, 0]}, "end": {"ref": [110, 7]}}]},
-		{"label": "23", "contentRanges": [{"start": {"ref": [111, 0]}, "end": {"ref": [113, 8]}}]},
-		{"label": "24", "contentRanges": [{"start": {"ref": [114, 0]}, "end": {"ref": [117, 0]}}]},
-		{"label": "25", "contentRanges": [{"start": {"ref": [118, 0]}, "end": {"ref": [120, 0]}}]},
-		{"label": "26", "contentRanges": [{"start": {"ref": [121, 0]}, "end": {"ref": [123, 0]}}]},
-		{"label": "27", "contentRanges": [{"start": {"ref": [124, 0]}, "end": {"ref": [125, 6]}}]},
-		{"label": "28", "contentRanges": [{"start": {"ref": [126, 0]}, "end": {"ref": [127, 0]}}]},
-		{"label": "29", "contentRanges": [{"start": {"ref": [128, 0]}, "end": {"ref": [132, 0]}}]},
-		{"label": "30", "contentRanges": [{"start": {"ref": [133, 0]}, "end": {"ref": [134, 0]}}]},
-		{"label": "31", "contentRanges": [{"start": {"ref": [135, 0]}, "end": {"ref": [136, 0]}}]},
-		{"label": "32", "contentRanges": [{"start": {"ref": [137, 0]}, "end": {"ref": [139, 0]}}]},
-		{"label": "33", "contentRanges": [{"start": {"ref": [140, 0]}, "end": {"ref": [141, 2]}}]},
-		{"label": "34", "contentRanges": [{"start": {"ref": [142, 0]}, "end": {"ref": [144, 0]}}]},
-		{"label": "35", "contentRanges": [{"start": {"ref": [145, 0]}, "end": {"ref": [147, 0]}}]},
-		{"label": "36", "contentRanges": [{"start": {"ref": [148, 0]}, "end": {"ref": [150, 4]}}]},
-		{"label": "37", "contentRanges": [{"start": {"ref": [151, 0]}, "end": {"ref": [153, 0]}}]},
-		{"label": "38", "contentRanges": [{"start": {"ref": [154, 0]}, "end": {"ref": [155, 0]}}]},
-		{"label": "39", "contentRanges": [{"start": {"ref": [156, 0]}, "end": {"ref": [157, 0]}}]},
-		{"label": "40", "contentRanges": [{"start": {"ref": [158, 0]}, "end": {"ref": [159, 0]}}]},
-		{"label": "41", "contentRanges": [{"start": {"ref": [160, 0]}, "end": {"ref": [162, 0]}}]},
-		{"label": "42", "contentRanges": [{"start": {"ref": [163, 0]}, "end": {"ref": [167, 0]}}]},
-		{"label": "43", "contentRanges": [{"start": {"ref": [168, 0]}, "end": {"ref": [174, 0]}}]},
-		{"label": "44", "contentRanges": [{"start": {"ref": [175, 0]}, "end": {"ref": [176, 0]}}]},
-		{"label": "45", "contentRanges": [{"start": {"ref": [177, 0]}, "end": {"ref": [179, 0]}}]},
-		{"label": "46", "contentRanges": [{"start": {"ref": [180, 0]}, "end": {"ref": [181, 0]}}]},
-		{"label": "47", "contentRanges": [{"start": {"ref": [182, 0]}, "end": {"ref": [185, 4]}}]},
-		{"label": "48", "contentRanges": [{"start": {"ref": [186, 0]}, "end": {"ref": [190, 2]}}]},
-		{"label": "49", "contentRanges": [{"start": {"ref": [191, 0]}, "end": {"ref": [192, 0]}}]},
-		{"label": "50", "contentRanges": [{"start": {"ref": [193, 0]}, "end": {"ref": [206, 0, 1]}}]},
-		{"label": "51", "contentRanges": [{"start": {"ref": [207, 0, 0]}, "end": {"ref": [212, 0, 1]}}]},
-		{"label": "52", "contentRanges": [{"start": {"ref": [213, 0, 0]}, "end": {"ref": [217, 0, 3]}}]},
-		{"label": "53", "contentRanges": [{"start": {"ref": [218, 0, 0]}, "end": {"ref": [224, 0, 11]}}]},
-		{"label": "54", "contentRanges": [{"start": {"ref": [225, 0, 0]}, "end": {"ref": [233, 19]}}]},
-		{"label": "55", "contentRanges": [{"start": {"ref": [234, 0]}, "end": {"ref": [239, 2]}}]}
-	],
+	"catalog": {
+		"pages": [
+			{"label": "1", "contentRanges": [[[0, 0], [13, 0]]]},
+			{"label": "2", "contentRanges": [[[14, 0], [23, 3, 14]]]},
+			{"label": "3", "contentRanges": [[[24, 0], [28, 4, 0, 0]]]},
+			{"label": "4", "contentRanges": [[[29, 0], [35, 0]]]},
+			{"label": "5", "contentRanges": [[[36, 0], [40, 0]]]},
+			{"label": "6", "contentRanges": [[[41, 0], [46, 0]]]},
+			{"label": "7", "contentRanges": [[[47, 0], [53, 0]]]},
+			{"label": "8", "contentRanges": [[[54, 0], [58, 2]]]},
+			{"label": "9", "contentRanges": [[[59, 0], [62, 0]]]},
+			{"label": "10", "contentRanges": [[[63, 0], [66, 0]]]},
+			{"label": "11", "contentRanges": [[[67, 0], [71, 0]]]},
+			{"label": "12", "contentRanges": [[[72, 0], [78, 2]]]},
+			{"label": "13", "contentRanges": [[[79, 0], [82, 0]]]},
+			{"label": "14", "contentRanges": [[[83, 0], [86, 2]]]},
+			{"label": "15", "contentRanges": [[[87, 0], [88, 0]]]},
+			{"label": "16", "contentRanges": [[[89, 0], [91, 16]]]},
+			{"label": "17", "contentRanges": [[[92, 0], [92, 0]]]},
+			{"label": "18", "contentRanges": [[[93, 0], [96, 2]]]},
+			{"label": "19", "contentRanges": [[[97, 0], [100, 4]]]},
+			{"label": "20", "contentRanges": [[[101, 0], [103, 0]]]},
+			{"label": "21", "contentRanges": [[[104, 0], [106, 0]]]},
+			{"label": "22", "contentRanges": [[[107, 0], [110, 7]]]},
+			{"label": "23", "contentRanges": [[[111, 0], [113, 8]]]},
+			{"label": "24", "contentRanges": [[[114, 0], [117, 0]]]},
+			{"label": "25", "contentRanges": [[[118, 0], [120, 0]]]},
+			{"label": "26", "contentRanges": [[[121, 0], [123, 0]]]},
+			{"label": "27", "contentRanges": [[[124, 0], [125, 6]]]},
+			{"label": "28", "contentRanges": [[[126, 0], [127, 0]]]},
+			{"label": "29", "contentRanges": [[[128, 0], [132, 0]]]},
+			{"label": "30", "contentRanges": [[[133, 0], [134, 0]]]},
+			{"label": "31", "contentRanges": [[[135, 0], [136, 0]]]},
+			{"label": "32", "contentRanges": [[[137, 0], [139, 0]]]},
+			{"label": "33", "contentRanges": [[[140, 0], [141, 2]]]},
+			{"label": "34", "contentRanges": [[[142, 0], [144, 0]]]},
+			{"label": "35", "contentRanges": [[[145, 0], [147, 0]]]},
+			{"label": "36", "contentRanges": [[[148, 0], [150, 4]]]},
+			{"label": "37", "contentRanges": [[[151, 0], [153, 0]]]},
+			{"label": "38", "contentRanges": [[[154, 0], [155, 0]]]},
+			{"label": "39", "contentRanges": [[[156, 0], [157, 0]]]},
+			{"label": "40", "contentRanges": [[[158, 0], [159, 0]]]},
+			{"label": "41", "contentRanges": [[[160, 0], [162, 0]]]},
+			{"label": "42", "contentRanges": [[[163, 0], [167, 0]]]},
+			{"label": "43", "contentRanges": [[[168, 0], [174, 0]]]},
+			{"label": "44", "contentRanges": [[[175, 0], [176, 0]]]},
+			{"label": "45", "contentRanges": [[[177, 0], [179, 0]]]},
+			{"label": "46", "contentRanges": [[[180, 0], [181, 0]]]},
+			{"label": "47", "contentRanges": [[[182, 0], [185, 4]]]},
+			{"label": "48", "contentRanges": [[[186, 0], [190, 2]]]},
+			{"label": "49", "contentRanges": [[[191, 0], [192, 0]]]},
+			{"label": "50", "contentRanges": [[[193, 0], [206, 0, 1]]]},
+			{"label": "51", "contentRanges": [[[207, 0, 0], [212, 0, 1]]]},
+			{"label": "52", "contentRanges": [[[213, 0, 0], [217, 0, 3]]]},
+			{"label": "53", "contentRanges": [[[218, 0, 0], [224, 0, 11]]]},
+			{"label": "54", "contentRanges": [[[225, 0, 0], [233, 19]]]},
+			{"label": "55", "contentRanges": [[[234, 0], [239, 2]]]}
+		],
+		"outline": [
+			{"title": "Titlepage", "ref": [0], "target": {"position": {"pageIndex": 0}}},
+			{"title": "Imprint", "ref": [3], "target": {"position": {"pageIndex": 0}}},
+			{
+				"title": "Introductory",
+				"ref": [9],
+				"target": {"position": {"pageIndex": 0}},
+				"children": [
+					{"title": "The Family of Mendoza", "ref": [10], "target": {"position": {"pageIndex": 0}}},
+					{
+						"title": "Don Diego Hurtado de Mendoza, Author of Lazarillo de Tormes",
+						"ref": [32],
+						"target": {"position": {"pageIndex": 3}}
+					},
+					{
+						"title": "The Book, Lazarillo de Tormes",
+						"ref": [42],
+						"target": {"position": {"pageIndex": 5}},
+						"children": [
+							{"title": "English Translations", "ref": [48], "target": {"position": {"pageIndex": 6}}}
+						]
+					},
+					{
+						"title": "Notes on the Character of Lazaro",
+						"ref": [55],
+						"target": {"position": {"pageIndex": 7}}
+					}
+				]
+			},
+			{
+				"title": "The Life of Lazarillo de Tormes",
+				"ref": [67],
+				"target": {"position": {"pageIndex": 10}},
+				"children": [
+					{"title": "Prologue", "ref": [68], "target": {"position": {"pageIndex": 10}}},
+					{
+						"title": "I: Lazaro Relates the Way of His Birth and Tells Whose Son He Is",
+						"ref": [73],
+						"target": {"position": {"pageIndex": 11}}
+					},
+					{"title": "First Master", "ref": [83], "target": {"position": {"pageIndex": 13}}},
+					{"title": "Second Master", "ref": [108], "target": {"position": {"pageIndex": 21}}},
+					{"title": "Third Master", "ref": [128], "target": {"position": {"pageIndex": 28}}},
+					{"title": "Fourth Master", "ref": [168], "target": {"position": {"pageIndex": 42}}},
+					{"title": "Fifth Master", "ref": [171], "target": {"position": {"pageIndex": 42}}},
+					{"title": "Sixth Master", "ref": [183], "target": {"position": {"pageIndex": 46}}},
+					{"title": "Seventh Master", "ref": [186], "target": {"position": {"pageIndex": 47}}}
+				]
+			},
+			{
+				"title": "Sketch Map of the Route from Salamanca to Toledo",
+				"ref": [194],
+				"target": {"position": {"pageIndex": 49}}
+			},
+			{"title": "Endnotes", "ref": [196], "target": {"position": {"pageIndex": 49}}},
+			{"title": "List of Illustrations", "ref": [226], "target": {"position": {"pageIndex": 53}}},
+			{"title": "Colophon", "ref": [228], "target": {"position": {"pageIndex": 53}}},
+			{"title": "Uncopyright", "ref": [235], "target": {"position": {"pageIndex": 54}}}
+		],
+		"pageMappingType": "locations"
+	},
 	"content": [
 		{
 			"type": "heading",
@@ -3798,67 +3867,5 @@
 			],
 			"anchor": {"selectorMap": "/6/36!/4/2/10"}
 		}
-	],
-	"pageMappingType": "locations",
-	"outline": [
-		{"title": "Titlepage", "ref": [0], "target": {"position": {"pageIndex": 0}}},
-		{"title": "Imprint", "ref": [3], "target": {"position": {"pageIndex": 0}}},
-		{
-			"title": "Introductory",
-			"ref": [9],
-			"target": {"position": {"pageIndex": 0}},
-			"children": [
-				{"title": "The Family of Mendoza", "ref": [10], "target": {"position": {"pageIndex": 0}}},
-				{
-					"title": "Don Diego Hurtado de Mendoza, Author of Lazarillo de Tormes",
-					"ref": [32],
-					"target": {"position": {"pageIndex": 3}}
-				},
-				{
-					"title": "The Book, Lazarillo de Tormes",
-					"ref": [42],
-					"target": {"position": {"pageIndex": 5}},
-					"children": [
-						{"title": "English Translations", "ref": [48], "target": {"position": {"pageIndex": 6}}}
-					]
-				},
-				{
-					"title": "Notes on the Character of Lazaro",
-					"ref": [55],
-					"target": {"position": {"pageIndex": 7}}
-				}
-			]
-		},
-		{
-			"title": "The Life of Lazarillo de Tormes",
-			"ref": [67],
-			"target": {"position": {"pageIndex": 10}},
-			"children": [
-				{"title": "Prologue", "ref": [68], "target": {"position": {"pageIndex": 10}}},
-				{
-					"title": "I: Lazaro Relates the Way of His Birth and Tells Whose Son He Is",
-					"ref": [73],
-					"target": {"position": {"pageIndex": 11}}
-				},
-				{"title": "First Master", "ref": [83], "target": {"position": {"pageIndex": 13}}},
-				{"title": "Second Master", "ref": [108], "target": {"position": {"pageIndex": 21}}},
-				{"title": "Third Master", "ref": [128], "target": {"position": {"pageIndex": 28}}},
-				{"title": "Fourth Master", "ref": [168], "target": {"position": {"pageIndex": 42}}},
-				{"title": "Fifth Master", "ref": [171], "target": {"position": {"pageIndex": 42}}},
-				{"title": "Sixth Master", "ref": [183], "target": {"position": {"pageIndex": 46}}},
-				{"title": "Seventh Master", "ref": [186], "target": {"position": {"pageIndex": 47}}}
-			]
-		},
-		{
-			"title": "Sketch Map of the Route from Salamanca to Toledo",
-			"ref": [194],
-			"target": {"position": {"pageIndex": 49}}
-		},
-		{"title": "Endnotes", "ref": [196], "target": {"position": {"pageIndex": 49}}},
-		{"title": "List of Illustrations", "ref": [226], "target": {"position": {"pageIndex": 53}}},
-		{"title": "Colophon", "ref": [228], "target": {"position": {"pageIndex": 53}}},
-		{"title": "Uncopyright", "ref": [235], "target": {"position": {"pageIndex": 54}}}
-	],
-	"characterCount": 121382,
-	"fileSize": 614906
+	]
 }

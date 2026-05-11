@@ -8,6 +8,7 @@ import { createCanvas } from 'canvas';
 import * as pdfjs from '../../pdf.js/src/pdf.js';
 import * as pdfjsWorker from '../../pdf.js/src/pdf.worker.js';
 import { getFulltext, getStructure } from '../../src/pdf/index.js';
+import { readFixtureSourceHash } from '../helpers/fixtures.js';
 
 globalThis.pdfjsWorker = pdfjsWorker;
 
@@ -66,10 +67,12 @@ describe('dataProvider integration', { timeout: 30000 }, () => {
 		}
 
 		let buf = fs.readFileSync(resolve(pdfFixturesDir, 'full', '1.pdf'));
-		let result = await getStructure(buf, '', trackingProvider);
+		let result = await getStructure(buf, '', trackingProvider, {
+			sourceHash: readFixtureSourceHash('pdf', 'full', '1.pdf'),
+		});
 
 		assert.equal(typeof result, 'object');
-		assert.ok(Array.isArray(result.pages));
+		assert.ok(Array.isArray(result.catalog.pages));
 		assert.ok(Array.isArray(result.content));
 		assert.ok(result.content.length > 0);
 

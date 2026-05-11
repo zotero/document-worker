@@ -306,24 +306,29 @@ function getPageLabels(catalogPageLabels, pageLabelCandidates, pagesCount) {
 }
 
 export function addPageLabels(structure, catalogPageLabels) {
-	if (!structure || !Array.isArray(structure.pages)) {
+	if (!structure || !Array.isArray(structure.catalog.pages)) {
 		return;
 	}
 
-	const pagesCount = structure.pages.length;
+	const pagesCount = structure.catalog.pages.length;
 	let pageLabels = null;
 
 	if (Array.isArray(catalogPageLabels) && catalogPageLabels.length === pagesCount) {
 		pageLabels = catalogPageLabels;
 	} else {
 		const pageLabelCandidates = [];
-		for (let pageIndex = 0; pageIndex < structure.pages.length; pageIndex++) {
-			let page = structure.pages[pageIndex];
+		for (let pageIndex = 0; pageIndex < structure.catalog.pages.length; pageIndex++) {
+			let page = structure.catalog.pages[pageIndex];
 			if (page && Array.isArray(page.contentRanges)) {
 				// Get all content nodes for this page
 				let contentNodes = [];
 				for (let range of page.contentRanges) {
-					for (let i = range[0]; i <= range[1]; i++) {
+					let startTopLevel = range?.[0]?.[0];
+					let endTopLevel = range?.[1]?.[0];
+					if (!Number.isInteger(startTopLevel) || !Number.isInteger(endTopLevel)) {
+						continue;
+					}
+					for (let i = startTopLevel; i <= endTopLevel; i++) {
 						contentNodes.push(structure.content[i]);
 					}
 				}
@@ -345,6 +350,6 @@ export function addPageLabels(structure, catalogPageLabels) {
 
 	for (let i = 0; i < pagesCount; i++) {
 		const label = pageLabels[i] != null ? String(pageLabels[i]) : (i + 1).toString();
-		structure.pages[i].label = label;
+		structure.catalog.pages[i].label = label;
 	}
 }

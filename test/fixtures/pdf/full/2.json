@@ -1,94 +1,85 @@
 {
-	"schemaVersion": "1.0.0-draft",
-	"processor": {"type": "pdf", "version": "1.0.0-draft"},
-	"sourceContentType": "application/pdf",
-	"sourceHash": "",
+	"schemaVersion": "1.0.0",
 	"metadata": {
-		"PDFFormatVersion": "1.4",
-		"Creator": "Writer",
-		"Producer": "OpenOffice.org 2.4",
-		"CreationDate": "D:20090324113315-06'00'",
-		"Language": "en-GB"
-	},
-	"pages": [
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [0, 0]}, "end": {"ref": [5, 0]}},
-				{"start": {"ref": [71, 0]}, "end": {"ref": [71, 0]}}
-			],
-			"label": "1"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [6, 0]}, "end": {"ref": [11, 2]}},
-				{"start": {"ref": [72, 0]}, "end": {"ref": [72, 0]}},
-				{"start": {"ref": [12, 0]}, "end": {"ref": [13, 8]}}
-			],
-			"label": "2"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [14, 0]}, "end": {"ref": [22, 0]}},
-				{"start": {"ref": [73, 0]}, "end": {"ref": [73, 0]}},
-				{"start": {"ref": [23, 0]}, "end": {"ref": [23, 0]}}
-			],
-			"label": "3"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [24, 0]}, "end": {"ref": [31, 0]}},
-				{"start": {"ref": [74, 0]}, "end": {"ref": [74, 0]}},
-				{"start": {"ref": [32, 0]}, "end": {"ref": [33, 0]}}
-			],
-			"label": "4"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [34, 0]}, "end": {"ref": [39, 0]}},
-				{"start": {"ref": [75, 0]}, "end": {"ref": [75, 0]}},
-				{"start": {"ref": [40, 0]}, "end": {"ref": [43, 0]}}
-			],
-			"label": "5"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [44, 0]}, "end": {"ref": [51, 5, 11]}},
-				{"start": {"ref": [76, 0]}, "end": {"ref": [76, 0]}},
-				{"start": {"ref": [52, 0]}, "end": {"ref": [52, 0]}}
-			],
-			"label": "6"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [53, 0]}, "end": {"ref": [63, 0]}},
-				{"start": {"ref": [77, 0]}, "end": {"ref": [77, 0]}}
-			],
-			"label": "7"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [64, 0]}, "end": {"ref": [68, 0]}},
-				{"start": {"ref": [78, 0]}, "end": {"ref": [78, 0]}}
-			],
-			"label": "8"
-		},
-		{
-			"viewRect": [0, 0, 612, 792],
-			"contentRanges": [
-				{"start": {"ref": [69, 0]}, "end": {"ref": [70, 7, 0]}},
-				{"start": {"ref": [79, 0]}, "end": {"ref": [79, 0]}}
-			],
-			"label": "9"
+		"processor": {"type": "pdf", "version": "1.0.0"},
+		"dateCreated": "2000-01-01T00:00:00.000Z",
+		"source": {
+			"contentType": "application/pdf",
+			"hash": "d56d71ecadf2137be09d8b1d35c6c042",
+			"properties": {
+				"PDFFormatVersion": "1.4",
+				"Creator": "Writer",
+				"Producer": "OpenOffice.org 2.4",
+				"CreationDate": "D:20090324113315-06'00'",
+				"Language": "en-GB"
+			}
 		}
-	],
+	},
+	"catalog": {
+		"pages": [
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [[[0, 0], [5, 0]], [[71, 0], [71, 0]]],
+				"label": "1"
+			},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [[[6, 0], [11, 2]], [[72, 0], [72, 0]], [[12, 0], [13, 8]]],
+				"label": "2"
+			},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [[[14, 0], [22, 0]], [[73, 0], [73, 0]], [[23, 0], [23, 0]]],
+				"label": "3"
+			},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [[[24, 0], [31, 0]], [[74, 0], [74, 0]], [[32, 0], [33, 0]]],
+				"label": "4"
+			},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [[[34, 0], [39, 0]], [[75, 0], [75, 0]], [[40, 0], [43, 0]]],
+				"label": "5"
+			},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [[[44, 0], [51, 5, 11]], [[76, 0], [76, 0]], [[52, 0], [52, 0]]],
+				"label": "6"
+			},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [[[53, 0], [63, 0]], [[77, 0], [77, 0]]],
+				"label": "7"
+			},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [[[64, 0], [68, 0]], [[78, 0], [78, 0]]],
+				"label": "8"
+			},
+			{
+				"viewRect": [0, 0, 612, 792],
+				"contentRanges": [[[69, 0], [70, 7, 0]], [[79, 0], [79, 0]]],
+				"label": "9"
+			}
+		],
+		"outline": [
+			{"title": "Satoshi Nakamoto satoshin@gmx.com www.bitcoin.org", "ref": [1]},
+			{"title": "1. Introduction", "ref": [3]},
+			{"title": "2. Transactions", "ref": [6]},
+			{"title": "3. Timestamp Server", "ref": [10]},
+			{"title": "4. Proof-of-Work", "ref": [14]},
+			{"title": "5. Network", "ref": [19]},
+			{"title": "6. Incentive", "ref": [25]},
+			{"title": "7. Reclaiming Disk Space", "ref": [29]},
+			{"title": "8. Simplified Payment Verification", "ref": [34]},
+			{"title": "9. Combining and Splitting Value", "ref": [37]},
+			{"title": "10. Privacy", "ref": [44]},
+			{"title": "11. Calculations", "ref": [47]},
+			{"title": "12. Conclusion", "ref": [67]},
+			{"title": "References", "ref": [69]}
+		]
+	},
 	"content": [
 		{
 			"type": "heading",
@@ -1673,21 +1664,5 @@
 			"anchor": {"pageRects": [[8, 310.8, 71.82, 315.85, 83]]},
 			"content": [{"text": "9", "anchor": {"textMap": "[[0,8,311,72,316,83]]"}}]
 		}
-	],
-	"outline": [
-		{"title": "Satoshi Nakamoto satoshin@gmx.com www.bitcoin.org", "ref": [1]},
-		{"title": "1. Introduction", "ref": [3]},
-		{"title": "2. Transactions", "ref": [6]},
-		{"title": "3. Timestamp Server", "ref": [10]},
-		{"title": "4. Proof-of-Work", "ref": [14]},
-		{"title": "5. Network", "ref": [19]},
-		{"title": "6. Incentive", "ref": [25]},
-		{"title": "7. Reclaiming Disk Space", "ref": [29]},
-		{"title": "8. Simplified Payment Verification", "ref": [34]},
-		{"title": "9. Combining and Splitting Value", "ref": [37]},
-		{"title": "10. Privacy", "ref": [44]},
-		{"title": "11. Calculations", "ref": [47]},
-		{"title": "12. Conclusion", "ref": [67]},
-		{"title": "References", "ref": [69]}
 	]
 }

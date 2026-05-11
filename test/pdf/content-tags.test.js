@@ -20,7 +20,7 @@ describe('getContent JSON format', () => {
 		};
 
 		const actual = getContent(structure, [
-			{ start: { ref: [0] }, end: { ref: [1] } },
+			[[0], [1]],
 		]);
 
 		assert.deepEqual(actual,[
@@ -63,7 +63,7 @@ describe('getContent JSON format', () => {
 		};
 
 		const actual = getContent(structure, [
-			{ start: { ref: [0] }, end: { ref: [0] } },
+			[[0], [0]],
 		]);
 
 		assert.deepEqual(actual,[
@@ -95,7 +95,7 @@ describe('getContent JSON format', () => {
 		};
 
 		const actual = getContent(structure, [
-			{ start: { ref: [0] }, end: { ref: [1] } },
+			[[0], [1]],
 		]);
 
 		assert.deepEqual(actual,[

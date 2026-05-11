@@ -17,6 +17,7 @@
     assert(worker && typeof worker === 'object', 'worker export should exist');
     assert(worker.pdf && typeof worker.pdf === 'object', 'worker.pdf should exist');
     assert(typeof worker.getStructuredDocumentText === 'function', 'getStructuredDocumentText should be exported');
+    assert(typeof worker.getStructuredDocumentTextJSON === 'undefined', 'getStructuredDocumentTextJSON should not be exported');
     assert(typeof worker.getStructure === 'undefined', 'getStructure should not be exported');
     assert(typeof worker.getFulltext === 'undefined', 'top-level getFulltext should not be exported');
     assert(typeof worker.getEpubFulltext === 'undefined', 'getEpubFulltext should not be exported');

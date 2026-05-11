@@ -4,24 +4,20 @@ import { createStructureIndex } from '../../src/pdf/structure/structure-index.js
 
 function createTestStructure() {
 	return {
-		pages: [
-			{
-				contentRanges: [
-					{
-						start: { ref: [0] },
-						end: { ref: [1] },
-					},
-				],
-			},
-			{
-				contentRanges: [
-					{
-						start: { ref: [2] },
-						end: { ref: [2] },
-					},
-				],
-			},
-		],
+		catalog: {
+			pages: [
+				{
+					contentRanges: [
+						[[0], [1]],
+					],
+				},
+				{
+					contentRanges: [
+						[[2], [2]],
+					],
+				},
+			],
+		},
 		content: [
 			{
 				type: 'paragraph',

@@ -30,7 +30,7 @@ function getMergeGroups(structure) {
 describe('mergeParagraphs', () => {
 	it('keeps normal cross-page paragraph continuations', () => {
 		let structure = {
-			pages: [{}, {}],
+			catalog: { pages: [{}, {}] },
 			content: [
 				paragraph(0, 'alpha'),
 				paragraph(1, 'beta'),
@@ -42,7 +42,7 @@ describe('mergeParagraphs', () => {
 
 	it('does not merge paragraphs across a degraded extraction page boundary', () => {
 		let structure = {
-			pages: [{ extractionDegraded: true }, {}],
+			catalog: { pages: [{ extractionDegraded: true }, {}] },
 			content: [
 				paragraph(0, 'alpha'),
 				paragraph(1, 'beta'),
@@ -54,7 +54,7 @@ describe('mergeParagraphs', () => {
 
 	it('still allows same-page paragraph cleanup on degraded extraction pages', () => {
 		let structure = {
-			pages: [{ extractionDegraded: true }],
+			catalog: { pages: [{ extractionDegraded: true }] },
 			content: [
 				paragraph(0, 'alpha'),
 				paragraph(0, 'beta'),

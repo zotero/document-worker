@@ -5,13 +5,25 @@ import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { getEpubStructure, getEpubFulltext } from '../../src/dom/epub/index';
 import stringify from 'json-stringify-pretty-compact';
+import { readFixtureSourceHash } from '../helpers/fixtures.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const epubsDir = resolve(__dirname, '..', 'fixtures', 'epub');
+const NORMALIZED_DATE_CREATED = '2000-01-01T00:00:00.000Z';
 
 function loadEpub(filename) {
 	let buf = fs.readFileSync(resolve(epubsDir, filename));
 	return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+}
+
+function extractEpubStructure(filename) {
+	let buf = loadEpub(filename);
+	return getEpubStructure(buf, { sourceHash: readFixtureSourceHash('epub', filename) });
+}
+
+function extractEpubFulltext(filename, options = {}) {
+	let buf = loadEpub(filename);
+	return getEpubFulltext(buf, options);
 }
 
 let epubFiles = fs.readdirSync(epubsDir).filter(f => f.endsWith('.epub'));
@@ -22,28 +34,28 @@ describe('EPUB structure extraction', { timeout: 30000 }, () => {
 			let structure;
 
 			it('extracts structure without throwing', () => {
-				structure = getEpubStructure(loadEpub(file));
+				structure = extractEpubStructure(file);
 				assert.ok(structure);
 			});
 
 			it('has correct top-level fields', () => {
-				assert.equal(structure.schemaVersion, '1.0.0-draft');
-				assert.equal(structure.processor.type, 'epub');
-				assert.equal(structure.sourceContentType, 'application/epub+zip');
-				assert.ok(structure.dateCreated);
-				assert.ok(typeof structure.fileSize === 'number');
+				assert.equal(structure.schemaVersion, '1.0.0');
+				assert.equal(structure.metadata.processor.type, 'epub');
+				assert.equal(structure.metadata.source.contentType, 'application/epub+zip');
+				assert.ok(structure.metadata.dateCreated);
+				assert.ok(typeof structure.metadata.source.fileSize === 'number');
 			});
 
 			it('has metadata', () => {
 				assert.ok(structure.metadata);
-				assert.ok(structure.metadata.title, 'should have a title');
-				assert.ok(typeof structure.metadata.title === 'string');
+				assert.ok(structure.metadata.source.properties.title, 'should have a title');
+				assert.ok(typeof structure.metadata.source.properties.title === 'string');
 			});
 
 			it('has pages (spine items)', () => {
-				assert.ok(Array.isArray(structure.pages));
-				assert.ok(structure.pages.length > 0, 'should have at least one page');
-				for (let page of structure.pages) {
+				assert.ok(Array.isArray(structure.catalog.pages));
+				assert.ok(structure.catalog.pages.length > 0, 'should have at least one page');
+				for (let page of structure.catalog.pages) {
 					assert.ok(Array.isArray(page.contentRanges), 'each page should have contentRanges');
 				}
 			});
@@ -54,8 +66,8 @@ describe('EPUB structure extraction', { timeout: 30000 }, () => {
 			});
 
 			it('has character count', () => {
-				assert.ok(typeof structure.characterCount === 'number');
-				assert.ok(structure.characterCount > 0);
+				assert.ok(typeof structure.metadata.characterCount === 'number');
+				assert.ok(structure.metadata.characterCount > 0);
 			});
 
 			it('blocks have valid types', () => {
@@ -78,15 +90,15 @@ describe('EPUB structure extraction', { timeout: 30000 }, () => {
 			});
 
 			it('has an outline', () => {
-				assert.ok(Array.isArray(structure.outline), 'should have an outline');
-				assert.ok(structure.outline.length > 0, 'outline should not be empty');
-				for (let item of structure.outline) {
+				assert.ok(Array.isArray(structure.catalog.outline), 'should have an outline');
+				assert.ok(structure.catalog.outline.length > 0, 'outline should not be empty');
+				for (let item of structure.catalog.outline) {
 					assert.ok(typeof item.title === 'string');
 				}
 			});
 
 			it('outline items have valid page targets', () => {
-				let pageCount = structure.pages.length;
+				let pageCount = structure.catalog.pages.length;
 				function checkTargets(items) {
 					for (let item of items) {
 						if (item.target) {
@@ -97,7 +109,7 @@ describe('EPUB structure extraction', { timeout: 30000 }, () => {
 						if (item.children) checkTargets(item.children);
 					}
 				}
-				checkTargets(structure.outline);
+				checkTargets(structure.catalog.outline);
 			});
 
 			it('outline items with fragment refs point to valid blocks', () => {
@@ -114,7 +126,7 @@ describe('EPUB structure extraction', { timeout: 30000 }, () => {
 						if (item.children) checkRefs(item.children);
 					}
 				}
-				checkRefs(structure.outline);
+				checkRefs(structure.catalog.outline);
 			});
 
 			it('outline items with fragments have block-level refs', () => {
@@ -136,7 +148,7 @@ describe('EPUB structure extraction', { timeout: 30000 }, () => {
 						if (item.children) checkRefs(item.children);
 					}
 				}
-				checkRefs(structure.outline);
+				checkRefs(structure.catalog.outline);
 			});
 
 			it('content blocks have text', () => {
@@ -148,14 +160,14 @@ describe('EPUB structure extraction', { timeout: 30000 }, () => {
 			});
 
 			it('pages with content have non-empty contentRanges', () => {
-				let pagesWithContent = structure.pages.filter(p => p.contentRanges.length > 0);
+				let pagesWithContent = structure.catalog.pages.filter(p => p.contentRanges.length > 0);
 				assert.ok(pagesWithContent.length > 0, 'at least some pages should have content');
 				for (let page of pagesWithContent) {
 					for (let range of page.contentRanges) {
-						assert.ok(range.start, 'contentRange should have start');
-						assert.ok(range.end, 'contentRange should have end');
-						assert.ok(range.start.ref, 'contentRange start should have a ref');
-						assert.ok(range.end.ref, 'contentRange end should have a ref');
+						assert.ok(Array.isArray(range), 'contentRange should be a tuple');
+						assert.equal(range.length, 2, 'contentRange should have start and end');
+						assert.ok(Array.isArray(range[0]), 'contentRange start should be a point');
+						assert.ok(Array.isArray(range[1]), 'contentRange end should be a point');
 					}
 				}
 			});
@@ -167,27 +179,35 @@ describe('EPUB fulltext extraction', { timeout: 30000 }, () => {
 	for (let file of epubFiles) {
 		describe(file, () => {
 			it('extracts fulltext', () => {
-				let { text, totalSections } = getEpubFulltext(loadEpub(file));
+				let { text, totalSections } = extractEpubFulltext(file);
 				assert.ok(typeof text === 'string');
 				assert.ok(text.length > 0, 'fulltext should not be empty');
 				assert.ok(totalSections > 0, 'should have at least one section');
 			});
 
 			it('fulltext contains expected words', () => {
-				let { text } = getEpubFulltext(loadEpub(file));
+				let { text } = extractEpubFulltext(file);
 				// Every Standard Ebooks epub should contain common English words
 				assert.ok(text.length > 100, 'fulltext should be substantial');
 			});
 
 			it('fulltext matches structure character count', () => {
-				let structure = getEpubStructure(loadEpub(file));
-				let { text } = getEpubFulltext(loadEpub(file), { structure });
+				let structure = extractEpubStructure(file);
+				let { text } = extractEpubFulltext(file, { structure });
 				// Fulltext includes page separators so may be slightly longer
-				assert.ok(text.length >= structure.characterCount,
-					`fulltext (${text.length}) should be >= characterCount (${structure.characterCount})`);
+				assert.ok(text.length >= structure.metadata.characterCount,
+					`fulltext (${text.length}) should be >= characterCount (${structure.metadata.characterCount})`);
 			});
 		});
 	}
+
+	it('does not require sourceHash with a precomputed structure', () => {
+		let file = epubFiles[0];
+		let buf = loadEpub(file);
+		let structure = extractEpubStructure(file);
+		let { text } = getEpubFulltext(buf, { structure });
+		assert.ok(text.length > 0);
+	});
 });
 
 describe('EPUB compatible vs advanced produce consistent results', { timeout: 30000 }, () => {
@@ -209,40 +229,40 @@ describe('EPUB compatible vs advanced produce consistent results', { timeout: 30
 
 		describe(base, () => {
 			it('both versions extract the same metadata', () => {
-				let sc = getEpubStructure(loadEpub(compatible));
-				let sa = getEpubStructure(loadEpub(advanced));
-				assert.deepEqual(sc.metadata, sa.metadata);
+				let sc = extractEpubStructure(compatible);
+				let sa = extractEpubStructure(advanced);
+				assert.deepEqual(sc.metadata.source.properties, sa.metadata.source.properties);
 			});
 
 			it('both versions have similar page counts', () => {
-				let sc = getEpubStructure(loadEpub(compatible));
-				let sa = getEpubStructure(loadEpub(advanced));
+				let sc = extractEpubStructure(compatible);
+				let sa = extractEpubStructure(advanced);
 				// Both should use the same mapping type and produce similar page counts
-				assert.equal(sc.pageMappingType, sa.pageMappingType);
-				let ratio = sc.pages.length / sa.pages.length;
+				assert.equal(sc.catalog.pageMappingType, sa.catalog.pageMappingType);
+				let ratio = sc.catalog.pages.length / sa.catalog.pages.length;
 				assert.ok(ratio > 0.8 && ratio < 1.25,
-					`page counts diverge too much: compatible=${sc.pages.length} advanced=${sa.pages.length}`);
+					`page counts diverge too much: compatible=${sc.catalog.pages.length} advanced=${sa.catalog.pages.length}`);
 			});
 
 			it('both versions produce similar character counts', () => {
-				let sc = getEpubStructure(loadEpub(compatible));
-				let sa = getEpubStructure(loadEpub(advanced));
+				let sc = extractEpubStructure(compatible);
+				let sa = extractEpubStructure(advanced);
 				// Allow 5% variance for formatting differences
-				let ratio = sc.characterCount / sa.characterCount;
+				let ratio = sc.metadata.characterCount / sa.metadata.characterCount;
 				assert.ok(ratio > 0.95 && ratio < 1.05,
-					`character counts diverge too much: compatible=${sc.characterCount} advanced=${sa.characterCount}`);
+					`character counts diverge too much: compatible=${sc.metadata.characterCount} advanced=${sa.metadata.characterCount}`);
 			});
 
 			it('both versions have the same outline titles', () => {
-				let sc = getEpubStructure(loadEpub(compatible));
-				let sa = getEpubStructure(loadEpub(advanced));
+				let sc = extractEpubStructure(compatible);
+				let sa = extractEpubStructure(advanced);
 				function titles(items) {
 					return items.map(i => ({
 						title: i.title,
 						...(i.children ? { children: titles(i.children) } : {}),
 					}));
 				}
-				assert.deepEqual(titles(sc.outline), titles(sa.outline));
+				assert.deepEqual(titles(sc.catalog.outline), titles(sa.catalog.outline));
 			});
 		});
 	}
@@ -254,8 +274,8 @@ describe('EPUB-specific content checks', { timeout: 30000 }, () => {
 		let file = epubFiles.find(f => f === '1.epub');
 
 		it('has expected metadata', { skip: !file }, () => {
-			structure = getEpubStructure(loadEpub(file));
-			assert.match(structure.metadata.title, /Lazarillo/i);
+			structure = extractEpubStructure(file);
+			assert.match(structure.metadata.source.properties.title, /Lazarillo/i);
 		});
 
 		it('has headings', { skip: !file }, () => {
@@ -309,7 +329,7 @@ describe('EPUB-specific content checks', { timeout: 30000 }, () => {
 
 		it('outline sub-items resolve to blocks within sections', { skip: !file }, () => {
 			// The introduction has sub-sections with fragment hrefs
-			let intro = structure.outline.find(i => /Introductory/i.test(i.title));
+			let intro = structure.catalog.outline.find(i => /Introductory/i.test(i.title));
 			assert.ok(intro, 'should have Introductory outline item');
 			assert.ok(intro.children && intro.children.length > 0, 'Introductory should have children');
 			for (let child of intro.children) {
@@ -327,9 +347,9 @@ describe('EPUB-specific content checks', { timeout: 30000 }, () => {
 		let file = epubFiles.find(f => f === '2.epub');
 
 		it('has expected metadata', { skip: !file }, () => {
-			structure = getEpubStructure(loadEpub(file));
-			assert.match(structure.metadata.title, /Portent/i);
-			assert.match(structure.metadata.creator, /MacDonald/i);
+			structure = extractEpubStructure(file);
+			assert.match(structure.metadata.source.properties.title, /Portent/i);
+			assert.match(structure.metadata.source.properties.creator, /MacDonald/i);
 		});
 
 		it('has headings', { skip: !file }, () => {
@@ -368,10 +388,9 @@ describe('EPUB structure snapshots', { timeout: 30000 }, () => {
 		let snapshotPath = resolve(epubsDir, name + '.json');
 
 		it(file, () => {
-			let result = getEpubStructure(loadEpub(file));
+			let result = extractEpubStructure(file);
 
-			// Strip non-deterministic fields
-			delete result.dateCreated;
+			result.metadata.dateCreated = NORMALIZED_DATE_CREATED;
 
 			let json = stringify(result, { indent: '\t', maxLength: 100 });
 

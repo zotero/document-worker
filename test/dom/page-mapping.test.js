@@ -679,9 +679,9 @@ describe('findPageForBlock', () => {
 	it('maps block index to correct page', () => {
 		let content = makeFakeContent(10);
 		let pages = [
-			{ label: '1', contentRanges: [{ start: { ref: [0] }, end: { ref: [2] } }] },
-			{ label: '2', contentRanges: [{ start: { ref: [3] }, end: { ref: [6] } }] },
-			{ label: '3', contentRanges: [{ start: { ref: [7] }, end: { ref: [9] } }] },
+			{ label: '1', contentRanges: [[[0], [2]]] },
+			{ label: '2', contentRanges: [[[3], [6]]] },
+			{ label: '3', contentRanges: [[[7], [9]]] },
 		];
 
 		assert.equal(findPageForBlock(pages, content, 0), 0);
@@ -695,7 +695,7 @@ describe('findPageForBlock', () => {
 	it('returns 0 for block before any page', () => {
 		let content = makeFakeContent(5);
 		let pages = [
-			{ label: '1', contentRanges: [{ start: { ref: [2] }, end: { ref: [4] } }] },
+			{ label: '1', contentRanges: [[[2], [4]]] },
 		];
 		assert.equal(findPageForBlock(pages, content, 0), 0);
 	});
