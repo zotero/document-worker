@@ -145,7 +145,7 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
   color: #999;
   border-radius: 4px;
 }
-#html-panel .table-block {
+#html-panel .fallback-table {
   font-family: 'Courier New', monospace;
   font-size: 0.9em;
   padding: 8px;
@@ -154,6 +154,43 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   white-space: pre-wrap;
+}
+#html-panel .table-block {
+  width: 100%;
+  max-width: 100%;
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 0.8em 0;
+  font-size: 0.9em;
+  white-space: normal;
+}
+#html-panel .table-block tbody {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+}
+#html-panel .table-block tr {
+  display: table-row;
+}
+#html-panel .table-block td {
+  display: table-cell;
+  border: 1px solid #d6d6d6;
+  padding: 4px 6px;
+  vertical-align: top;
+  background: #fff;
+}
+#html-panel .table-block tr:first-child td {
+  background: #f6f6f6;
+  font-weight: 600;
+}
+#html-panel .table-block p {
+  margin: 0;
+  padding: 0;
+}
+#html-panel .table-block p + p {
+  margin-top: 0.35em;
 }
 #html-panel aside {
   border-left: 3px solid #d0d0d0;
@@ -603,9 +640,7 @@ function renderBlock(block, ref) {
       renderAreaForBlock(el, block);
       break;
     case 'table':
-      el = document.createElement('div');
-      el.className = 'table-block';
-      renderTextContent(el, block.content);
+      el = renderTable(block);
       break;
     case 'note':
       el = document.createElement('aside');
@@ -633,6 +668,12 @@ function renderBlock(block, ref) {
       el = document.createElement('li');
       renderTextContent(el, block.content);
       break;
+    case 'tablerow':
+      el = renderTableRow(block);
+      break;
+    case 'tablecell':
+      el = renderTableCell(block);
+      break;
     case 'preformatted':
       el = document.createElement('pre');
       const code = document.createElement('code');
@@ -659,6 +700,86 @@ function renderBlock(block, ref) {
   }
 
   return el;
+}
+
+function isStructuredTable(block) {
+  return block.content?.some(item => item?.type === 'tablerow');
+}
+
+function renderTable(block) {
+  if (!isStructuredTable(block)) {
+    const el = document.createElement('div');
+    el.className = 'fallback-table';
+    renderTextContent(el, block.content);
+    return el;
+  }
+
+  const table = document.createElement('table');
+  table.className = 'table-block';
+  const tbody = document.createElement('tbody');
+  for (const row of block.content || []) {
+    if (row?.type !== 'tablerow') continue;
+    tbody.appendChild(renderTableRow(row));
+  }
+  table.appendChild(tbody);
+  return table;
+}
+
+function renderTableRow(row) {
+  const tr = document.createElement('tr');
+  for (const cell of row.content || []) {
+    if (cell?.type !== 'tablecell') continue;
+    tr.appendChild(renderTableCell(cell));
+  }
+  return tr;
+}
+
+function renderTableCell(cell) {
+  const td = document.createElement('td');
+  const colspan = Number(cell.colspan ?? cell.colSpan ?? 1);
+  const rowspan = Number(cell.rowspan ?? cell.rowSpan ?? 1);
+  if (Number.isFinite(colspan) && colspan > 1) td.colSpan = colspan;
+  if (Number.isFinite(rowspan) && rowspan > 1) td.rowSpan = rowspan;
+  renderNestedTableContent(td, cell.content);
+  if (!td.childNodes.length) td.appendChild(document.createTextNode('\u00a0'));
+  return td;
+}
+
+function renderNestedTableContent(parent, content) {
+  if (!content) return;
+  const inlineNodes = [];
+
+  const flushInline = () => {
+    if (!inlineNodes.length) return;
+    const span = document.createElement('span');
+    renderTextContent(span, inlineNodes);
+    parent.appendChild(span);
+    inlineNodes.length = 0;
+  };
+
+  for (const node of content) {
+    if (!node?.type) {
+      inlineNodes.push(node);
+      continue;
+    }
+
+    flushInline();
+    if (node.type === 'paragraph' || node.type === 'caption') {
+      const p = document.createElement('p');
+      renderNestedTableContent(p, node.content);
+      parent.appendChild(p);
+    } else if (node.type === 'preformatted') {
+      const pre = document.createElement('pre');
+      const code = document.createElement('code');
+      renderTextContent(code, node.content);
+      pre.appendChild(code);
+      parent.appendChild(pre);
+    } else {
+      renderNestedTableContent(parent, node.content);
+    }
+  }
+
+  flushInline();
 }
 
 function renderTextContent(parent, content) {

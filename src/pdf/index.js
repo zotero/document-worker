@@ -663,7 +663,7 @@ async function getStructure(buf, password, dataProvider, options = {}) {
 	setHandler(pdfManager.pdfDocument, dataProvider);
 
 	let onnxRuntimeProvider = () => dataProvider('onnx/ort-wasm-simd.wasm');
-	let modelProvider = (name) => dataProvider(name + '/model.onnx');
+	let modelProvider = (name) => dataProvider(name.includes('/') ? name : name + '/model.onnx');
 	return await getFullStructure(pdfManager.pdfDocument, onnxRuntimeProvider, modelProvider, options);
 }
 

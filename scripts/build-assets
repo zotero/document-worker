@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-rm -rf build/wasm build/onnx build/block-seg
+rm -rf build/wasm build/onnx build/block-seg build/table-grid
 
 # pdf.js assets
 mkdir -p build/cmaps
@@ -25,3 +25,5 @@ cp src/pdf/structure/model/block-seg/clusterer/runtime.bin build/block-seg/clust
 mkdir -p build/block-seg/classifier
 cp src/pdf/structure/model/block-seg/classifier/model.onnx build/block-seg/classifier/
 cp src/pdf/structure/model/block-seg/classifier/stats.bin build/block-seg/classifier/
+mkdir -p build/table-grid
+cp src/pdf/structure/model/table-grid/*.onnx build/table-grid/
