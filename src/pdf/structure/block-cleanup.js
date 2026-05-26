@@ -1,4 +1,50 @@
 
+import { HEADER_LAST_IS_SOFT_HYPHEN } from '../../../structured-document-text/src/pdf/constants.js';
+import { parseTextMap } from '../../../structured-document-text/src/pdf/decode.js';
+
+function getFirstTextNode(block) {
+	if (!Array.isArray(block?.content)) {
+		return null;
+	}
+	return block.content.find(node => node && typeof node.text === 'string') || null;
+}
+
+function getLastTextNode(block) {
+	if (!Array.isArray(block?.content)) {
+		return null;
+	}
+	for (let i = block.content.length - 1; i >= 0; i--) {
+		const node = block.content[i];
+		if (node && typeof node.text === 'string') {
+			return node;
+		}
+	}
+	return null;
+}
+
+function textNodeEndsWithSoftHyphen(node) {
+	const runs = parseTextMap(node?.anchor?.textMap);
+	const lastRun = runs.at(-1);
+	return Array.isArray(lastRun) && (lastRun[0] & HEADER_LAST_IS_SOFT_HYPHEN) !== 0;
+}
+
+function addParagraphMergeBoundarySpace(first, second) {
+	const lastNode = getLastTextNode(first);
+	const firstNode = getFirstTextNode(second);
+	if (!lastNode || !firstNode) {
+		return;
+	}
+	if (/\s$/.test(lastNode.text) || /^\s/.test(firstNode.text)) {
+		return;
+	}
+	if (textNodeEndsWithSoftHyphen(lastNode)) {
+		return;
+	}
+	if (/[\p{L}\p{N}]$/u.test(lastNode.text) && /^[\p{L}\p{N}]/u.test(firstNode.text)) {
+		lastNode.text += ' ';
+	}
+}
+
 export function cleanupBlockMetrics(structure) {
 	if (!structure || !Array.isArray(structure.content)) {
 		return;
@@ -326,6 +372,12 @@ export function mergeParagraphs(structure, mergeBlocks) {
 
 	if (mergeGroups.length === 0) {
 		return structure;
+	}
+
+	for (const group of mergeGroups) {
+		for (let i = 0; i < group.length - 1; i++) {
+			addParagraphMergeBoundarySpace(structure.content[group[i]], structure.content[group[i + 1]]);
+		}
 	}
 
 	return mergeBlocks(structure, mergeGroups);
