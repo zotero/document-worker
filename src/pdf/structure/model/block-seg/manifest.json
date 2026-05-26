@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "name": "block-seg",
+  "assets": {
+    "clusterer/model.onnx": {
+      "bytes": 4362638,
+      "sha256": "5cb6f8645a0f4c8f4396d5e8b1da70d9c8d8fff8c98f324889b8c6e271575350"
+    },
+    "clusterer/repair.onnx": {
+      "bytes": 358150,
+      "sha256": "7fd29831c26f09cefa5a4f92c797e559bda5f513f6691d339d6c323bd563a789"
+    },
+    "clusterer/runtime.bin": {
+      "bytes": 293284,
+      "sha256": "a0d71f9be6c63404393457ec31875ae799b5f4ba48dc17736112446a4f82ca26"
+    },
+    "clusterer/runtime.json": {
+      "bytes": 3228,
+      "sha256": "ae33809a06b6dc9d132d190da03ee0048edfd23797da02ec6c4c4f4ef01d0ebf"
+    },
+    "classifier/model.onnx": {
+      "bytes": 4367485,
+      "sha256": "572077354eea61583982a31a3f443c5abd8d92c04e2dbfd105299c1ca1d131f7"
+    },
+    "classifier/metadata.json": {
+      "bytes": 5598,
+      "sha256": "a8c11d8fe3992b99f1da0d5340f0014b8c8a25dbe2e50e090e7fcc079b0a9e72"
+    },
+    "classifier/stats.bin": {
+      "bytes": 4016,
+      "sha256": "abc86d6fa7cfb9aa18bafc2fd8cbcbf656350a7190b08fab2239efba5c673e95"
+    }
+  }
+}

@@ -1,0 +1,213 @@
+{
+  "arrays": [
+    {
+      "byteLength": 1296,
+      "byteOffset": 0,
+      "dtype": "f32",
+      "length": 324,
+      "name": "crf.transitions",
+      "shape": [
+        18,
+        18
+      ]
+    },
+    {
+      "byteLength": 72,
+      "byteOffset": 1296,
+      "dtype": "f32",
+      "length": 18,
+      "name": "crf.start",
+      "shape": [
+        18
+      ]
+    },
+    {
+      "byteLength": 72,
+      "byteOffset": 1368,
+      "dtype": "f32",
+      "length": 18,
+      "name": "crf.end",
+      "shape": [
+        18
+      ]
+    },
+    {
+      "byteLength": 224256,
+      "byteOffset": 1440,
+      "dtype": "f32",
+      "length": 56064,
+      "name": "repair.net.0.weight",
+      "shape": [
+        256,
+        219
+      ]
+    },
+    {
+      "byteLength": 1024,
+      "byteOffset": 225696,
+      "dtype": "f32",
+      "length": 256,
+      "name": "repair.net.0.bias",
+      "shape": [
+        256
+      ]
+    },
+    {
+      "byteLength": 65536,
+      "byteOffset": 226720,
+      "dtype": "f16",
+      "length": 32768,
+      "name": "repair.net.3.weight",
+      "shape": [
+        128,
+        256
+      ]
+    },
+    {
+      "byteLength": 512,
+      "byteOffset": 292256,
+      "dtype": "f32",
+      "length": 128,
+      "name": "repair.net.3.bias",
+      "shape": [
+        128
+      ]
+    },
+    {
+      "byteLength": 512,
+      "byteOffset": 292768,
+      "dtype": "f32",
+      "length": 128,
+      "name": "repair.net.6.weight",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "byteLength": 4,
+      "byteOffset": 293280,
+      "dtype": "f32",
+      "length": 1,
+      "name": "repair.net.6.bias",
+      "shape": [
+        1
+      ]
+    }
+  ],
+  "baseLineFeatureDim": 21,
+  "blockTypes": [
+    "title",
+    "body",
+    "caption",
+    "image",
+    "table",
+    "footnote",
+    "list_item",
+    "equation",
+    "frame",
+    "ignore"
+  ],
+  "classToBase": {
+    "0": 0,
+    "1": 1,
+    "10": 0,
+    "11": 1,
+    "12": 2,
+    "13": 3,
+    "14": 4,
+    "15": 5,
+    "16": 6,
+    "17": 7,
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 5,
+    "6": 6,
+    "7": 7,
+    "8": 8,
+    "9": 9
+  },
+  "contClasses": [
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+  ],
+  "contOf": {
+    "0": 10,
+    "1": 11,
+    "2": 12,
+    "3": 13,
+    "4": 14,
+    "5": 15,
+    "6": 16,
+    "7": 17
+  },
+  "fixedShape": {
+    "batch": 1,
+    "inputFeatureDim": 22,
+    "maxObjects": 64,
+    "maxTextTokens": 512
+  },
+  "inputFeatureDim": 22,
+  "inputs": [
+    "line_features",
+    "line_pad_mask",
+    "object_features",
+    "object_pad_mask"
+  ],
+  "kind": "block-seg-clusterer-runtime",
+  "lineFeatureTransform": "clean-v3-directional",
+  "numBaseTypes": 10,
+  "numClasses": 18,
+  "outputs": [
+    "emissions",
+    "object_rule_logits"
+  ],
+  "primaryBases": [
+    0,
+    1,
+    2,
+    4,
+    5,
+    6,
+    7
+  ],
+  "repair": {
+    "featureDim": 219,
+    "hiddenDim": 256,
+    "midDim": 128
+  },
+  "schemaVersion": 1,
+  "shapeMode": "dynamic",
+  "singletonClasses": [
+    8,
+    9
+  ],
+  "startClasses": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "startOf": {
+    "10": 0,
+    "11": 1,
+    "12": 2,
+    "13": 3,
+    "14": 4,
+    "15": 5,
+    "16": 6,
+    "17": 7
+  },
+  "threshold": 0.54
+}

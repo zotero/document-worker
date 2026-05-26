@@ -1,4 +1,4 @@
-import { buildInferenceErrorFallbackBlocks, inference } from './model/line-seg/inference.js';
+import { buildInferenceErrorFallbackBlocks, inferenceBatch } from './model/block-seg/inference.js';
 import { getOutline } from './outline/outline.js';
 import { getReferenceLists } from './reference/reference.js';
 import { getCandidates } from './citations.js';
@@ -29,7 +29,6 @@ const PROCESSOR_VERSION = '1.0.0';
 const DEGRADED_EXTRACTION_FALLBACK_REASONS = new Set([
 	'inference_error',
 	'too_many_lines',
-	'too_many_objects',
 ]);
 
 function hasDegradedExtractionFallbacks(layoutFallbacks) {
@@ -54,6 +53,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	const pageCount = pdfDocument.numPages;
 	const onChunk = typeof options.onChunk === 'function' ? options.onChunk : null;
 	const batchSize = Math.max(1, options.batchSize || 5);
+	const inferenceBatchSize = Math.max(1, options.inferenceBatchSize || (onChunk ? batchSize : 8));
 	const shouldAbort = typeof options.shouldAbort === 'function' ? options.shouldAbort : null;
 	const sourceHash = options.sourceHash;
 
@@ -140,38 +140,9 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 		await onChunk(chunk);
 	}
 
-	for (let i = 0; i < pageCount; i++) {
-		checkAbort();
-
+	async function appendPageContext(context) {
+		let { i, chars, page, blocks, extractionDegraded } = context;
 		let prevContentLength = structure.content.length;
-
-		let { chars, objects } = await pdfDocument.module.getPageCharsObjects(i);
-
-		updateRegularWordsSet(chars, regularWordsSet);
-
-		let page = await pdfDocument.getPage(i);
-
-		let links = await getLinksFromAnnotations(pdfDocument, page);
-		if (links.length) {
-			linkMap.set(i, links);
-		}
-
-		let pageDataList = [{ chars, objects, viewBox: page.view, pageIndex: i }];
-		let blocks = [];
-		let extractionDegraded = false;
-
-		if (chars.length) {
-			let val = {};
-			try {
-				blocks = await inference(pageDataList, onnxRuntimeProvider, modelProvider, val);
-			}
-			catch (error) {
-				blocks = buildInferenceErrorFallbackBlocks(pageDataList[0], val, error);
-			}
-			if (val.layoutFallbacks?.length) {
-				extractionDegraded = hasDegradedExtractionFallbacks(val.layoutFallbacks);
-			}
-		}
 
 		for (let j = 0; j < blocks.length; j++) {
 			let block = blocks[j];
@@ -291,6 +262,83 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 		structure.catalog.pages.push(newPage);
 
 		await emitPartialChunkIfDue(i);
+	}
+
+	async function inferBlockListsWithFallback(inferenceInputs, inferenceVals) {
+		try {
+			return await inferenceBatch(inferenceInputs, onnxRuntimeProvider, modelProvider, inferenceVals);
+		}
+		catch {
+			let blockLists = [];
+			for (let index = 0; index < inferenceInputs.length; index++) {
+				try {
+					blockLists[index] = (await inferenceBatch(
+						[inferenceInputs[index]],
+						onnxRuntimeProvider,
+						modelProvider,
+						[inferenceVals[index]],
+					))[0];
+				}
+				catch (error) {
+					blockLists[index] = buildInferenceErrorFallbackBlocks(
+						inferenceInputs[index],
+						inferenceVals[index],
+						error,
+					);
+				}
+			}
+			return blockLists;
+		}
+	}
+
+	for (let batchStart = 0; batchStart < pageCount; batchStart += inferenceBatchSize) {
+		let contexts = [];
+		let inferenceInputs = [];
+		let inferenceVals = [];
+		let inferenceContextIndexes = [];
+		let batchEnd = Math.min(pageCount, batchStart + inferenceBatchSize);
+
+		for (let i = batchStart; i < batchEnd; i++) {
+			checkAbort();
+
+			let { chars, objects } = await pdfDocument.module.getPageCharsObjects(i);
+
+			updateRegularWordsSet(chars, regularWordsSet);
+
+			let page = await pdfDocument.getPage(i);
+
+			let links = await getLinksFromAnnotations(pdfDocument, page);
+			if (links.length) {
+				linkMap.set(i, links);
+			}
+
+			let context = { i, chars, objects, page, blocks: [], extractionDegraded: false };
+			if (chars.length || objects?.length) {
+				let val = {};
+				inferenceInputs.push({ chars, objects, viewBox: page.view, pageIndex: i });
+				inferenceVals.push(val);
+				inferenceContextIndexes.push(contexts.length);
+			}
+			contexts.push(context);
+		}
+
+		if (inferenceInputs.length) {
+			let blockLists = await inferBlockListsWithFallback(inferenceInputs, inferenceVals);
+			for (let j = 0; j < blockLists.length; j++) {
+				let context = contexts[inferenceContextIndexes[j]];
+				let val = inferenceVals[j];
+				context.blocks = blockLists[j];
+				if (val.layoutFallbacks?.length) {
+					context.extractionDegraded = hasDegradedExtractionFallbacks(val.layoutFallbacks);
+				}
+			}
+		}
+
+
+		for (let context of contexts) {
+			checkAbort();
+			await appendPageContext(context);
+		}
 	}
 
 	await emitPartialChunkIfDue(pageCount - 1, true);
