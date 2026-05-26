@@ -1,21 +1,18 @@
 
 export function updateRegularWordsSet(chars, existingSet) {
-	let word = [];
-	let wordOffsetFrom = 0;
+	let word = '';
 	for (let i = 0; i < chars.length; i++) {
 		let char = chars[i];
-		word.push(char);
+		word += char.c ?? '';
 		if (char.wordBreakAfter) {
-			let text = word.map(x => x.c).join('');
-			let lower = text.toLowerCase();
-			let upper = text.toUpperCase();
+			let lower = word.toLowerCase();
+			let upper = word.toUpperCase();
 
-			if (lower !== upper && text === lower) {
-				existingSet.add(text);
+			if (lower !== upper && word === lower) {
+				existingSet.add(word);
 			}
 
-			word = [];
-			wordOffsetFrom = i + 1;
+			word = '';
 		}
 	}
 	return existingSet;

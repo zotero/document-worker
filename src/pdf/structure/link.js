@@ -263,7 +263,7 @@ export function addRefs(existingRefs, newRefs) {
 	}
 }
 
-export function getParsedLinkRefs(structure) {
+export function getParsedLinkRefs(structure, structureIndex = null) {
 	let linkRefsMap = new Map();
 
 	if (!structure?.content) {
@@ -300,7 +300,9 @@ export function getParsedLinkRefs(structure) {
 	for (let i = 0; i < structure.content.length; i++) {
 		if (structure.content[i].type === 'preformatted') continue;
 		let blockRef = [i];
-		let bt = getBlockText(structure, blockRef);
+		let bt = structureIndex
+			? structureIndex.withBlockText(blockRef, (bt) => bt)
+			: getBlockText(structure, blockRef);
 
 		if (!bt.text || bt.text.length === 0) {
 			continue;

@@ -310,7 +310,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	let structureIndex = createStructureIndex(structure, options.structureIndex);
 
 	let annotLinkRefs = getAnnotLinkRefs(structure, linkMap, structureIndex);
-	let parsedLinkRefs = getParsedLinkRefs(structure);
+	let parsedLinkRefs = getParsedLinkRefs(structure, structureIndex);
 
 	let referenceLists = getReferenceLists(structure, regularWordsSet);
 	for (let refList of referenceLists) {

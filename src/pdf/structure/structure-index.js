@@ -30,6 +30,7 @@ class StructureIndex {
 
 		this._blockEntries = [];
 		this._blockEntryByKey = new Map();
+		this._blockTextByKey = new Map();
 		this._entriesByTopLevel = new Map();
 		this._pageBlockEntries = new Map();
 		this._pageTextEntries = new Map();
@@ -70,9 +71,12 @@ class StructureIndex {
 	}
 
 	withBlockText(blockRef, fn) {
-		let ref = Array.isArray(blockRef) ? blockRef : this.getBlockEntry(blockRef)?.ref;
-		let bt = getBlockText(this.structure, ref);
-		this._recordBlockText(bt);
+		let entry = this.getBlockEntry(blockRef);
+		let ref = Array.isArray(blockRef) ? blockRef : entry?.ref;
+		let bt = entry ? this._getBlockText(entry) : getBlockText(this.structure, ref);
+		if (!entry) {
+			this._recordBlockText(bt);
+		}
 		return fn(bt);
 	}
 
@@ -188,8 +192,7 @@ class StructureIndex {
 		let textBytes = 0;
 
 		for (let entry of this._getPageBlockEntries(pageIndex)) {
-			let bt = getBlockText(this.structure, entry.ref);
-			this._recordBlockText(bt);
+			let bt = this._getBlockText(entry);
 			if (!bt.text) {
 				continue;
 			}
@@ -209,6 +212,17 @@ class StructureIndex {
 
 		this._stats.pageTextEntriesCreated++;
 		return { entries, textBytes };
+	}
+
+	_getBlockText(entry) {
+		let key = entry.key;
+		if (this._blockTextByKey.has(key)) {
+			return this._blockTextByKey.get(key);
+		}
+		let bt = getBlockText(this.structure, entry.ref);
+		this._blockTextByKey.set(key, bt);
+		this._recordBlockText(bt);
+		return bt;
 	}
 
 	_getCachedPageTextEntries(pageIndex) {
