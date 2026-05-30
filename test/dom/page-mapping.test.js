@@ -534,7 +534,7 @@ describe('page mapping from markers', () => {
 		assert.equal(result.isPhysical, false);
 	});
 
-	it('all pages have contentRanges', () => {
+	it('all pages have content ranges', () => {
 		let content = makeFakeContent(10);
 		let sectionOffsets = [0];
 		let markersBySection = [[]];
@@ -545,8 +545,9 @@ describe('page mapping from markers', () => {
 		);
 
 		for (let page of result.pages) {
-			assert.ok(page.contentRanges.length > 0,
-				`page "${page.label}" should have contentRanges`);
+			assert.ok(Array.isArray(page.contentRange),
+				`page "${page.label}" should have a contentRange`);
+			assert.equal(page.contentRange.length, 2);
 		}
 	});
 
@@ -679,9 +680,9 @@ describe('findPageForBlock', () => {
 	it('maps block index to correct page', () => {
 		let content = makeFakeContent(10);
 		let pages = [
-			{ label: '1', contentRanges: [[[0], [2]]] },
-			{ label: '2', contentRanges: [[[3], [6]]] },
-			{ label: '3', contentRanges: [[[7], [9]]] },
+			{ label: '1', contentRange: [[0], [3]] },
+			{ label: '2', contentRange: [[3], [7]] },
+			{ label: '3', contentRange: [[7], [10]] },
 		];
 
 		assert.equal(findPageForBlock(pages, content, 0), 0);
@@ -695,7 +696,7 @@ describe('findPageForBlock', () => {
 	it('returns 0 for block before any page', () => {
 		let content = makeFakeContent(5);
 		let pages = [
-			{ label: '1', contentRanges: [[[2], [4]]] },
+			{ label: '1', contentRange: [[2], [5]] },
 		];
 		assert.equal(findPageForBlock(pages, content, 0), 0);
 	});

@@ -12,7 +12,7 @@ import { convertBody } from '../html-to-blocks';
 import type { ConvertHooks } from '../html-to-blocks';
 import type { ContentBlockNode } from '../../../structured-document-text/schema';
 import { getFulltextFromStructuredText } from '../../../structured-document-text/src/fulltext.js';
-import { getContentRange, getNestedBlockPlainText, getBlockPlainText } from '../../../structured-document-text/src/text.js';
+import { getNestedBlockPlainText, getBlockPlainText } from '../../../structured-document-text/src/text.js';
 import type { StructuredDocumentText, OutlineItem } from '../../../structured-document-text/schema';
 import { cssEscape } from "./cssEscape";
 import { filterForReadability, isInKeptSetIncludingAncestors } from './readability';
@@ -128,11 +128,6 @@ function buildSnapshotStructure(
 	}
 	let { blocks } = convertBody(body, hooks);
 
-	// Build page content range
-	let contentRanges = blocks.length > 0
-		? [getContentRange(blocks, 0, blocks.length - 1)]
-		: [];
-
 	// Build outline from headings
 	let outline = buildOutlineFromHeadings(body, blocks, kept);
 
@@ -156,7 +151,7 @@ function buildSnapshotStructure(
 			...(charCount > 0 ? { characterCount: charCount } : {}),
 		},
 		catalog: {
-			pages: [{ contentRanges }],
+			pages: [{ contentRange: [[0], [blocks.length]] }],
 			outline,
 		},
 		content: blocks,
@@ -400,7 +395,7 @@ function emptyStructure(
 			},
 		},
 		catalog: {
-			pages: [{ contentRanges: [] }],
+			pages: [{ contentRange: [[0], [0]] }],
 			outline: [],
 		},
 		content: [],

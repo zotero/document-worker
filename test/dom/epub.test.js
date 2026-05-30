@@ -56,7 +56,8 @@ describe('EPUB structure extraction', { timeout: 30000 }, () => {
 				assert.ok(Array.isArray(structure.catalog.pages));
 				assert.ok(structure.catalog.pages.length > 0, 'should have at least one page');
 				for (let page of structure.catalog.pages) {
-					assert.ok(Array.isArray(page.contentRanges), 'each page should have contentRanges');
+					assert.ok(Array.isArray(page.contentRange), 'each page should have a contentRange');
+					assert.equal(page.contentRange.length, 2);
 				}
 			});
 
@@ -159,16 +160,15 @@ describe('EPUB structure extraction', { timeout: 30000 }, () => {
 				assert.ok(hasText, 'should have at least one block with text content');
 			});
 
-			it('pages with content have non-empty contentRanges', () => {
-				let pagesWithContent = structure.catalog.pages.filter(p => p.contentRanges.length > 0);
+			it('pages with content have content ranges', () => {
+				let pagesWithContent = structure.catalog.pages.filter(p => {
+					let range = p.contentRange;
+					return Array.isArray(range) && JSON.stringify(range[0]) !== JSON.stringify(range[1]);
+				});
 				assert.ok(pagesWithContent.length > 0, 'at least some pages should have content');
 				for (let page of pagesWithContent) {
-					for (let range of page.contentRanges) {
-						assert.ok(Array.isArray(range), 'contentRange should be a tuple');
-						assert.equal(range.length, 2, 'contentRange should have start and end');
-						assert.ok(Array.isArray(range[0]), 'contentRange start should be a point');
-						assert.ok(Array.isArray(range[1]), 'contentRange end should be a point');
-					}
+					assert.ok(page.contentRange[0][0] >= 0 && page.contentRange[0][0] <= structure.content.length);
+					assert.ok(page.contentRange[1][0] >= 0 && page.contentRange[1][0] <= structure.content.length);
 				}
 			});
 		});

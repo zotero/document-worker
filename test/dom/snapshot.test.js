@@ -152,9 +152,9 @@ describe('Snapshot SDT: document shape', () => {
 		assert.equal(structure.metadata.source.contentType, 'text/html');
 	});
 
-	it('contains a single page with at least one content range', () => {
+	it('contains a single page with a content range', () => {
 		assert.equal(structure.catalog.pages.length, 1);
-		assert.ok(structure.catalog.pages[0].contentRanges.length > 0);
+		assert.deepEqual(structure.catalog.pages[0].contentRange, [[0], [structure.content.length]]);
 	});
 
 	it('reports file size and character count', () => {

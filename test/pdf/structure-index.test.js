@@ -7,14 +7,10 @@ function createTestStructure() {
 		catalog: {
 			pages: [
 				{
-					contentRanges: [
-						[[0], [1]],
-					],
+					contentRange: [[0], [2]],
 				},
 				{
-					contentRanges: [
-						[[2], [2]],
-					],
+					contentRange: [[2], [3]],
 				},
 			],
 		},
@@ -61,11 +57,36 @@ describe('StructureIndex', () => {
 		let index = createStructureIndex(createTestStructure());
 		let pageTexts = index.withPageEntries(0, entries => entries.map(entry => entry.bt.text));
 
-		assert.deepEqual(pageTexts, ['Alpha', 'Beta', 'Beta']);
+		assert.deepEqual(pageTexts, ['Alpha', 'Beta']);
 		let stats = index.stats();
 		assert.equal(stats.pageTextEntriesCreated, 1);
 		assert.equal(stats.pageTextCachePages, 0);
 		assert.equal(stats.pageTextCacheBytes, 0);
+	});
+
+	it('honors nested page range bounds exactly', () => {
+		let structure = {
+			catalog: {
+				pages: [{ contentRange: [[0, 1], [0, 2]] }],
+			},
+			content: [{
+				type: 'list',
+				content: [
+					{ type: 'listitem', content: [{ text: 'First' }] },
+					{ type: 'listitem', content: [{ text: 'Second' }] },
+				],
+			}],
+		};
+		let index = createStructureIndex(structure);
+
+		assert.deepEqual(
+			index.withPageEntries(0, entries => entries.map(entry => entry.key)),
+			['0,1']
+		);
+		assert.deepEqual(
+			index.withPageEntries(0, entries => entries.map(entry => entry.bt.text)),
+			['Second']
+		);
 	});
 
 	it('keeps page text caching bounded when explicitly enabled', () => {

@@ -9,11 +9,10 @@ import type {
     TextStyle,
     TextNode,
     ContentBlockNode,
-    DomAnchor,
-    Anchor,
-    RefsArray,
-    BackRefsArray,
-    ArtifactFlag,
+	DomAnchor,
+	Anchor,
+	RefsArray,
+	BackRefsArray,
 } from '../../structured-document-text/schema';
 
 /** Block type for incremental construction. Covers all block variant properties. */
@@ -23,7 +22,6 @@ export interface Block {
 	anchor?: Anchor;
 	refs?: RefsArray;
 	backRefs?: BackRefsArray;
-	artifact?: ArtifactFlag;
 	reference?: boolean;
 	ordered?: boolean;
 	startIndex?: number;

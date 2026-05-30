@@ -10,8 +10,8 @@
 import type { PageListEntry } from './toc';
 import type { PageMarker, PageMarkerSource } from './epub-xhtml-to-blocks';
 import type { IdInfo } from './epub-xhtml-to-blocks';
-import type { ContentBlockNode, PageInfo } from '../../../structured-document-text/schema';
-import { getContentRange, getNestedBlockPlainText } from '../../../structured-document-text/src/text.js';
+import type { ContentBlockNode, PageContentBoundary, PageInfo } from '../../../structured-document-text/schema';
+import { getNestedBlockPlainText } from '../../../structured-document-text/src/text.js';
 import { splitHref } from './cross-references';
 
 const EPUB_LOCATION_BREAK_INTERVAL = 1800;
@@ -292,38 +292,24 @@ function generateEpubLocations(content: ContentBlockNode[]): RawPageMapping[] {
 
 /**
  * Build a pages array from raw mappings.
- * Each page spans from its block index to the block before the next mapping.
+ * Each page spans from its top-level block index to the next page's block index.
  */
 function buildPagesArray(mappings: RawPageMapping[], content: ContentBlockNode[]): PageInfo[] {
 	if (mappings.length === 0 || content.length === 0) return [];
 
 	let pages: PageInfo[] = [];
+	let starts: PageContentBoundary[] = mappings.map((mapping, i) => i === 0
+		? [0]
+		: [clampBlockIndex(mapping.blockIndex, content.length)]);
 
 	for (let i = 0; i < mappings.length; i++) {
-		let startBlock = i === 0 ? 0 : mappings[i].blockIndex;
-		let endBlock = i < mappings.length - 1
-			? mappings[i + 1].blockIndex - 1
-			: content.length - 1;
-
-		if (startBlock > endBlock) {
-			// Mapping points past the end or two mappings at the same block
-			startBlock = endBlock;
-		}
-
 		let page: PageInfo = {
 			label: mappings[i].label,
-			contentRanges: [],
+			contentRange: [
+				starts[i],
+				i < starts.length - 1 ? starts[i + 1] : [content.length],
+			],
 		};
-
-		if (startBlock <= endBlock && startBlock < content.length) {
-			let contentRange = getContentRange(
-				content,
-				startBlock,
-				Math.min(endBlock, content.length - 1),
-			);
-			page.contentRanges = [contentRange];
-		}
-
 		pages.push(page);
 	}
 
@@ -334,16 +320,15 @@ function buildPagesArray(mappings: RawPageMapping[], content: ContentBlockNode[]
  * Find which page a given global block index falls on.
  */
 export function findPageForBlock(pages: PageInfo[], content: ContentBlockNode[], globalBlockIdx: number): number {
-	// Binary search: find the last page whose content starts at or before globalBlockIdx
-	// We use the contentRanges to determine page boundaries
 	for (let i = pages.length - 1; i >= 0; i--) {
-		let ranges = pages[i].contentRanges;
-		if (ranges && ranges.length > 0) {
-			let startRef = ranges[0]?.[0]?.[0];
-			if (typeof startRef === 'number' && startRef <= globalBlockIdx) {
-				return i;
-			}
+		let startIndex = pages[i].contentRange?.[0]?.[0];
+		if (typeof startIndex === 'number' && Number.isInteger(startIndex) && startIndex <= globalBlockIdx) {
+			return i;
 		}
 	}
 	return 0;
+}
+
+function clampBlockIndex(value: number, blockCount: number): number {
+	return Math.max(0, Math.min(value, blockCount));
 }

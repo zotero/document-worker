@@ -1,9 +1,4 @@
 import { mergePageRects } from './util.js';
-import {
-	setContentRangeEnd,
-	setContentRangeStart,
-	splitContentRange,
-} from '../../../structured-document-text/src/range.js';
 import { normalizeFlowClass, resolveFlowClass } from './flow-policy.js';
 
 function getMajorityFlowClass(blocks) {
@@ -27,8 +22,7 @@ function getMajorityFlowClass(blocks) {
 	return normalizeFlowClass(majorityFlowClass);
 }
 
-// wrap continous 'listitem' blocks into 'list' block
-// you also need to update structure.catalog.pages.contentRanges accordingly
+// Wrap continuous 'listitem' blocks into 'list' blocks.
 export function wrapListItems(structure) {
 	if (!structure || !Array.isArray(structure.content) || structure.content.length === 0) {
 		return structure;
@@ -38,6 +32,7 @@ export function wrapListItems(structure) {
 	const newContent = [];
 	const listItemMap = new Map();
 	const indexMap = new Map();
+	const listGroups = [];
 
 	let i = 0;
 	while (i < originalContent.length) {
@@ -45,13 +40,24 @@ export function wrapListItems(structure) {
 
 		if (block && block.type === 'listitem') {
 			const listIndex = newContent.length;
+			const oldStart = i;
 			const items = [];
+			const pageIndex = block._metrics?.pageIndex;
 
-			while (i < originalContent.length && originalContent[i]?.type === 'listitem') {
+			while (
+				i < originalContent.length
+				&& originalContent[i]?.type === 'listitem'
+				&& originalContent[i]?._metrics?.pageIndex === pageIndex
+			) {
 				listItemMap.set(i, { listIndex, itemIndex: items.length });
 				items.push(originalContent[i]);
 				i++;
 			}
+			listGroups.push({
+				oldStart,
+				oldEnd: i,
+				listIndex,
+			});
 
 			const combinedRects = mergePageRects(items);
 			const flowClass = getMajorityFlowClass(items);
@@ -81,6 +87,10 @@ export function wrapListItems(structure) {
 		}
 
 		const oldIndex = ref[0];
+		if (oldIndex === originalContent.length && ref.length === 1) {
+			return [newContent.length];
+		}
+
 		const listInfo = listItemMap.get(oldIndex);
 		if (listInfo) {
 			return [listInfo.listIndex, listInfo.itemIndex, ...ref.slice(1)];
@@ -94,6 +104,30 @@ export function wrapListItems(structure) {
 		return [mappedIndex, ...ref.slice(1)];
 	};
 
+	const mapBoundary = (boundary) => {
+		if (!Array.isArray(boundary) || boundary.length === 0) {
+			return boundary;
+		}
+
+		const oldIndex = boundary[0];
+		if (oldIndex === originalContent.length && boundary.length === 1) {
+			return [newContent.length];
+		}
+
+		if (boundary.length === 1) {
+			for (const group of listGroups) {
+				if (oldIndex === group.oldStart) {
+					return [group.listIndex];
+				}
+				if (oldIndex > group.oldStart && oldIndex < group.oldEnd) {
+					return [group.listIndex, oldIndex - group.oldStart];
+				}
+			}
+		}
+
+		return mapRef(boundary);
+	};
+
 	const updateRefPath = (ref) => {
 		const mapped = mapRef(ref);
 		if (mapped === ref || !Array.isArray(mapped)) {
@@ -101,6 +135,15 @@ export function wrapListItems(structure) {
 		}
 		ref.length = 0;
 		ref.push(...mapped);
+	};
+
+	const updateBoundaryPath = (boundary) => {
+		const mapped = mapBoundary(boundary);
+		if (mapped === boundary || !Array.isArray(mapped)) {
+			return;
+		}
+		boundary.length = 0;
+		boundary.push(...mapped);
 	};
 
 	const updateRefsArray = (refs) => {
@@ -123,6 +166,8 @@ export function wrapListItems(structure) {
 
 		updateRefsArray(node.refs);
 		updateRefsArray(node.backRefs);
+		updateRefPath(node.previousPart);
+		updateRefPath(node.nextPart);
 
 		if (Array.isArray(node.content)) {
 			for (const child of node.content) {
@@ -140,185 +185,11 @@ export function wrapListItems(structure) {
 
 	if (Array.isArray(structure.catalog.pages)) {
 		for (const page of structure.catalog.pages) {
-			if (!page || !Array.isArray(page.contentRanges)) {
+			if (!Array.isArray(page?.contentRange)) {
 				continue;
 			}
-			for (const range of page.contentRanges) {
-				let { start, end } = splitContentRange(range, originalContent);
-				if (start.ref) {
-					updateRefPath(start.ref);
-					setContentRangeStart(range, start.ref, start.offset);
-				}
-				if (end.ref) {
-					updateRefPath(end.ref);
-					setContentRangeEnd(range, end.ref, end.offset);
-				}
-			}
-		}
-	}
-
-	return structure;
-}
-
-// Merge continuous lists, and ofcourse update structure.catalog.pages.contentRanges
-export function mergeLists(structure) {
-	if (!structure || !Array.isArray(structure.content) || structure.content.length === 0) {
-		return structure;
-	}
-
-	const originalContent = structure.content;
-	const newContent = [];
-	const listMap = new Map();
-	const indexMap = new Map();
-	let mergedAny = false;
-
-	let i = 0;
-	while (i < originalContent.length) {
-		const block = originalContent[i];
-
-		if (block && block.type === 'list') {
-			const mergedIndex = newContent.length;
-			const mergedItems = [];
-			const mergedRefs = [];
-			const mergedBackRefs = [];
-			const listsToMerge = [];
-			let baseBlock = block;
-			let groupSize = 0;
-
-			while (i < originalContent.length && originalContent[i]?.type === 'list') {
-				const listBlock = originalContent[i];
-				groupSize++;
-				listsToMerge.push(listBlock);
-
-				const listItems = Array.isArray(listBlock.content) ? listBlock.content : [];
-
-				listMap.set(i, { mergedIndex, itemOffset: mergedItems.length });
-				mergedItems.push(...listItems);
-
-				if (Array.isArray(listBlock.refs)) {
-					mergedRefs.push(...listBlock.refs);
-				}
-
-				if (Array.isArray(listBlock.backRefs)) {
-					mergedBackRefs.push(...listBlock.backRefs);
-				}
-
-				i++;
-			}
-
-			if (groupSize > 1) {
-				mergedAny = true;
-			}
-
-			const combinedRects = mergePageRects(listsToMerge);
-			const mergedBlock = {
-				...baseBlock,
-				...(combinedRects && { anchor: { pageRects: combinedRects } }),
-				content: mergedItems
-			};
-
-			if (mergedRefs.length > 0) {
-				mergedBlock.refs = mergedRefs;
-			}
-
-			if (mergedBackRefs.length > 0) {
-				mergedBlock.backRefs = mergedBackRefs;
-			}
-
-			newContent.push(mergedBlock);
-			continue;
-		}
-
-		indexMap.set(i, newContent.length);
-		newContent.push(block);
-		i++;
-	}
-
-	if (!mergedAny) {
-		return structure;
-	}
-
-	const mapRef = (ref) => {
-		if (!Array.isArray(ref) || ref.length === 0) {
-			return ref;
-		}
-
-		const oldIndex = ref[0];
-		const listInfo = listMap.get(oldIndex);
-		if (listInfo) {
-			if (ref.length > 1 && Number.isInteger(ref[1])) {
-				return [listInfo.mergedIndex, listInfo.itemOffset + ref[1], ...ref.slice(2)];
-			}
-			return [listInfo.mergedIndex, ...ref.slice(1)];
-		}
-
-		const mappedIndex = indexMap.get(oldIndex);
-		if (!Number.isInteger(mappedIndex)) {
-			return ref;
-		}
-
-		return [mappedIndex, ...ref.slice(1)];
-	};
-
-	const updateRefPath = (ref) => {
-		const mapped = mapRef(ref);
-		if (mapped === ref || !Array.isArray(mapped)) {
-			return;
-		}
-		ref.length = 0;
-		ref.push(...mapped);
-	};
-
-	const updateRefsArray = (refs) => {
-		if (!Array.isArray(refs)) {
-			return;
-		}
-		for (const ref of refs) {
-			updateRefPath(ref);
-		}
-	};
-
-	const updateNodeRefs = (node) => {
-		if (!node || typeof node !== 'object') {
-			return;
-		}
-
-		if (Array.isArray(node.ref)) {
-			updateRefPath(node.ref);
-		}
-
-		updateRefsArray(node.refs);
-		updateRefsArray(node.backRefs);
-
-		if (Array.isArray(node.content)) {
-			for (const child of node.content) {
-				updateNodeRefs(child);
-			}
-		}
-
-	};
-
-	structure.content = newContent;
-
-	for (const block of structure.content) {
-		updateNodeRefs(block);
-	}
-
-	if (Array.isArray(structure.catalog.pages)) {
-		for (const page of structure.catalog.pages) {
-			if (!page || !Array.isArray(page.contentRanges)) {
-				continue;
-			}
-			for (const range of page.contentRanges) {
-				let { start, end } = splitContentRange(range, originalContent);
-				if (start.ref) {
-					updateRefPath(start.ref);
-					setContentRangeStart(range, start.ref, start.offset);
-				}
-				if (end.ref) {
-					updateRefPath(end.ref);
-					setContentRangeEnd(range, end.ref, end.offset);
-				}
+			for (const boundary of page.contentRange) {
+				updateBoundaryPath(boundary);
 			}
 		}
 	}

@@ -1,4 +1,8 @@
 import { getBlockText } from '../../../structured-document-text/src/pdf/index.js';
+import {
+	refKey,
+	walkContentRangeLeafBlocks,
+} from '../../../structured-document-text/src/range.js';
 
 const DEFAULT_OPTIONS = {
 	textCache: 'none',
@@ -31,7 +35,6 @@ class StructureIndex {
 		this._blockEntries = [];
 		this._blockEntryByKey = new Map();
 		this._blockTextByKey = new Map();
-		this._entriesByTopLevel = new Map();
 		this._pageBlockEntries = new Map();
 		this._pageTextEntries = new Map();
 		this._cachedTextBytes = 0;
@@ -134,10 +137,6 @@ class StructureIndex {
 				};
 				this._blockEntries.push(entry);
 				this._blockEntryByKey.set(key, entry);
-				if (!this._entriesByTopLevel.has(ref[0])) {
-					this._entriesByTopLevel.set(ref[0], []);
-				}
-				this._entriesByTopLevel.get(ref[0]).push(entry);
 				visit(block.content, ref);
 			}
 		};
@@ -151,36 +150,21 @@ class StructureIndex {
 			return this._pageBlockEntries.get(pageIndex);
 		}
 
-		let topLevels = [];
-		let seenTopLevels = new Set();
-		let page = this.structure?.catalog?.pages?.[pageIndex];
-		for (let range of page?.contentRanges || []) {
-			let startTopLevel = range?.[0]?.[0];
-			let endTopLevel = range?.[1]?.[0];
-			if (!Number.isInteger(startTopLevel) || !Number.isInteger(endTopLevel)) {
-				continue;
-			}
-
-			if (Number.isInteger(startTopLevel) && !seenTopLevels.has(startTopLevel)) {
-				seenTopLevels.add(startTopLevel);
-				topLevels.push(startTopLevel);
-			}
-
-			for (let i = startTopLevel; i <= endTopLevel; i++) {
-				if (!seenTopLevels.has(i)) {
-					seenTopLevels.add(i);
-					topLevels.push(i);
-				}
-			}
-		}
-
 		let entries = [];
-		for (let topLevel of topLevels) {
-			let topLevelEntries = this._entriesByTopLevel.get(topLevel);
-			if (topLevelEntries) {
-				entries.push(...topLevelEntries);
+		let seen = new Set();
+		let content = Array.isArray(this.structure?.content) ? this.structure.content : [];
+		let pageRange = this.structure?.catalog?.pages?.[pageIndex]?.contentRange;
+		walkContentRangeLeafBlocks(content, pageRange, ({ ref }) => {
+			let key = refKey(ref);
+			if (seen.has(key)) {
+				return;
 			}
-		}
+			seen.add(key);
+			let entry = this._blockEntryByKey.get(key);
+			if (entry) {
+				entries.push(entry);
+			}
+		});
 
 		this._pageBlockEntries.set(pageIndex, entries);
 		this._stats.pageBlockEntriesCreated++;
