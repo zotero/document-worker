@@ -10,12 +10,9 @@ import { textApproximatelyEqual } from './utils.js';
 import { LocalPdfManager } from '../../pdf.js/src/core/pdf_manager.js';
 import { XRefParseException } from '../../pdf.js/src/core/core_utils.js';
 import { FontEmbedder } from './font/font-embedder.js';
-import { renderAnnotations, renderArea } from './renderer.js';
+import { openRenderablePdfDocument, renderAnnotations, renderArea } from './renderer.js';
 
-import { runInference, loadModel, initModel } from './structure/model/line-seg/model.js';
 import { getFullStructure } from './structure/structure.js';
-
-// loadModel({ modelUrl: "./model/out1.onnx",  crfUrl: "./model/out1.crf.json" });
 
 // TODO: Highlights shouldn't be allowed to be outside of page view
 
@@ -955,6 +952,7 @@ export {
 	importCitaviAnnotations,
 	importMendeleyAnnotations,
 	hasAnnotations,
+	openRenderablePdfDocument,
 	renderAnnotations,
 	renderArea
 };

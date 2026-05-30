@@ -83,7 +83,7 @@ function getPositionBoundingRect(position) {
 	}
 }
 
-async function getRenderablePdfDocument(source, password, dataProvider) {
+async function getRenderablePdfDocument(source, password, dataProvider, pdfOptions = {}) {
 	if (source?.getPage) {
 		return {
 			pdfDocument: source,
@@ -97,6 +97,11 @@ async function getRenderablePdfDocument(source, password, dataProvider) {
 		data: new Uint8Array(source).buffer,
 		ownerDocument: document,
 		CanvasFactory,
+		cMapUrl: pdfOptions.cMapUrl || null,
+		cMapPacked: true,
+		standardFontDataUrl: pdfOptions.standardFontDataUrl || null,
+		wasmUrl: pdfOptions.wasmUrl || null,
+		useWorkerFetch: false,
 		disableFontFace: false,
 		password,
 	};
@@ -124,6 +129,10 @@ async function getRenderablePdfDocument(source, password, dataProvider) {
 			document.releaseNodeFonts?.();
 		},
 	};
+}
+
+export async function openRenderablePdfDocument(source, password, dataProvider, pdfOptions = {}) {
+	return getRenderablePdfDocument(source, password, dataProvider, pdfOptions);
 }
 
 async function renderImage(pdfDocument, annotation) {
@@ -221,7 +230,8 @@ export async function renderArea(pdfDocument, pageIndex, rect, options = {}) {
 	let renderablePdf = await getRenderablePdfDocument(
 		pdfDocument,
 		options.password,
-		options.dataProvider
+		options.dataProvider,
+		options
 	);
 	pdfDocument = renderablePdf.pdfDocument;
 

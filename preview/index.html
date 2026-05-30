@@ -107,6 +107,24 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
   outline: 1.5px solid transparent;
   transition: background 0.1s, outline-color 0.1s;
 }
+.block-region-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  max-width: 100%;
+  transform: translateY(-100%);
+  padding: 1px 4px;
+  background: rgba(20, 24, 32, 0.82);
+  color: #fff;
+  font-size: 10px;
+  line-height: 1.35;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 2px 2px 0 0;
+  pointer-events: none;
+}
 
 /* HTML panel block styles */
 #html-panel [data-block-id] {
@@ -206,6 +224,7 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
   margin: 0.6em 0;
 }
 #html-panel ul {
+  list-style: none;
   margin: 0.4em 0;
   padding-left: 24px;
 }
@@ -213,7 +232,7 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
   margin: 0.2em 0;
   padding: 2px 4px;
 }
-#html-panel .artifact { opacity: 0.4; }
+#html-panel .excluded-flow { opacity: 0.4; }
 #html-panel pre {
   font-family: 'Courier New', Consolas, monospace;
   font-size: 0.88em;
@@ -279,6 +298,8 @@ import { getDocument } from '../pdf.js/src/display/api.js';
 // Run pdf.js on the main thread (sets globalThis.pdfjsWorker).
 import '../pdf.js/src/pdf.worker.js';
 import { getStructure, renderArea } from '../src/pdf/index.js';
+import { getPartBoundarySeparator, getPartChain, shouldDropHardHyphenAtPartBoundary } from '../structured-document-text/src/parts.js';
+import { refKey } from '../structured-document-text/src/range.js';
 
 const fileInput = document.getElementById('file-input');
 const statusEl = document.getElementById('status');
@@ -566,9 +587,17 @@ let blockIdCounter = 0;
 function buildRefMap(structure) {
   let counter = 0;
   const map = new Map();
+  const renderedPartRefs = new Set();
   function walk(block, ref) {
+    const chain = getPreviewPartChain(structure, block, ref);
+    if (!chain.length || hasRenderedPart(chain, renderedPartRefs)) return;
+
     const id = counter++;
-    map.set(ref.join(','), id);
+    for (const part of chain) {
+      map.set(refKey(part.ref), id);
+      renderedPartRefs.add(refKey(part.ref));
+    }
+
     if (block.type === 'list' && block.content) {
       let j = 0;
       for (const item of block.content) {
@@ -587,8 +616,9 @@ function buildRefMap(structure) {
 
 function renderHtml(structure) {
   blockIdCounter = 0;
+  const renderedPartRefs = new Set();
   for (let i = 0; i < structure.content.length; i++) {
-    const el = renderBlock(structure.content[i], [i]);
+    const el = renderBlock(structure.content[i], [i], structure, renderedPartRefs);
     if (el) htmlPanel.appendChild(el);
   }
 }
@@ -605,8 +635,8 @@ async function renderAreaForBlock(container, block) {
     img.src = url;
     img.style.maxWidth = '100%';
     img.onload = () => URL.revokeObjectURL(url);
-    // For image blocks, replace placeholder text; for equations, prepend
-    if (block.type === 'image') {
+    // Replace placeholder text once the PDF crop is available.
+    if (block.type === 'image' || block.type === 'math' || block.type === 'equation') {
       container.textContent = '';
     }
     container.prepend(img);
@@ -615,23 +645,97 @@ async function renderAreaForBlock(container, block) {
   }
 }
 
-function renderBlock(block, ref) {
+function getPreviewPartChain(structure, block, ref) {
+  if (!block || typeof block !== 'object' || Array.isArray(block.previousPart)) {
+    return [];
+  }
+
+  const chain = getPartChain(structure, ref);
+  return chain.length ? chain : [{ block, ref }];
+}
+
+function hasRenderedPart(chain, renderedPartRefs) {
+  return chain.some(part => renderedPartRefs.has(refKey(part.ref)));
+}
+
+function markRenderedParts(chain, renderedPartRefs) {
+  for (const part of chain) {
+    renderedPartRefs.add(refKey(part.ref));
+  }
+}
+
+function renderPartChainTextContent(parent, chain) {
+  for (let i = 0; i < chain.length; i++) {
+    if (i > 0) {
+      if (shouldDropHardHyphenAtPartBoundary(chain[i - 1].block, chain[i].block)) {
+        stripTrailingRenderedHyphen(parent);
+      }
+      const separator = getPartBoundarySeparator(chain[i - 1].block, chain[i].block);
+      if (separator) parent.appendChild(document.createTextNode(separator));
+    }
+    renderTextContent(parent, chain[i].block.content);
+  }
+}
+
+function stripTrailingRenderedHyphen(parent) {
+  const textNode = getLastRenderedTextNode(parent);
+  if (textNode?.nodeValue?.endsWith('-')) {
+    textNode.nodeValue = textNode.nodeValue.slice(0, -1);
+  }
+}
+
+function getLastRenderedTextNode(node) {
+  for (let child = node.lastChild; child; child = child.previousSibling) {
+    if (child.nodeType === Node.TEXT_NODE) {
+      return child;
+    }
+    const textNode = getLastRenderedTextNode(child);
+    if (textNode) {
+      return textNode;
+    }
+  }
+  return null;
+}
+
+function getPartChainAnchor(chain) {
+  let anchor = null;
+  let pageRects = [];
+  for (const { block } of chain) {
+    if (!block?.anchor) continue;
+    if (!anchor) anchor = block.anchor;
+    if (Array.isArray(block.anchor.pageRects)) {
+      pageRects.push(...block.anchor.pageRects);
+    }
+  }
+  return anchor
+    ? { ...anchor, ...(pageRects.length ? { pageRects } : {}) }
+    : pageRects.length
+      ? { pageRects }
+      : null;
+}
+
+function renderBlock(block, ref, structure, renderedPartRefs) {
+  const chain = getPreviewPartChain(structure, block, ref);
+  if (!chain.length || hasRenderedPart(chain, renderedPartRefs)) return null;
+  markRenderedParts(chain, renderedPartRefs);
+
   const id = blockIdCounter++;
+  block = chain[0].block;
   let el;
 
   switch (block.type) {
     case 'heading':
       el = document.createElement('h2');
-      renderTextContent(el, block.content);
+      renderPartChainTextContent(el, chain);
       break;
     case 'paragraph':
       el = document.createElement('p');
-      renderTextContent(el, block.content);
+      renderPartChainTextContent(el, chain);
       break;
     case 'caption':
       el = document.createElement('p');
       el.className = 'caption';
-      renderTextContent(el, block.content);
+      renderPartChainTextContent(el, chain);
       break;
     case 'image':
       el = document.createElement('div');
@@ -644,11 +748,13 @@ function renderBlock(block, ref) {
       break;
     case 'note':
       el = document.createElement('aside');
-      renderTextContent(el, block.content);
+      renderPartChainTextContent(el, chain);
       break;
+    case 'math':
     case 'equation':
       el = document.createElement('div');
       el.className = 'equation-block';
+      el.textContent = '[Math]';
       renderAreaForBlock(el, block);
       break;
     case 'list':
@@ -657,7 +763,7 @@ function renderBlock(block, ref) {
         let j = 0;
         for (const item of block.content) {
           if (item.type) {
-            const li = renderBlock(item, [...ref, j]);
+            const li = renderBlock(item, [...ref, j], structure, renderedPartRefs);
             if (li) el.appendChild(li);
             j++;
           }
@@ -666,7 +772,7 @@ function renderBlock(block, ref) {
       break;
     case 'listitem':
       el = document.createElement('li');
-      renderTextContent(el, block.content);
+      renderPartChainTextContent(el, chain);
       break;
     case 'tablerow':
       el = renderTableRow(block);
@@ -677,22 +783,30 @@ function renderBlock(block, ref) {
     case 'preformatted':
       el = document.createElement('pre');
       const code = document.createElement('code');
-      renderTextContent(code, block.content);
+      renderPartChainTextContent(code, chain);
       el.appendChild(code);
       break;
     default:
       el = document.createElement('p');
-      renderTextContent(el, block.content);
+      renderPartChainTextContent(el, chain);
       break;
   }
 
-  if (block.artifact) el.classList.add('artifact');
+  if (block.flowClass === 'excluded') el.classList.add('excluded-flow');
 
   const isContainer = block.type === 'list';
   if (!isContainer) {
     el.dataset.blockId = id;
 
-    blockMap.set(id, { htmlEl: el, regionEls: [], anchor: block.anchor, ref, type: block.type });
+    blockMap.set(id, {
+      htmlEl: el,
+      regionEls: [],
+      anchor: getPartChainAnchor(chain),
+      ref,
+      type: block.type,
+      flowClass: block.flowClass,
+      label: getBlockLabel(block),
+    });
 
     el.addEventListener('mouseenter', () => setActive(id));
     el.addEventListener('mouseleave', () => clearActive());
@@ -700,6 +814,13 @@ function renderBlock(block, ref) {
   }
 
   return el;
+}
+
+function getBlockLabel(block) {
+  const type = block.type || '';
+  const flowClass = block.flowClass || '';
+  if (type && flowClass) return type + ' / ' + flowClass;
+  return type || flowClass || '';
 }
 
 function isStructuredTable(block) {
@@ -853,50 +974,71 @@ function renderTextContent(parent, content) {
 
 function renderOverlays(structure) {
   blockIdCounter = 0;
-  for (const block of structure.content) {
-    renderBlockOverlay(block, structure.catalog.pages);
+  const renderedPartRefs = new Set();
+  for (let i = 0; i < structure.content.length; i++) {
+    renderBlockOverlay(structure.content[i], [i], structure.catalog.pages, structure, renderedPartRefs);
   }
 }
 
-function renderBlockOverlay(block, pages) {
+function renderBlockOverlay(block, ref, pages, structure, renderedPartRefs) {
+  const chain = getPreviewPartChain(structure, block, ref);
+  if (!chain.length || hasRenderedPart(chain, renderedPartRefs)) return;
+  markRenderedParts(chain, renderedPartRefs);
+
   const id = blockIdCounter++;
+  block = chain[0].block;
 
   const isContainer = block.type === 'list';
 
-  if (!isContainer && block.anchor && block.anchor.pageRects) {
-    for (const rect of block.anchor.pageRects) {
-      const [pageIndex, x1, y1, x2, y2] = rect;
-      const vr = pages[pageIndex]?.viewRect;
-      if (!vr) continue;
+  if (!isContainer) {
+    for (const { block: partBlock } of chain) {
+      if (!partBlock.anchor?.pageRects) continue;
+      for (const rect of partBlock.anchor.pageRects) {
+        const [pageIndex, x1, y1, x2, y2] = rect;
+        const vr = pages[pageIndex]?.viewRect;
+        if (!vr) continue;
 
-      const container = pageContainers[pageIndex];
-      if (!container) continue;
-      const pageW = vr[2] - vr[0];
-      const pageH = vr[3] - vr[1];
+        const container = pageContainers[pageIndex];
+        if (!container) continue;
+        const pageW = vr[2] - vr[0];
+        const pageH = vr[3] - vr[1];
 
-      const regionDiv = document.createElement('div');
-      regionDiv.className = 'block-region';
-      regionDiv.dataset.blockId = id;
-      regionDiv.style.left = ((x1 - vr[0]) / pageW * 100) + '%';
-      regionDiv.style.top = ((vr[3] - y2) / pageH * 100) + '%';
-      regionDiv.style.width = ((x2 - x1) / pageW * 100) + '%';
-      regionDiv.style.height = ((y2 - y1) / pageH * 100) + '%';
+        const regionDiv = document.createElement('div');
+        regionDiv.className = 'block-region';
+        regionDiv.dataset.blockId = id;
+        regionDiv.style.left = ((x1 - vr[0]) / pageW * 100) + '%';
+        regionDiv.style.top = ((vr[3] - y2) / pageH * 100) + '%';
+        regionDiv.style.width = ((x2 - x1) / pageW * 100) + '%';
+        regionDiv.style.height = ((y2 - y1) / pageH * 100) + '%';
+        const label = getBlockLabel(block);
+        if (label) {
+          const labelEl = document.createElement('div');
+          labelEl.className = 'block-region-label';
+          labelEl.textContent = label;
+          regionDiv.title = label;
+          regionDiv.appendChild(labelEl);
+        }
 
-      regionDiv.addEventListener('mouseenter', () => setActive(id));
-      regionDiv.addEventListener('mouseleave', () => clearActive());
-      regionDiv.addEventListener('click', () => scrollHtmlToBlock(id));
+        regionDiv.addEventListener('mouseenter', () => setActive(id));
+        regionDiv.addEventListener('mouseleave', () => clearActive());
+        regionDiv.addEventListener('click', () => scrollHtmlToBlock(id));
 
-      container.overlay.appendChild(regionDiv);
+        container.overlay.appendChild(regionDiv);
 
-      const entry = blockMap.get(id);
-      if (entry) entry.regionEls.push(regionDiv);
+        const entry = blockMap.get(id);
+        if (entry) entry.regionEls.push(regionDiv);
+      }
     }
   }
 
   // Recurse into nested blocks (list -> listitem)
   if (block.type === 'list' && block.content) {
+    let j = 0;
     for (const item of block.content) {
-      if (item.type) renderBlockOverlay(item, pages);
+      if (item.type) {
+        renderBlockOverlay(item, [...ref, j], pages, structure, renderedPartRefs);
+        j++;
+      }
     }
   }
 }
@@ -912,7 +1054,7 @@ function setActive(id) {
   if (!entry) return;
   entry.htmlEl.classList.add('active');
   for (const r of entry.regionEls) r.classList.add('active');
-  if (entry.ref) statusEl.textContent = 'Block [' + entry.ref.join(', ') + '] ' + (entry.type || '');
+  if (entry.ref) statusEl.textContent = 'Block [' + entry.ref.join(', ') + '] ' + (entry.label || entry.type || '');
 }
 
 function clearActive() {

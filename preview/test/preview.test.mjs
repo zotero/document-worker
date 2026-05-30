@@ -3,7 +3,10 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const PDF_PATH = resolve(__dirname, '..', '..', 'test/fixtures/pdf/full/1.pdf');
+const DEFAULT_PDF_PATH = resolve(__dirname, '..', '..', 'test/fixtures/pdf/full/1.pdf');
+const PDF_PATH = process.env.PREVIEW_PDF_PATH
+  ? resolve(process.env.PREVIEW_PDF_PATH)
+  : DEFAULT_PDF_PATH;
 const SCREENSHOT_DIR = resolve(__dirname, '..');
 
 const browser = await chromium.launch({ headless: true });
@@ -45,6 +48,68 @@ const blockCount = await page.locator('#html-panel [data-block-id]').count();
 const regionCount = await page.locator('.block-region').count();
 console.log(`3. Pages: ${pageCount}, HTML blocks: ${blockCount}, PDF overlays: ${regionCount}`);
 
+const logicalPartPreview = await page.evaluate(() => {
+  const blocks = [...document.querySelectorAll('#html-panel [data-block-id]')];
+  const el = blocks.find(x => x.textContent.includes('de facto standard for client-side web programming'));
+  if (!el) return null;
+  const id = el.dataset.blockId;
+  return {
+    id,
+    text: el.textContent,
+    regionCount: document.querySelectorAll(`.block-region[data-block-id="${id}"]`).length,
+    continuationRenderedSeparately: blocks.some(x => (
+      x !== el
+      && x.textContent.trim().startsWith('and is used for the application logic of browser-based productivity applications')
+    )),
+  };
+});
+if (logicalPartPreview) {
+  if (!logicalPartPreview.text.includes('browser-based productivity applications')) {
+    errors.push('Preview did not join paragraph continuation text into the root part');
+  }
+  if (logicalPartPreview.continuationRenderedSeparately) {
+    errors.push('Preview rendered a continuation part as a separate HTML block');
+  }
+  if (logicalPartPreview.regionCount < 2) {
+    errors.push('Preview did not attach continuation part PDF regions to the root block');
+  }
+  console.log(`   Part-chain block ${logicalPartPreview.id}: ${logicalPartPreview.regionCount} PDF regions`);
+}
+else {
+  errors.push('Could not find expected split paragraph in preview');
+}
+
+const hardHyphenPreview = await page.evaluate(() => {
+  const blocks = [...document.querySelectorAll('#html-panel [data-block-id]')];
+  const el = blocks.find(x => (
+    x.textContent.includes('TraceMonkey, objects')
+    && x.textContent.includes('representations are assigned an integer key')
+  ));
+  return el ? el.textContent : null;
+});
+if (hardHyphenPreview) {
+  if (hardHyphenPreview.includes('rep-resentations')) {
+    errors.push('Preview did not drop hard hyphen at paragraph part boundary');
+  }
+}
+else {
+  errors.push('Could not find expected hard-hyphen split paragraph in preview');
+}
+
+const listItemCount = await page.locator('#html-panel li').count();
+if (listItemCount) {
+  const listMarkerStyles = await page.locator('#html-panel li').evaluateAll(els => (
+    [...new Set(els.map(el => getComputedStyle(el).listStyleType))]
+  ));
+  if (!listMarkerStyles.every(style => style === 'none')) {
+    errors.push(`List markers visible: ${listMarkerStyles.join(', ')}`);
+  }
+  console.log(`   List marker styles: ${listMarkerStyles.join(', ')}`);
+}
+else {
+  console.log('   No list items in preview fixture');
+}
+
 // Scroll first page into view to trigger render, wait for canvas content
 await page.waitForFunction(() => {
   const canvas = document.querySelector('.pdf-page canvas');
@@ -54,6 +119,19 @@ await page.waitForFunction(() => {
   return data[3] > 0; // has visible content
 }, { timeout: 10000 });
 console.log('4. First page canvas has content');
+
+const mathBlockCount = await page.locator('.equation-block').count();
+if (mathBlockCount) {
+  await page.waitForFunction(() => {
+    const mathBlocks = [...document.querySelectorAll('.equation-block')];
+    return mathBlocks.every(el => el.querySelector('img'));
+  }, { timeout: 30000 });
+  const mathImageCount = await page.locator('.equation-block img').count();
+  console.log(`   Math blocks rendered as images: ${mathImageCount}`);
+}
+else {
+  console.log('   No math blocks in preview fixture');
+}
 
 // Take initial screenshot
 await page.screenshot({ path: resolve(SCREENSHOT_DIR, 'screenshot-initial.png') });
