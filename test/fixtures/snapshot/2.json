@@ -12,7 +12,7 @@
 		"characterCount": 3559
 	},
 	"catalog": {
-		"pages": [{"contentRanges": [[[0, 0], [14, 0]]]}],
+		"pages": [{"contentRange": [[0], [15]]}],
 		"outline": [
 			{
 				"title": "A Deep Dive Into Widgets",

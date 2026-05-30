@@ -16,7 +16,7 @@
 		"characterCount": 496
 	},
 	"catalog": {
-		"pages": [{"contentRanges": [[[0, 0], [21, 0]]]}],
+		"pages": [{"contentRange": [[0], [22]]}],
 		"outline": [
 			{
 				"title": "Main Title",
