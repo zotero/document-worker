@@ -12,16 +12,15 @@ import { applyRefs, getRefsList } from './apply-refs.js';
 import {
 	charsToTextNodes,
 	charsToPreformattedTextNodes,
-	getContentRangeFromBlocks,
-	mergeBlocks,
-	pushArtifactsToTheEnd,
 } from '../../../structured-document-text/src/pdf/index.js';
-import { mergeLists, wrapListItems } from './list-utils.js';
+import { wrapListItems } from './list-utils.js';
 import { addRefs, getParsedLinkRefs, getAnnotLinkRefs, getLinksFromAnnotations } from './link.js';
-import { cleanupBlockMetrics, cleanupTextNodeStyles, getHeadingMetrics, getParagraphMetrics, mergeListItemContinuations, mergeParagraphs } from './block-cleanup.js';
+import { cleanupBlockMetrics, cleanupTextNodeStyles, getHeadingMetrics, getParagraphMetrics, markListItemParts, markParagraphParts } from './block-cleanup.js';
+import { normalizePdfRawBlockFlow, normalizeTopLevelFlowClasses, setNormalizedFlowClass } from './flow-policy.js';
 import { createBlockAnchor, ensureBlockPageRects } from './util.js';
 import { createStructureIndex } from './structure-index.js';
 import { extractStructuredTable, extractStructuredTables } from './table/extract.js';
+import { postProcessStructure } from './post-process.js';
 // import { getNextChunk } from '../../../structured-document-text/src/chunker.js';
 // import { getContent, getRefRangesFromPageRects } from '../../../structured-document-text/src/pdf/content.js';
 
@@ -34,6 +33,10 @@ const DEGRADED_EXTRACTION_FALLBACK_REASONS = new Set([
 
 function hasDegradedExtractionFallbacks(layoutFallbacks) {
 	return layoutFallbacks?.some(fallback => DEGRADED_EXTRACTION_FALLBACK_REASONS.has(fallback.reason));
+}
+
+function applyFlowClassMetadata(node, block) {
+	setNormalizedFlowClass(node, block);
 }
 
 export class StructureAbortError extends Error {
@@ -231,19 +234,12 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 					content: charsToPreformattedTextNodes(i, charsRange)
 				}
 			}
-			else if (block.type === 'frame') {
-				node = {
-					type: 'paragraph',
-					artifact: true,
-					...(anchor && { anchor }),
-					content: charsToTextNodes(i, charsRange)
-				}
-			}
 			else {
 				throw new Error(`Unknown block type: ${block.type}`);
 			}
 
 			if (node) {
+				applyFlowClassMetadata(node, block);
 				structure.content.push(node);
 			}
 
@@ -258,13 +254,8 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 		let newPage = {
 			viewRect: page.view,
 			...(extractionDegraded ? { extractionDegraded: true } : {}),
-			contentRanges: []
+			contentRange: [[prevContentLength], [structure.content.length]]
 		};
-
-		if (prevContentLength < structure.content.length) {
-			let contentRange = getContentRangeFromBlocks(structure.content, prevContentLength, structure.content.length - 1)
-			newPage.contentRanges.push(contentRange);
-		}
 
 		structure.catalog.pages.push(newPage);
 
@@ -373,6 +364,9 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 				let context = contexts[inferenceContextIndexes[j]];
 				let val = inferenceVals[j];
 				context.blocks = blockLists[j];
+				for (let block of context.blocks) {
+					normalizePdfRawBlockFlow(block);
+				}
 				if (val.layoutFallbacks?.length) {
 					context.extractionDegraded = hasDegradedExtractionFallbacks(val.layoutFallbacks);
 				}
@@ -392,11 +386,11 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	await emitPartialChunkIfDue(pageCount - 1, true);
 
 	// Block transformations
-	mergeListItemContinuations(structure, mergeBlocks);
 	wrapListItems(structure);
-	pushArtifactsToTheEnd(structure);
-	mergeLists(structure);
-	mergeParagraphs(structure, mergeBlocks);
+	postProcessStructure(structure);
+	markListItemParts(structure);
+	markParagraphParts(structure);
+	normalizeTopLevelFlowClasses(structure);
 
 	// After this only text node transformations are allowed
 

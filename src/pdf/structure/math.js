@@ -39,6 +39,9 @@ export function getMathBlocks(structure) {
 
 	for (let i = 0; i < structure.content.length; i++) {
 		let block = structure.content[i];
+		if (block.flowClass === 'excluded') {
+			continue;
+		}
 		if (block.type === 'math') {
 			let blockText = getBlockText(structure, [i]);
 

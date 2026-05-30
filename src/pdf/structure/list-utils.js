@@ -4,6 +4,28 @@ import {
 	setContentRangeStart,
 	splitContentRange,
 } from '../../../structured-document-text/src/range.js';
+import { normalizeFlowClass, resolveFlowClass } from './flow-policy.js';
+
+function getMajorityFlowClass(blocks) {
+	const counts = {
+		body: 0,
+		auxiliary: 0,
+		excluded: 0,
+	};
+
+	for (const block of blocks) {
+		counts[resolveFlowClass(block)]++;
+	}
+
+	let majorityFlowClass = 'body';
+	for (const flowClass of ['auxiliary', 'excluded']) {
+		if (counts[flowClass] > counts[majorityFlowClass]) {
+			majorityFlowClass = flowClass;
+		}
+	}
+
+	return normalizeFlowClass(majorityFlowClass);
+}
 
 // wrap continous 'listitem' blocks into 'list' block
 // you also need to update structure.catalog.pages.contentRanges accordingly
@@ -32,8 +54,10 @@ export function wrapListItems(structure) {
 			}
 
 			const combinedRects = mergePageRects(items);
+			const flowClass = getMajorityFlowClass(items);
 			const listBlock = {
 				type: 'list',
+				...(flowClass && { flowClass }),
 				...(combinedRects && { anchor: { pageRects: combinedRects } }),
 				content: items
 			};

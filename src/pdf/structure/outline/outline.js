@@ -125,6 +125,7 @@ function buildAllBlocksByPage(blocks) {
 	const allBlocksByPage = new Map();
 	for (let i = 0; i < blocks.length; i++) {
 		const block = blocks[i];
+		if (block.flowClass === 'excluded') continue;
 		const metrics = block._metrics || {};
 		const anchorRect = block?.anchor?.pageRects?.[0];
 		const rect = metrics.rect || (anchorRect ? anchorRect.slice(1) : null);
@@ -157,6 +158,7 @@ function extractHeadingItems(blocks) {
 	const headingItems = [];
 	for (let i = 0; i < blocks.length; i++) {
 		const block = blocks[i];
+		if (block.flowClass === 'excluded') continue;
 		if (block.type !== 'heading') continue;
 		const metrics = block._metrics || {};
 		const anchorRect = block?.anchor?.pageRects?.[0];

@@ -1,48 +1,61 @@
+import { canCrossPagePartLink, isBodyFlowBlock, isTransparentBetweenParts } from './flow-policy.js';
 
-import { HEADER_LAST_IS_SOFT_HYPHEN } from '../../../structured-document-text/src/pdf/constants.js';
-import { parseTextMap } from '../../../structured-document-text/src/pdf/decode.js';
-
-function getFirstTextNode(block) {
-	if (!Array.isArray(block?.content)) {
-		return null;
-	}
-	return block.content.find(node => node && typeof node.text === 'string') || null;
-}
-
-function getLastTextNode(block) {
-	if (!Array.isArray(block?.content)) {
-		return null;
-	}
-	for (let i = block.content.length - 1; i >= 0; i--) {
-		const node = block.content[i];
-		if (node && typeof node.text === 'string') {
-			return node;
+function getNodeByRef(structure, ref) {
+	let node = { content: structure?.content };
+	for (const index of ref || []) {
+		if (!Number.isInteger(index) || !Array.isArray(node?.content)) {
+			return null;
+		}
+		node = node.content[index];
+		if (!node || typeof node !== 'object') {
+			return null;
 		}
 	}
-	return null;
+	return node;
 }
 
-function textNodeEndsWithSoftHyphen(node) {
-	const runs = parseTextMap(node?.anchor?.textMap);
-	const lastRun = runs.at(-1);
-	return Array.isArray(lastRun) && (lastRun[0] & HEADER_LAST_IS_SOFT_HYPHEN) !== 0;
+function sameRef(a, b) {
+	return Array.isArray(a)
+		&& Array.isArray(b)
+		&& a.length === b.length
+		&& a.every((value, index) => value === b[index]);
 }
 
-function addParagraphMergeBoundarySpace(first, second) {
-	const lastNode = getLastTextNode(first);
-	const firstNode = getFirstTextNode(second);
-	if (!lastNode || !firstNode) {
-		return;
+function getParentRef(ref) {
+	return Array.isArray(ref) && ref.length > 0 ? ref.slice(0, -1) : null;
+}
+
+function getLastRefIndex(ref) {
+	return Array.isArray(ref) && ref.length > 0 ? ref[ref.length - 1] : null;
+}
+
+function hasOnlySkippableBlocksBetween(structure, firstIndex, secondIndex) {
+	for (let i = firstIndex + 1; i < secondIndex; i++) {
+		const block = structure.content[i];
+		if (!isTransparentBetweenParts(block)) {
+			return false;
+		}
 	}
-	if (/\s$/.test(lastNode.text) || /^\s/.test(firstNode.text)) {
-		return;
+	return true;
+}
+
+function setPartLinks(structure, groups) {
+	for (const group of groups) {
+		for (let i = 0; i < group.length; i++) {
+			const ref = group[i];
+			const block = getNodeByRef(structure, ref);
+			if (!block) {
+				continue;
+			}
+			if (i > 0) {
+				block.previousPart = [...group[i - 1]];
+			}
+			if (i < group.length - 1) {
+				block.nextPart = [...group[i + 1]];
+			}
+		}
 	}
-	if (textNodeEndsWithSoftHyphen(lastNode)) {
-		return;
-	}
-	if (/[\p{L}\p{N}]$/u.test(lastNode.text) && /^[\p{L}\p{N}]/u.test(firstNode.text)) {
-		lastNode.text += ' ';
-	}
+	return structure;
 }
 
 export function cleanupBlockMetrics(structure) {
@@ -163,7 +176,29 @@ export function getParagraphMetrics(rawBlock, charsRange) {
 	};
 }
 
-export function mergeListItemContinuations(structure, mergeBlocks) {
+function collectBlocksByType(structure, type) {
+	const entries = [];
+	const visit = (content, baseRef) => {
+		if (!Array.isArray(content)) {
+			return;
+		}
+		for (let i = 0; i < content.length; i++) {
+			const block = content[i];
+			if (!block || typeof block.text === 'string') {
+				continue;
+			}
+			const ref = [...baseRef, i];
+			if (block.type === type && block._metrics) {
+				entries.push({ ref, block });
+			}
+			visit(block.content, ref);
+		}
+	};
+	visit(structure?.content, []);
+	return entries;
+}
+
+export function markListItemParts(structure) {
 	if (!structure || !Array.isArray(structure.content) || structure.content.length === 0) {
 		return structure;
 	}
@@ -176,8 +211,7 @@ export function mergeListItemContinuations(structure, mergeBlocks) {
 			return false;
 		}
 
-		// Check page proximity (same page or next page)
-		if (m2.pageIndex !== m1.pageIndex && m2.pageIndex !== m1.pageIndex + 1) {
+		if (!canCrossPagePartLink(structure, m1, m2)) {
 			return false;
 		}
 
@@ -195,58 +229,80 @@ export function mergeListItemContinuations(structure, mergeBlocks) {
 		return true;
 	};
 
-	// Find all listitem blocks with their indices
-	const listItems = [];
-	for (let i = 0; i < structure.content.length; i++) {
-		const block = structure.content[i];
-		if (block && block.type === 'listitem' && block._metrics) {
-			listItems.push({ index: i, block });
+	const areAdjacentListParts = (first, second) => {
+		const firstParent = getParentRef(first.ref);
+		const secondParent = getParentRef(second.ref);
+		const firstIndex = getLastRefIndex(first.ref);
+		const secondIndex = getLastRefIndex(second.ref);
+		if (!firstParent || !secondParent || !Number.isInteger(firstIndex) || !Number.isInteger(secondIndex)) {
+			return false;
 		}
-	}
+
+		if (sameRef(firstParent, secondParent)) {
+			return secondIndex === firstIndex + 1;
+		}
+
+		if (firstParent.length !== 1 || secondParent.length !== 1) {
+			return false;
+		}
+
+		const firstList = getNodeByRef(structure, firstParent);
+		const secondList = getNodeByRef(structure, secondParent);
+		return firstList?.type === 'list'
+			&& secondList?.type === 'list'
+			&& Array.isArray(firstList.content)
+			&& firstIndex === firstList.content.length - 1
+			&& secondIndex === 0
+			&& firstParent[0] < secondParent[0]
+			&& hasOnlySkippableBlocksBetween(structure, firstParent[0], secondParent[0]);
+	};
+
+	const listItems = collectBlocksByType(structure, 'listitem')
+		.filter(({ block }) => isBodyFlowBlock(block));
 
 	if (listItems.length < 2) {
 		return structure;
 	}
 
-	// Find groups of list items to merge
-	const mergeGroups = [];
+	// Find groups of list items that should be read as one logical item.
+	const partGroups = [];
 	let currentGroup = null;
 
 	for (let i = 0; i < listItems.length - 1; i++) {
 		const current = listItems[i];
 		const next = listItems[i + 1];
 
-		if (canMerge(current.block, next.block)) {
+		if (canMerge(current.block, next.block) && areAdjacentListParts(current, next)) {
 			if (!currentGroup) {
-				currentGroup = [current.index];
+				currentGroup = [current.ref];
 			}
-			currentGroup.push(next.index);
+			currentGroup.push(next.ref);
 		} else {
 			if (currentGroup) {
-				mergeGroups.push(currentGroup);
+				partGroups.push(currentGroup);
 				currentGroup = null;
 			}
 		}
 	}
 
 	if (currentGroup) {
-		mergeGroups.push(currentGroup);
+		partGroups.push(currentGroup);
 	}
 
-	if (mergeGroups.length === 0) {
+	if (partGroups.length === 0) {
 		return structure;
 	}
 
-	return mergeBlocks(structure, mergeGroups);
+	return setPartLinks(structure, partGroups);
 }
 
-export function mergeParagraphs(structure, mergeBlocks) {
-	// merge subsequent paragraph (even if there are other types of blocks in between) if:
+export function markParagraphParts(structure) {
+	// Link subsequent paragraph parts if:
 	// first paragraph ends with a lowercase letter or number and doesn't have sentence end mark, and lastLineRag is <=1
 	// and second paragraph indent is <=1 and starts with a lowercase letter or number,
-	// and both paragraph width is the same
+	// and both paragraph widths match, unless the second part is a one-line cross-page continuation,
 	// and the second one is on the same page or on the next page
-	// and after identifying those paragraphs to join, use mergeBlocks
+	// and only non-body flow blocks appear between them in the top-level sequence.
 
 	if (!structure || !Array.isArray(structure.content) || structure.content.length === 0) {
 		return structure;
@@ -264,6 +320,14 @@ export function mergeParagraphs(structure, mergeBlocks) {
 		return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9');
 	};
 
+	const isLowercase = (char) => {
+		if (!char || char.length === 0) {
+			return false;
+		}
+		const c = char.charAt(0);
+		return c >= 'a' && c <= 'z';
+	};
+
 	const getBlockWidth = (metrics) => {
 		if (!metrics || !Array.isArray(metrics.rect)) {
 			return null;
@@ -271,12 +335,21 @@ export function mergeParagraphs(structure, mergeBlocks) {
 		return metrics.rect[2] - metrics.rect[0];
 	};
 
-	const isDegradedExtractionPage = (pageIndex) => {
-		return Number.isInteger(pageIndex)
-			&& structure.catalog.pages?.[pageIndex]?.extractionDegraded === true;
+	const hasCompatibleWidth = (m1, m2) => {
+		const width1 = getBlockWidth(m1);
+		const width2 = getBlockWidth(m2);
+		if (width1 === null || width2 === null) {
+			return false;
+		}
+		if (Math.abs(width1 - width2) <= 1) {
+			return true;
+		}
+		return m2.pageIndex === m1.pageIndex + 1
+			&& m2.lineCount === 1
+			&& width2 <= width1 + 1;
 	};
 
-	const canMergeParagraphs = (first, second) => {
+	const canLinkParagraphs = (first, second) => {
 		const m1 = first._metrics;
 		const m2 = second._metrics;
 
@@ -284,12 +357,7 @@ export function mergeParagraphs(structure, mergeBlocks) {
 			return false;
 		}
 
-		// Check page proximity (same page or next page)
-		if (m2.pageIndex !== m1.pageIndex && m2.pageIndex !== m1.pageIndex + 1) {
-			return false;
-		}
-
-		if (m2.pageIndex !== m1.pageIndex && (isDegradedExtractionPage(m1.pageIndex) || isDegradedExtractionPage(m2.pageIndex))) {
+		if (!canCrossPagePartLink(structure, m1, m2)) {
 			return false;
 		}
 
@@ -300,13 +368,10 @@ export function mergeParagraphs(structure, mergeBlocks) {
 			return false;
 		}
 
-		// First paragraph must end with lowercase letter or number
-		if (!isLowercaseOrNumber(m1.lastChar)) {
-			return false;
-		}
-
-		// First paragraph must not end with sentence end mark
-		if (SENTENCE_END_MARKS.has(m1.lastChar)) {
+		const plainContinuation = isLowercaseOrNumber(m1.lastChar)
+			&& !SENTENCE_END_MARKS.has(m1.lastChar);
+		const hyphenatedContinuation = m1.lastChar === '-' && isLowercase(m2.firstChar);
+		if (!plainContinuation && !hyphenatedContinuation) {
 			return false;
 		}
 
@@ -325,17 +390,14 @@ export function mergeParagraphs(structure, mergeBlocks) {
 			return false;
 		}
 
-		// Both paragraphs must have the same width
-		const width1 = getBlockWidth(m1);
-		const width2 = getBlockWidth(m2);
-		return width1 !== null && width2 !== null && Math.abs(width1 - width2) <= 1;
+		return hasCompatibleWidth(m1, m2);
 	};
 
 	// Find all paragraphs with their indices
 	const paragraphs = [];
 	for (let i = 0; i < structure.content.length; i++) {
 		const block = structure.content[i];
-		if (block && block.type === 'paragraph' && !block.artifact && block._metrics) {
+		if (block && block.type === 'paragraph' && isBodyFlowBlock(block) && block._metrics) {
 			paragraphs.push({ index: i, block });
 		}
 	}
@@ -344,22 +406,29 @@ export function mergeParagraphs(structure, mergeBlocks) {
 		return structure;
 	}
 
-	// Find groups of paragraphs to merge
-	const mergeGroups = [];
+	// Find groups of paragraphs that should be read as one logical paragraph.
+	const partGroups = [];
 	let currentGroup = null;
 
 	for (let i = 0; i < paragraphs.length - 1; i++) {
 		const current = paragraphs[i];
 		const next = paragraphs[i + 1];
 
-		if (canMergeParagraphs(current.block, next.block)) {
-			if (!currentGroup) {
-				currentGroup = [current.index];
+		if (canLinkParagraphs(current.block, next.block)) {
+			if (!hasOnlySkippableBlocksBetween(structure, current.index, next.index)) {
+				if (currentGroup) {
+					partGroups.push(currentGroup);
+					currentGroup = null;
+				}
+				continue;
 			}
-			currentGroup.push(next.index);
+			if (!currentGroup) {
+				currentGroup = [[current.index]];
+			}
+			currentGroup.push([next.index]);
 		} else {
 			if (currentGroup) {
-				mergeGroups.push(currentGroup);
+				partGroups.push(currentGroup);
 				currentGroup = null;
 			}
 		}
@@ -367,18 +436,12 @@ export function mergeParagraphs(structure, mergeBlocks) {
 
 	// Don't forget the last group
 	if (currentGroup) {
-		mergeGroups.push(currentGroup);
+		partGroups.push(currentGroup);
 	}
 
-	if (mergeGroups.length === 0) {
+	if (partGroups.length === 0) {
 		return structure;
 	}
 
-	for (const group of mergeGroups) {
-		for (let i = 0; i < group.length - 1; i++) {
-			addParagraphMergeBoundarySpace(structure.content[group[i]], structure.content[group[i + 1]]);
-		}
-	}
-
-	return mergeBlocks(structure, mergeGroups);
+	return setPartLinks(structure, partGroups);
 }

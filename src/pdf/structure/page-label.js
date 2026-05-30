@@ -1,3 +1,5 @@
+import { getPageBlockSpan } from '../../../structured-document-text/src/pages.js';
+import { getNestedBlockPlainText } from '../../../structured-document-text/src/text.js';
 
 // export function validatePageLabel(blocks, chars, pageLabel) {
 // 	let combinedChars = blocks.flatMap(x => chars.slice(x.startOffset, x.endOffset + 1));
@@ -90,28 +92,19 @@ function parseCandidateNumber(str) {
 function getPageLabelCandidates(contentNodes) {
 	let candidates = [];
 
-	// Only look at artifact paragraphs (frames)
-	let frameNodes = contentNodes.filter(x => x.artifact);
+	// Only look at excluded text, which is where page labels usually live.
+	let excludedNodes = contentNodes.filter(x => x.flowClass === 'excluded');
 
-	// Extract all text from frame nodes
-	for (let node of frameNodes) {
-		if (!node.content) continue;
-
-		// node.content is an array of text nodes, extract the text
-		for (let textNode of node.content) {
-			if (textNode.type === 'text' && textNode.text) {
-				// Split text into words
-				let words = textNode.text.split(' ').filter(Boolean);
-				for (let word of words) {
-					let candidateNumber = parseCandidateNumber(word);
-					if (candidateNumber) {
-						candidates.push({
-							text: word,
-							type: candidateNumber.type,
-							integer: candidateNumber.integer
-						});
-					}
-				}
+	for (let node of excludedNodes) {
+		let words = getNestedBlockPlainText(node).split(/\s+/u).filter(Boolean);
+		for (let word of words) {
+			let candidateNumber = parseCandidateNumber(word);
+			if (candidateNumber) {
+				candidates.push({
+					text: word,
+					type: candidateNumber.type,
+					integer: candidateNumber.integer
+				});
 			}
 		}
 	}
@@ -252,33 +245,33 @@ function validate(catalogPageLabels, pages) {
 
 	let validatedPageLabels = [];
 	for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
-		let page = pages[pageIndex];
-		let pageLabel = catalogPageLabels[pageIndex];
-		let validatedInFrame = false;
-		for (let block of page.blocks) {
-			if (block.type === 'frame') {
-				let parts = new Set(block.text.split(rx).filter(Boolean));
-				if (parts.has(pageLabel)) {
-					validatedInFrame = true;
-					break;
-				}
-			}
-		}
-
-		let validatedInBody = false;
-		if (!validatedInFrame) {
+			let page = pages[pageIndex];
+			let pageLabel = catalogPageLabels[pageIndex];
+			let validatedInExcluded = false;
 			for (let block of page.blocks) {
-				if (block.type !== 'frame') {
+				if (block.flowClass === 'excluded') {
 					let parts = new Set(block.text.split(rx).filter(Boolean));
 					if (parts.has(pageLabel)) {
-						validatedInBody = true;
+						validatedInExcluded = true;
 						break;
 					}
 				}
 			}
-		}
 
-		validatedPageLabels[pageIndex] = [pageLabel, validatedInFrame, validatedInBody];
+			let validatedInBody = false;
+			if (!validatedInExcluded) {
+				for (let block of page.blocks) {
+					if (block.flowClass !== 'excluded') {
+						let parts = new Set(block.text.split(rx).filter(Boolean));
+						if (parts.has(pageLabel)) {
+							validatedInBody = true;
+						break;
+					}
+				}
+				}
+			}
+
+		validatedPageLabels[pageIndex] = [pageLabel, validatedInExcluded, validatedInBody];
 	}
 	return validatedPageLabels;
 }
@@ -318,19 +311,11 @@ export function addPageLabels(structure, catalogPageLabels) {
 	} else {
 		const pageLabelCandidates = [];
 		for (let pageIndex = 0; pageIndex < structure.catalog.pages.length; pageIndex++) {
-			let page = structure.catalog.pages[pageIndex];
-			if (page && Array.isArray(page.contentRanges)) {
-				// Get all content nodes for this page
+			const span = getPageBlockSpan(structure, pageIndex);
+			if (span) {
 				let contentNodes = [];
-				for (let range of page.contentRanges) {
-					let startTopLevel = range?.[0]?.[0];
-					let endTopLevel = range?.[1]?.[0];
-					if (!Number.isInteger(startTopLevel) || !Number.isInteger(endTopLevel)) {
-						continue;
-					}
-					for (let i = startTopLevel; i <= endTopLevel; i++) {
-						contentNodes.push(structure.content[i]);
-					}
+				for (let i = span.startIndex; i < span.endIndexExclusive; i++) {
+					contentNodes.push(structure.content[i]);
 				}
 				pageLabelCandidates.push(getPageLabelCandidates(contentNodes));
 			} else {

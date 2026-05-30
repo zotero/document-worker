@@ -786,6 +786,7 @@ function overlayRegions(blocks, regions) {
 		if (!region._emitted) {
 			result.push({
 				type: 'preformatted',
+				...(block.flowClass && { flowClass: block.flowClass }),
 				startOffset: region.startOffset,
 				endOffset: region.endOffset,
 				bbox: region.bbox,
