@@ -16,9 +16,10 @@ import { getNestedBlockPlainText, getBlockPlainText } from '../../../structured-
 import type { StructuredDocumentText, OutlineItem } from '../../../structured-document-text/schema';
 import { cssEscape } from "./cssEscape";
 import { filterForReadability, isInKeptSetIncludingAncestors } from './readability';
-
-const SCHEMA_VERSION = '1.0.0';
-const PROCESSOR_VERSION = '1.0.0';
+import {
+	DOCUMENT_WORKER_PROCESSOR_VERSION,
+	SDT_SCHEMA_VERSION,
+} from '../../versions.js';
 
 interface FulltextOptions {
 	structure?: StructuredDocumentText;
@@ -138,9 +139,9 @@ function buildSnapshotStructure(
 	}
 
 	return {
-		schemaVersion: SCHEMA_VERSION,
+		schemaVersion: SDT_SCHEMA_VERSION,
 		metadata: {
-			processor: { type: 'snapshot' as const, version: PROCESSOR_VERSION },
+			processor: { type: 'snapshot' as const, version: DOCUMENT_WORKER_PROCESSOR_VERSION },
 			dateCreated: new Date().toISOString(),
 			source: {
 				contentType: sourceContentType,
@@ -383,9 +384,9 @@ function emptyStructure(
 	sourceHash?: string,
 ): InternalStructuredDocumentText {
 	return {
-		schemaVersion: SCHEMA_VERSION,
+		schemaVersion: SDT_SCHEMA_VERSION,
 		metadata: {
-			processor: { type: 'snapshot' as const, version: PROCESSOR_VERSION },
+			processor: { type: 'snapshot' as const, version: DOCUMENT_WORKER_PROCESSOR_VERSION },
 			dateCreated: new Date().toISOString(),
 			source: {
 				contentType: sourceContentType,

@@ -1,6 +1,6 @@
 {
 	"name": "document-worker",
-	"version": "1.0.0",
+	"private": true,
 	"description": "Document processing worker for PDFs, EPUBs, and HTML snapshots",
 	"exports": {
 		".": "./src/index.js"

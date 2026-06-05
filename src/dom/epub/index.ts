@@ -9,9 +9,10 @@ import { resolveLinks, computeSectionOffsets, splitHref } from './cross-referenc
 import { getFulltextFromStructuredText } from '../../../structured-document-text/src/fulltext.js';
 import { getNestedBlockPlainText, mergeNodesWithSelectorMap } from '../../../structured-document-text/src/text.js';
 import type { StructuredDocumentText, OutlineItem, PageInfo, ContentBlockNode } from '../../../structured-document-text/schema';
-
-const SCHEMA_VERSION = '1.0.0';
-const PROCESSOR_VERSION = '1.0.0';
+import {
+	DOCUMENT_WORKER_PROCESSOR_VERSION,
+	SDT_SCHEMA_VERSION,
+} from '../../versions.js';
 
 const XHTML_MEDIA_TYPES = new Set([
 	'application/xhtml+xml',
@@ -69,11 +70,11 @@ function buildEpubStructure(arrayBuffer: ArrayBuffer, sourceHash?: string): Inte
 
 	// 4. Build structure object
 	let structure: InternalStructuredDocumentText = {
-		schemaVersion: SCHEMA_VERSION,
+		schemaVersion: SDT_SCHEMA_VERSION,
 		metadata: {
 			processor: {
 				type: 'epub',
-				version: PROCESSOR_VERSION,
+				version: DOCUMENT_WORKER_PROCESSOR_VERSION,
 			},
 			dateCreated: new Date().toISOString(),
 			source: {

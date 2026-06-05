@@ -21,11 +21,13 @@ import { createBlockAnchor, ensureBlockPageRects } from './util.js';
 import { createStructureIndex } from './structure-index.js';
 import { extractStructuredTable, extractStructuredTables } from './table/extract.js';
 import { postProcessStructure } from './post-process.js';
+import {
+	DOCUMENT_WORKER_PROCESSOR_VERSION,
+	SDT_SCHEMA_VERSION,
+} from '../../versions.js';
 // import { getNextChunk } from '../../../structured-document-text/src/chunker.js';
 // import { getContent, getRefRangesFromPageRects } from '../../../structured-document-text/src/pdf/content.js';
 
-const SCHEMA_VERSION = '1.0.0';
-const PROCESSOR_VERSION = '1.0.0';
 const DEGRADED_EXTRACTION_FALLBACK_REASONS = new Set([
 	'inference_error',
 	'too_many_lines',
@@ -66,11 +68,11 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	}
 
 	let structure = {
-		schemaVersion: SCHEMA_VERSION,
+		schemaVersion: SDT_SCHEMA_VERSION,
 		metadata: {
 			processor: {
 				type: 'pdf',
-				version: PROCESSOR_VERSION
+				version: DOCUMENT_WORKER_PROCESSOR_VERSION
 			},
 			dateCreated: new Date().toISOString(),
 			source: {
