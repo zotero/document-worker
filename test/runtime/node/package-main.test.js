@@ -1,6 +1,7 @@
 import '../../../scripts/pdfjs-setup.js';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { inflateRawSync } from 'node:zlib';
 import * as worker from 'document-worker';
 import { openStructuredDocumentTextPack } from '../../../structured-document-text/src/pack/reader.js';
 import {
@@ -40,7 +41,9 @@ function pdf2() {
 
 async function assertPackedStructuredDocumentText(result, type) {
 	assert.ok(result.buf instanceof ArrayBuffer);
-	let reader = await openStructuredDocumentTextPack(result.buf);
+	let reader = await openStructuredDocumentTextPack(result.buf, {
+		inflate: bytes => new Uint8Array(inflateRawSync(bytes)),
+	});
 	let structure = await reader.materialize();
 	assertStructuredDocumentText(structure, type);
 	return structure;

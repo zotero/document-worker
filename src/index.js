@@ -16,6 +16,7 @@ import { canvasToPNGArrayBuffer } from './pdf/render-runtime.js';
 import { getEpubStructure } from './dom/epub/index';
 import { getSnapshotStructure } from './dom/snapshot/index';
 import { packStructuredDocumentText } from '../structured-document-text/src/pack/writer.js';
+import { deflateSync } from 'fflate';
 
 const EPUB_CONTENT_TYPE = 'application/epub+zip';
 const SOURCE_HASH_RE = /^[0-9a-f]{32}$/u;
@@ -84,7 +85,10 @@ async function getStructuredDocumentText(buf, options = {}) {
 		shouldAbort: options.shouldAbort,
 		sourceHash: options.sourceHash,
 	});
-	let buffer = packStructuredDocumentText(structure, { destructive: true });
+	let buffer = packStructuredDocumentText(structure, {
+		destructive: true,
+		deflate: bytes => deflateSync(bytes),
+	});
 	return { buf: buffer };
 }
 

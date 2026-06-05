@@ -33,6 +33,13 @@
     var decoded = new TextDecoder('utf-8').decode(bytes);
     assertEqual(decoded, 'Hello', 'TextDecoder UTF-8');
 
+    // TextEncoder UTF-8
+    var encoded = new TextEncoder().encode('Hello \u20ac \ud83d\ude00');
+    assert(encoded instanceof Uint8Array, 'TextEncoder should return Uint8Array');
+    assertEqual(new TextDecoder('utf-8').decode(encoded), 'Hello \u20ac \ud83d\ude00', 'TextEncoder UTF-8');
+    assertEqual(new TextDecoder('utf-8').decode(new TextEncoder().encode(0)), '0', 'TextEncoder should stringify input');
+    assertEqual(new TextDecoder('utf-8').decode(new TextEncoder().encode('\ud800')), '\ufffd', 'TextEncoder should replace lone surrogates');
+
     // setTimeout calls the callback
     var called = false;
     setTimeout(function () { called = true; }, 0);
