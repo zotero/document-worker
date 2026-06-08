@@ -35,7 +35,6 @@ export const workerActionNames = [
 	'pdf.getFulltext',
 	'pdf.getRecognizerData',
 	'getStructuredDocumentText',
-	'getStructuredDocumentTextJSON',
 	'pdf.renderAnnotations',
 	'pdf.renderArea',
 	'pdf.hasAnnotations',

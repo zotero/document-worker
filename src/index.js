@@ -40,39 +40,16 @@ async function createStructuredDocumentText(buf, options = {}) {
 		contentType,
 		password,
 		dataProvider,
-		onChunk,
-		batchSize,
-		shouldAbort,
 		sourceHash,
 	} = options;
 	assertSourceHash(sourceHash);
 
 	if (isEpub(contentType) || isSnapshot(contentType)) {
-		let result = isEpub(contentType)
+		return isEpub(contentType)
 			? await getEpubStructure(buf, { sourceHash })
 			: await getSnapshotStructure(buf, contentType, { sourceHash });
-		// EPUB/snapshot have no per-page chunking, so emit the whole
-		// structure as a single partial chunk before the final, matching
-		// PDF's protocol so consumer-side handling stays uniform.
-		if (onChunk && result) {
-			let pages = result.catalog.pages || [];
-			await onChunk({
-				kind: 'partial',
-				pages,
-				content: result.content || [],
-				pageIndexOffset: 0,
-				contentIndexOffset: 0,
-				pageIndexRange: [0, Math.max(0, pages.length - 1)],
-				totalPageCount: Math.max(1, pages.length),
-			});
-			await onChunk({ kind: 'final', structure: result });
-		}
-		return result;
 	}
 	return await pdfGetStructure(buf, password, dataProvider, {
-		onChunk,
-		batchSize,
-		shouldAbort,
 		sourceHash,
 	});
 }
@@ -82,7 +59,6 @@ async function getStructuredDocumentText(buf, options = {}) {
 		contentType: options.contentType,
 		password: options.password,
 		dataProvider: options.dataProvider,
-		shouldAbort: options.shouldAbort,
 		sourceHash: options.sourceHash,
 	});
 	let buffer = packStructuredDocumentText(structure, {
@@ -90,10 +66,6 @@ async function getStructuredDocumentText(buf, options = {}) {
 		deflate: bytes => deflateSync(bytes),
 	});
 	return { buf: buffer };
-}
-
-async function getStructuredDocumentTextJSON(buf, options = {}) {
-	return await createStructuredDocumentText(buf, options);
 }
 
 const pdf = {
@@ -136,7 +108,6 @@ async function renderedAnnotationSaver(libraryID, annotationKey, buf) {
 if (typeof self !== 'undefined') {
 	let promiseID = 0;
 	let waitingPromises = {};
-	let abortFlags = {};
 
 	self.query = async function (action, data, transfer) {
 		return new Promise(function (resolve) {
@@ -154,12 +125,6 @@ if (typeof self !== 'undefined') {
 			if (resolve) {
 				resolve(message.data);
 			}
-			return;
-		}
-
-		if (message.action === 'abort') {
-			let flag = abortFlags[message.id];
-			if (flag) flag.aborted = true;
 			return;
 		}
 
@@ -321,48 +286,6 @@ if (typeof self !== 'undefined') {
 					responseID: message.id,
 					error: errObject(e)
 				}, []);
-			}
-		}
-		else if (message.action === 'getStructuredDocumentTextJSON') {
-			let streaming = !!message.data.streaming;
-			let abortFlag = { aborted: false };
-			if (streaming) {
-				abortFlags[message.id] = abortFlag;
-			}
-			try {
-				let onChunk = streaming
-					? (chunk) => {
-						self.postMessage({
-							responseID: message.id,
-							data: chunk,
-							isPartial: true
-						}, []);
-					}
-					: undefined;
-				let data = await getStructuredDocumentTextJSON(message.data.buf, {
-					contentType: message.data.contentType,
-					password: message.data.password,
-					dataProvider: fetchData,
-					onChunk,
-					batchSize: message.data.batchSize,
-					shouldAbort: streaming ? () => abortFlag.aborted : undefined,
-					sourceHash: message.data.sourceHash,
-				});
-				self.postMessage({
-					responseID: message.id,
-					data: streaming ? null : data
-				}, []);
-			}
-			catch (e) {
-				self.postMessage({
-					responseID: message.id,
-					error: errObject(e)
-				}, []);
-			}
-			finally {
-				if (streaming) {
-					delete abortFlags[message.id];
-				}
 			}
 		}
 		else if (message.action === 'pdf.renderAnnotations') {

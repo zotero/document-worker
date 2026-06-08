@@ -25,8 +25,6 @@ import {
 	DOCUMENT_WORKER_PROCESSOR_VERSION,
 	SDT_SCHEMA_VERSION,
 } from '../../versions.js';
-// import { getNextChunk } from '../../../structured-document-text/src/chunker.js';
-// import { getContent, getRefRangesFromPageRects } from '../../../structured-document-text/src/pdf/content.js';
 
 const DEGRADED_EXTRACTION_FALLBACK_REASONS = new Set([
 	'inference_error',
@@ -41,31 +39,10 @@ function applyFlowClassMetadata(node, block) {
 	setNormalizedFlowClass(node, block);
 }
 
-export class StructureAbortError extends Error {
-	constructor() {
-		super('Structured document text generation aborted');
-		this.name = 'AbortError';
-		this.aborted = true;
-	}
-}
-
-// Options:
-//   onChunk(chunk): when set, emits { kind: 'partial', ... } per batch (blocks
-//     are pre-post-processing) and { kind: 'final', structure } once the
-//     canonical structure is ready.
-//   batchSize: pages per partial chunk (default 5).
-//   shouldAbort(): checked between pages; throws StructureAbortError when truthy.
 export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelProvider, options = {}) {
 	const pageCount = pdfDocument.numPages;
-	const onChunk = typeof options.onChunk === 'function' ? options.onChunk : null;
-	const batchSize = Math.max(1, options.batchSize || 5);
-	const inferenceBatchSize = Math.max(1, options.inferenceBatchSize || (onChunk ? batchSize : 8));
-	const shouldAbort = typeof options.shouldAbort === 'function' ? options.shouldAbort : null;
+	const inferenceBatchSize = Math.max(1, options.inferenceBatchSize || 8);
 	const sourceHash = options.sourceHash;
-
-	function checkAbort() {
-		if (shouldAbort?.()) throw new StructureAbortError();
-	}
 
 	let structure = {
 		schemaVersion: SDT_SCHEMA_VERSION,
@@ -121,30 +98,6 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 	let regularWordsSet = new Set();
 	let catalogPageLabels = await pdfDocument.pdfManager.ensureCatalog("pageLabels");
-
-	let lastEmittedPageCount = 0;
-	let lastEmittedContentCount = 0;
-
-	async function emitPartialChunkIfDue(pageIndex, force = false) {
-		if (!onChunk) return;
-		let pagesInBatch = structure.catalog.pages.length - lastEmittedPageCount;
-		if (!force && pagesInBatch < batchSize) return;
-		if (pagesInBatch === 0) return;
-		let pageIndexOffset = lastEmittedPageCount;
-		let contentIndexOffset = lastEmittedContentCount;
-		let chunk = {
-			kind: 'partial',
-			pages: structure.catalog.pages.slice(pageIndexOffset),
-			content: structure.content.slice(contentIndexOffset),
-			pageIndexOffset,
-			contentIndexOffset,
-			pageIndexRange: [pageIndexOffset, pageIndex],
-			totalPageCount: pageCount,
-		};
-		lastEmittedPageCount = structure.catalog.pages.length;
-		lastEmittedContentCount = structure.content.length;
-		await onChunk(chunk);
-	}
 
 	async function appendPageContext(context) {
 		let { i, chars, page, blocks, extractionDegraded } = context;
@@ -255,8 +208,6 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 		};
 
 		structure.catalog.pages.push(newPage);
-
-		await emitPartialChunkIfDue(i);
 	}
 
 	async function prepareTableNodesForContexts(contexts) {
@@ -328,8 +279,6 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 		let batchEnd = Math.min(pageCount, batchStart + inferenceBatchSize);
 
 		for (let i = batchStart; i < batchEnd; i++) {
-			checkAbort();
-
 			let { chars, objects } = await pdfDocument.module.getPageCharsObjects(i);
 
 			updateRegularWordsSet(chars, regularWordsSet);
@@ -366,17 +315,12 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 			}
 		}
 
-		checkAbort();
 		await prepareTableNodesForContexts(contexts);
-		checkAbort();
 
 		for (let context of contexts) {
-			checkAbort();
 			await appendPageContext(context);
 		}
 	}
-
-	await emitPartialChunkIfDue(pageCount - 1, true);
 
 	// Block transformations
 	wrapListItems(structure);
@@ -425,20 +369,6 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	cleanupBlockMetrics(structure);
 	cleanupTextNodeStyles(structure);
 	ensureBlockPageRects(structure);
-
-	if (onChunk) {
-		await onChunk({ kind: 'final', structure });
-	}
-
-	// let chunks = [];
-	// let startIndex = 0;
-	// let chunk;
-	// while (chunk = getNextChunk(structure, startIndex)) {
-	// 	chunk.refRanges = getRefRangesFromPageRects(structure, chunk.pageRects);
-	// 	chunk.content = getContent(structure, chunk.refRanges)
-	// 	chunks.push(chunk);
-	// 	startIndex = chunk.endBlockIndex + 1;
-	// }
 
 	return structure;
 }

@@ -80,11 +80,6 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 				if (!pendingCall) {
 					return;
 				}
-				if (message.isPartial) {
-					pendingCall.onPartial?.(message.data);
-					return;
-				}
-
 				pending.delete(message.responseID);
 				if (message.error) {
 					pendingCall.reject(new Error(message.error.message || String(message.error)));
@@ -94,10 +89,10 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 				}
 			};
 
-			function callWorker(action, data, transfer = [], onPartial = null) {
+			function callWorker(action, data, transfer = []) {
 				return new Promise((resolve, reject) => {
 					const id = ++nextID;
-					pending.set(id, { resolve, reject, onPartial });
+					pending.set(id, { resolve, reject });
 					worker.postMessage({ id, action, data }, transfer);
 				});
 			}
@@ -105,18 +100,6 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 			function callWorkerWithBuffer(action, sourceBuf, data = {}) {
 				const buf = sourceBuf.slice(0);
 				return callWorker(action, { buf, ...data }, [buf]);
-			}
-
-			async function callWorkerStreamingWithBuffer(action, sourceBuf, data = {}) {
-				const buf = sourceBuf.slice(0);
-				const partials = [];
-				const final = await callWorker(
-					action,
-					{ buf, ...data },
-					[buf],
-					chunk => partials.push(chunk)
-				);
-				return { final, partials };
 			}
 
 			async function fetchArrayBuffer(path) {
@@ -202,15 +185,6 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 				sourceHash: snapshotHash,
 			});
 
-			const streamedPdfJSON = await callWorkerStreamingWithBuffer('getStructuredDocumentTextJSON', pdf, {
-				contentType: 'application/pdf',
-				password: '',
-				sourceHash: pdfHash,
-				streaming: true,
-				batchSize: 1,
-			});
-			const streamedFinalChunk = streamedPdfJSON.partials[streamedPdfJSON.partials.length - 1];
-
 			const renderedAnnotationCount = await callWorkerWithBuffer('pdf.renderAnnotations', pdf, {
 				libraryID: 1,
 				annotations: samples.renderableAnnotations,
@@ -244,9 +218,6 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 				packedEpubByteLength: packedEpubStructure.buf.byteLength,
 				packedSnapshotIsSdt: isSdtBuffer(packedSnapshotStructure.buf),
 				packedSnapshotByteLength: packedSnapshotStructure.buf.byteLength,
-				jsonStreamingFinalIsNull: streamedPdfJSON.final === null,
-				jsonStreamingKinds: streamedPdfJSON.partials.map(chunk => chunk.kind),
-				jsonStreamingProcessor: streamedFinalChunk?.structure?.metadata?.processor?.type,
 				renderedAnnotationCount,
 				renderedAnnotationPNGs,
 				renderedAreaPNG: arrayBufferToBase64(renderedArea.buf),
@@ -274,10 +245,6 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 		expect(result.packedEpubByteLength).toBeGreaterThan(100);
 		expect(result.packedSnapshotIsSdt).toBe(true);
 		expect(result.packedSnapshotByteLength).toBeGreaterThan(100);
-		expect(result.jsonStreamingFinalIsNull).toBe(true);
-		expect(result.jsonStreamingKinds).toContain('partial');
-		expect(result.jsonStreamingKinds[result.jsonStreamingKinds.length - 1]).toBe('final');
-		expect(result.jsonStreamingProcessor).toBe('pdf');
 		expect(result.renderedAnnotationCount).toBe(1);
 		expect(result.renderedAnnotationPNGs).toHaveLength(1);
 		await assertRenderedTextCropPNG(Buffer.from(result.renderedAnnotationPNGs[0], 'base64'));
