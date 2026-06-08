@@ -1,6 +1,8 @@
 import { getRuntime } from '../onnx/runtime.js';
 import { createCompactTableRuntime } from './runtime.js';
 
+const TABLE_GRID_MODEL_ENABLED = false;
+
 let runtimePromise = null;
 
 async function createRuntime(onnxRuntimeProvider, modelProvider) {
@@ -28,6 +30,9 @@ async function getTableGridRuntime(onnxRuntimeProvider, modelProvider) {
 }
 
 export async function inferTableGrid(page, onnxRuntimeProvider, modelProvider) {
+	if (!TABLE_GRID_MODEL_ENABLED) {
+		return null;
+	}
 	const runtime = await getTableGridRuntime(onnxRuntimeProvider, modelProvider);
 	return runtime.infer(page);
 }
@@ -37,6 +42,9 @@ export async function inferTableGrids(
 	onnxRuntimeProvider,
 	modelProvider,
 ) {
+	if (!TABLE_GRID_MODEL_ENABLED) {
+		return pages.map(() => null);
+	}
 	const runtime = await getTableGridRuntime(onnxRuntimeProvider, modelProvider);
 	const results = new Array(pages.length);
 	for (let index = 0; index < pages.length; index++) {

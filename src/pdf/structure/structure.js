@@ -118,7 +118,6 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 	// internal and external links
 	let linkMap = new Map();
-	let tableGridCache = new Map();
 
 	let regularWordsSet = new Set();
 	let catalogPageLabels = await pdfDocument.pdfManager.ensureCatalog("pageLabels");
@@ -199,12 +198,8 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 				node = context.tableNodes?.get(bi)
 					|| await extractStructuredTable({
 						pageIndex: i,
-						viewBox: page.view,
 						block,
 						chars: charsRange,
-						onnxRuntimeProvider,
-						modelProvider,
-						tableGridCache,
 					});
 			}
 			else if (block.type === 'footnote') {
@@ -277,12 +272,8 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 				}
 				requests.push({
 					pageIndex: i,
-					viewBox: page.view,
 					block,
 					chars: chars.slice(block.startOffset, block.endOffset + 1),
-					onnxRuntimeProvider,
-					modelProvider,
-					tableGridCache,
 				});
 				targets.push({ context, blockIndex });
 			}
