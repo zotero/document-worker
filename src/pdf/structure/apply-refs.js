@@ -135,6 +135,7 @@ export function getRefCit(candidateGroups) {
 							obj = {
 								refList,
 								candidateGroup,
+								candidateGroupKey: key,
 								candidateRelations: new Map()
 							};
 							g1.set(candidateGroup, obj);
@@ -190,7 +191,7 @@ export function getRefCit(candidateGroups) {
 	let bestRefCit = null;
 	for (let refCit of refCitGroups) {
 		if (
-			(!bestRefCit || refCit.matchedReferences > bestRefCit.matchedReferences)
+			(!bestRefCit || refCit.matchedReferences.length > bestRefCit.matchedReferences.length)
 			&& refCit.referenceCoverage > 0.3 && refCit.pageCoverage >= 0.3
 		) {
 			bestRefCit = refCit;
@@ -210,7 +211,7 @@ export function getRefCit(candidateGroups) {
 				}
 			}
 		}
-		candidateGroups.delete(bestRefCit.candidateGroup);
+		candidateGroups.delete(bestRefCit.candidateGroupKey);
 	}
 
 	return bestRefCit;
@@ -224,7 +225,7 @@ export function getRefsList(candidateGroups) {
 
 
 	for (let [key, candidateGroup] of candidateGroups) {
-		if (candidateGroup[0].mathRelations) {
+		if (hasMathRelations(candidateGroup)) {
 			mathGroup = candidateGroup;
 			candidateGroups.delete(key);
 			break;
@@ -284,6 +285,10 @@ export function getRefsList(candidateGroups) {
 	}
 
 	return refsList;
+}
+
+function hasMathRelations(candidateGroup) {
+	return candidateGroup.some(candidate => candidate.mathRelations?.length);
 }
 
 function sameRef(a, b) {
