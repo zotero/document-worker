@@ -11,6 +11,8 @@ export function assertFulltextResult(result) {
 
 export function assertStructuredDocumentText(result, type) {
 	assert.equal(result.metadata?.processor?.type, type);
+	assert.equal(Number.isInteger(result.metadata?.processor?.version), true);
+	assert.ok(result.metadata.processor.version > 0);
 	assert.equal(result.schemaVersion, '1.0.0');
 	assert.match(result.metadata?.source?.hash, /^[0-9a-f]{32}$/u);
 	assert.ok(Array.isArray(result.catalog?.pages));

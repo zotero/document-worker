@@ -17,7 +17,7 @@ import type { StructuredDocumentText, OutlineItem } from '../../../structured-do
 import { cssEscape } from "./cssEscape";
 import { filterForReadability, isInKeptSetIncludingAncestors } from './readability';
 import {
-	DOCUMENT_WORKER_PROCESSOR_VERSION,
+	SDT_PROCESSOR_VERSIONS,
 	SDT_SCHEMA_VERSION,
 } from '../../versions.js';
 
@@ -141,7 +141,7 @@ function buildSnapshotStructure(
 	return {
 		schemaVersion: SDT_SCHEMA_VERSION,
 		metadata: {
-			processor: { type: 'snapshot' as const, version: DOCUMENT_WORKER_PROCESSOR_VERSION },
+			processor: { type: 'snapshot' as const, version: SDT_PROCESSOR_VERSIONS.snapshot },
 			dateCreated: new Date().toISOString(),
 			source: {
 				contentType: sourceContentType,
@@ -386,7 +386,7 @@ function emptyStructure(
 	return {
 		schemaVersion: SDT_SCHEMA_VERSION,
 		metadata: {
-			processor: { type: 'snapshot' as const, version: DOCUMENT_WORKER_PROCESSOR_VERSION },
+			processor: { type: 'snapshot' as const, version: SDT_PROCESSOR_VERSIONS.snapshot },
 			dateCreated: new Date().toISOString(),
 			source: {
 				contentType: sourceContentType,

@@ -9,14 +9,14 @@
 		"preview"
 	],
 	"scripts": {
-		"build": "webpack --mode production && sh scripts/build-assets",
+		"build": "webpack --mode production && sh scripts/build-assets && node scripts/build-metadata.js",
 		"dev:preview": "npm --workspace preview run dev --",
 		"typecheck": "tsc --noEmit",
 		"test": "npm run typecheck && npm run build && npm run test:pdf && npm run test:dom && npm run test:runtime:node && npm run test:runtime:jscontext && npm run test:runtime:browser",
 		"test:pdf": "node --import ./scripts/pdfjs-setup.js --import tsx --test test/pdf/*.test.js",
 		"test:dom": "node --import tsx --test test/dom/*.test.js",
 		"test:runtime:jscontext": "bash test/runtime/jscontext/run-tests.sh",
-		"test:runtime:node": "node --import ./scripts/pdfjs-setup.js --import tsx --test test/runtime/node/*.test.js",
+		"test:runtime:node": "node scripts/build-metadata.js && node --import ./scripts/pdfjs-setup.js --import tsx --test test/runtime/node/*.test.js",
 		"test:runtime:browser": "playwright test test/runtime/browser/*.test.mjs --browser=chromium --workers=1",
 		"fixtures:update": "UPDATE_FIXTURES=1 node --import ./scripts/pdfjs-setup.js --test test/pdf/structure.test.js && UPDATE_FIXTURES=1 npm run test:dom"
 	},

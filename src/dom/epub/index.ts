@@ -10,7 +10,7 @@ import { getFulltextFromStructuredText } from '../../../structured-document-text
 import { getNestedBlockPlainText, mergeNodesWithSelectorMap } from '../../../structured-document-text/src/text.js';
 import type { StructuredDocumentText, OutlineItem, PageInfo, ContentBlockNode } from '../../../structured-document-text/schema';
 import {
-	DOCUMENT_WORKER_PROCESSOR_VERSION,
+	SDT_PROCESSOR_VERSIONS,
 	SDT_SCHEMA_VERSION,
 } from '../../versions.js';
 
@@ -74,7 +74,7 @@ function buildEpubStructure(arrayBuffer: ArrayBuffer, sourceHash?: string): Inte
 		metadata: {
 			processor: {
 				type: 'epub',
-				version: DOCUMENT_WORKER_PROCESSOR_VERSION,
+				version: SDT_PROCESSOR_VERSIONS.epub,
 			},
 			dateCreated: new Date().toISOString(),
 			source: {

@@ -145,7 +145,8 @@ describe('Snapshot SDT: document shape', () => {
 
 	it('identifies as a snapshot processor result', () => {
 		assert.equal(structure.metadata.processor.type, 'snapshot');
-		assert.equal(typeof structure.metadata.processor.version, 'string');
+		assert.equal(Number.isInteger(structure.metadata.processor.version), true);
+		assert.ok(structure.metadata.processor.version > 0);
 	});
 
 	it('records the source content type', () => {

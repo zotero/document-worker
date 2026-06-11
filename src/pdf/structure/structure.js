@@ -22,7 +22,7 @@ import { createStructureIndex } from './structure-index.js';
 import { extractStructuredTable, extractStructuredTables } from './table/extract.js';
 import { postProcessStructure } from './post-process.js';
 import {
-	DOCUMENT_WORKER_PROCESSOR_VERSION,
+	SDT_PROCESSOR_VERSIONS,
 	SDT_SCHEMA_VERSION,
 } from '../../versions.js';
 
@@ -49,7 +49,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 		metadata: {
 			processor: {
 				type: 'pdf',
-				version: DOCUMENT_WORKER_PROCESSOR_VERSION
+				version: SDT_PROCESSOR_VERSIONS.pdf
 			},
 			dateCreated: new Date().toISOString(),
 			source: {
