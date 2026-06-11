@@ -9,7 +9,7 @@
 		"preview"
 	],
 	"scripts": {
-		"build": "webpack --mode production && sh scripts/build-assets && node scripts/build-metadata.js",
+		"build": "webpack --mode production && bash scripts/build-assets && node scripts/build-metadata.js",
 		"dev:preview": "npm --workspace preview run dev --",
 		"typecheck": "tsc --noEmit",
 		"test": "npm run typecheck && npm run build && npm run test:pdf && npm run test:dom && npm run test:runtime:node && npm run test:runtime:jscontext && npm run test:runtime:browser",

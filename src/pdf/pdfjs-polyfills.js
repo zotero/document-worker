@@ -1,3 +1,9 @@
+if (typeof Promise.try !== 'function') {
+	Promise.try = function (fn, ...args) {
+		return new Promise(resolve => resolve(fn(...args)));
+	};
+}
+
 if (typeof Math.sumPrecise !== 'function') {
 	Math.sumPrecise = function (numbers) {
 		return numbers.reduce((sum, value) => sum + value, 0);
