@@ -5,6 +5,7 @@ import {
 	getElementChildren,
 } from './epub/xml';
 import { mergeTextNodes } from '../../structured-document-text/src/text.js';
+import { composeDeltaMaps } from '../../structured-document-text/src/dom/deltamap.js';
 import type {
     TextStyle,
     TextNode,
@@ -425,12 +426,12 @@ export function collectInlineContent(node: Element, ctx: ConvertContext, preserv
 function walkInline(node: Element, ctx: ConvertContext, textNodes: TextNode[], preserveWhitespace: boolean): void {
 	for (let child of node.children || []) {
 		if (child.type === 'text') {
-			let text = (child as any).data || '';
-			if (!preserveWhitespace) {
-				text = text.replace(/\s+/g, ' ');
-			}
+			let raw = (child as any).data || '';
+			let { text, deltaMap } = preserveWhitespace
+				? { text: raw, deltaMap: '' }
+				: collapseWhitespace(raw);
 			if (text) {
-				textNodes.push(createTextNode(text, child, ctx));
+				textNodes.push(createTextNode(text, child, ctx, deltaMap));
 			}
 		}
 		else if (child.type === 'tag') {
@@ -487,19 +488,48 @@ function walkInline(node: Element, ctx: ConvertContext, textNodes: TextNode[], p
 
 // Text node helpers:
 
-function createTextNode(text: string, node: ChildNode, ctx: ConvertContext): TextNode {
+function createTextNode(text: string, node: ChildNode, ctx: ConvertContext, collapseMap = ''): TextNode {
 	let nfc = text.normalize('NFC');
 	let tn: TextNode = { text: nfc };
 	let merged = mergeStyles(ctx.styleStack);
 	if (merged) tn.style = merged;
 	let anchor = ctx.hooks.textAnchor?.(node);
 	if (anchor) {
-		if (nfc !== text && 'selectorMap' in anchor) {
-			(anchor as DomAnchor).deltaMap = computeDeltaMap(text, nfc);
+		let nfcMap = nfc !== text ? computeDeltaMap(text, nfc) : '';
+		let deltaMap = composeDeltaMaps(nfcMap, collapseMap, nfc.length);
+		if (deltaMap) {
+			(anchor as DomAnchor).deltaMap = deltaMap;
 		}
 		tn.anchor = anchor;
 	}
 	return tn;
+}
+
+/**
+ * Collapse whitespace runs to single spaces, returning the collapsed text
+ * and a deltaMap from collapsed positions back to positions in `raw`.
+ */
+function collapseWhitespace(raw: string): { text: string; deltaMap: string } {
+	let text = raw.replace(/\s+/g, ' ');
+	if (text === raw) {
+		return { text, deltaMap: '' };
+	}
+	let entries: string[] = [];
+	let collapsedPos = 0;
+	let delta = 0;
+	let lastIndex = 0;
+	let re = /\s+/g;
+	let m;
+	while ((m = re.exec(raw))) {
+		// Chars before the run, plus the single space it collapses to
+		collapsedPos += m.index - lastIndex + 1;
+		if (m[0].length > 1) {
+			delta -= m[0].length - 1;
+			entries.push(collapsedPos + ' ' + delta);
+		}
+		lastIndex = m.index + m[0].length;
+	}
+	return { text, deltaMap: entries.join(' ') };
 }
 
 /**

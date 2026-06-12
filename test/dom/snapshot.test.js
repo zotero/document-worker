@@ -6,6 +6,12 @@ import { fileURLToPath } from 'node:url';
 import stringify from 'json-stringify-pretty-compact';
 import { parseDocument } from 'htmlparser2';
 import { getSnapshotStructure, getSnapshotFulltext } from '../../src/dom/snapshot/index';
+import {
+	buildDomMapIndex,
+	findDomMapContaining,
+	generateDomMapSelector,
+} from '../../structured-document-text/src/dom/snapshot/dommap.js';
+import { nfcToOriginal } from '../../structured-document-text/src/dom/deltamap.js';
 import { readFixtureSourceHash } from '../helpers/fixtures.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -344,15 +350,22 @@ describe('Snapshot SDT: selectors resolve against the original document', () => 
 		body = parseBody('2.html');
 	});
 
-	it('emits a selector on every block anchor', () => {
-		let count = 0;
+	it('emits a selector on every block anchor and a stream offset on every text anchor', () => {
+		let blockCount = 0;
+		let textCount = 0;
 		forEachBlock(structure.content, b => {
-			if (b.anchor) {
+			if (!b.anchor) return;
+			if (typeof b.text === 'string') {
+				assert.equal(typeof b.anchor.stream, 'number');
+				textCount++;
+			}
+			else {
 				assert.equal(typeof b.anchor.selectorMap, 'string');
-				count++;
+				blockCount++;
 			}
 		});
-		assert.ok(count > 5);
+		assert.ok(blockCount > 5);
+		assert.ok(textCount > 5);
 	});
 
 	it('every block-level selector resolves to an element of the expected tag', () => {
@@ -404,6 +417,85 @@ describe('Snapshot SDT: selectors resolve against the original document', () => 
 			}
 			assert.ok(reached, `${b.anchor.selectorMap} does not descend from <article>`);
 		});
+	});
+});
+
+// Concatenate the raw text of every text node under `node` in document
+// order, skipping <template> subtrees -- the body text stream that `stream`
+// anchors and domMap offsets are measured in.
+function rawTextStream(node) {
+	let parts = [];
+	function walk(n) {
+		for (let c of n.children || []) {
+			if (c.type === 'text') parts.push(c.data || '');
+			else if (c.type === 'tag' && c.name !== 'template') walk(c);
+		}
+	}
+	walk(node);
+	return parts.join('');
+}
+
+describe('Snapshot SDT: stream anchors and domMap', () => {
+	let structure;
+	let body;
+	let stream;
+	before(() => {
+		structure = extractSnapshotStructure('2.html');
+		body = parseBody('2.html');
+		stream = rawTextStream(body);
+	});
+
+	it('every text anchor locates its text in the body stream', () => {
+		let checked = 0;
+		forEachBlock(structure.content, b => {
+			if (typeof b.text !== 'string' || !b.anchor) return;
+			let rawLength = nfcToOriginal(b.anchor.deltaMap, b.text.length);
+			let raw = stream.substring(b.anchor.stream, b.anchor.stream + rawLength);
+			assert.ok(
+				raw.normalize('NFC') === b.text
+					|| raw.replace(/\s+/g, ' ').normalize('NFC') === b.text,
+				`stream range ${JSON.stringify(raw)} does not produce ${JSON.stringify(b.text)}`,
+			);
+			checked++;
+		});
+		assert.ok(checked > 5);
+	});
+
+	it('every domMap node resolves to an element whose subtree text matches its stream range', () => {
+		let index = buildDomMapIndex(structure.catalog.domMap);
+		assert.ok(index);
+		for (let indexed of index.nodes) {
+			let selector = generateDomMapSelector(indexed);
+			let el = resolveSelector(body, selector.replace(/^body > /, ''));
+			assert.ok(el, `did not resolve: ${selector}`);
+			assert.equal(
+				rawTextStream(el),
+				stream.substr(indexed.node.textStart, indexed.node.textLength),
+				`subtree text mismatch for ${selector}`,
+			);
+		}
+	});
+
+	it('finds a common ancestor for a range spanning two blocks', () => {
+		let paragraphs = structure.content.filter(
+			b => b.type === 'paragraph' && b.content?.some(t => t.anchor)
+		);
+		assert.ok(paragraphs.length >= 2);
+		let first = paragraphs[0].content.find(t => t.anchor);
+		let second = paragraphs[1].content.find(t => t.anchor);
+		let start = first.anchor.stream + 1;
+		let end = second.anchor.stream + 1;
+		let index = buildDomMapIndex(structure.catalog.domMap);
+		let ancestor = findDomMapContaining(index, start, end);
+		assert.ok(ancestor, 'no common ancestor found');
+		let el = resolveSelector(body, generateDomMapSelector(ancestor).replace(/^body > /, ''));
+		assert.ok(el);
+		// The ancestor's subtree text must contain both endpoints
+		assert.ok(ancestor.node.textStart <= start);
+		assert.ok(end <= ancestor.node.textStart + ancestor.node.textLength);
+		// And it must be a true ancestor, not either paragraph itself
+		let firstLen = nfcToOriginal(first.anchor.deltaMap, first.text.length);
+		assert.ok(ancestor.node.textLength > firstLen);
 	});
 });
 

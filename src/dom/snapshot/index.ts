@@ -15,6 +15,7 @@ import { getFulltextFromStructuredText } from '../../../structured-document-text
 import { getNestedBlockPlainText, getBlockPlainText } from '../../../structured-document-text/src/text.js';
 import type { StructuredDocumentText, OutlineItem } from '../../../structured-document-text/schema';
 import { cssEscape } from "./cssEscape";
+import { buildDomIndex, buildDomMap } from './dom-index';
 import { filterForReadability, isInKeptSetIncludingAncestors } from './readability';
 import {
 	SDT_PROCESSOR_VERSIONS,
@@ -81,46 +82,26 @@ function buildSnapshotStructure(
 		kept = null;
 	}
 
-	let currentBlockSelector = '';
+	let domIndex = buildDomIndex(body);
+	let anchored = new Set<Element>();
 
 	let hooks: ConvertHooks = {
 		blockAnchor(node) {
 			if (!('attribs' in node)) return undefined;
-			let value = getUniqueSelector(node as Element, body);
+			let el = node as Element;
+			anchored.add(el);
+			let value = getUniqueSelector(el, body);
 			if (!value) return undefined;
-			currentBlockSelector = value;
 			return { selectorMap: value };
 		},
 		textAnchor(node) {
+			let offset = domIndex.textOffsets.get(node);
+			if (offset === undefined) return undefined;
 			let el = node.parent;
-			if (!el || !isElement(el)) return undefined;
-			let value = getUniqueSelector(el, body);
-			if (!value) return undefined;
-
-			// Compute relative textMap, storing a suffix after the block's
-			// CSS selector.
-			// Text parent selector always starts with the block selector
-			// (since it walks up through the same ancestors), unless an
-			// inline element or intermediate ancestor has an id attribute
-			// which short-circuits getUniqueSelector. In that case, fall
-			// back to the absolute selector.
-			let children = el.children || [];
-			let hasOffset = children.length > 1;
-			let offset = hasOffset ? getTextOffset(el, node) : 0;
-
-			if (value === currentBlockSelector) {
-				// Same element as block: just the offset (or nothing)
-				return { selectorMap: hasOffset ? String(offset) : '' };
+			if (el && isElement(el)) {
+				anchored.add(el);
 			}
-
-			if (value.startsWith(currentBlockSelector + ' > ')) {
-				// Child of block: store the ' > ...' suffix
-				let suffix = value.substring(currentBlockSelector.length);
-				return { selectorMap: hasOffset ? suffix + ' ' + offset : suffix };
-			}
-
-			// Absolute fallback (inline element has its own id attribute)
-			return { selectorMap: hasOffset ? value + ' ' + offset : value };
+			return { stream: offset };
 		},
 	};
 	if (kept) {
@@ -128,6 +109,8 @@ function buildSnapshotStructure(
 		hooks.shouldInclude = (el: Element) => isInKeptSetIncludingAncestors(el, body, keptSet);
 	}
 	let { blocks } = convertBody(body, hooks);
+
+	let domMap = buildDomMap(domIndex, anchored);
 
 	// Build outline from headings
 	let outline = buildOutlineFromHeadings(body, blocks, kept);
@@ -154,6 +137,7 @@ function buildSnapshotStructure(
 		catalog: {
 			pages: [{ contentRange: [[0], [blocks.length]] }],
 			outline,
+			...(domMap.length > 0 ? { domMap } : {}),
 		},
 		content: blocks,
 	};
@@ -306,30 +290,6 @@ function extractMetadata(doc: Document): Record<string, string> {
 
 // Unique selector generation
 // Adapted from zotero-client/reader unique-selector.ts for htmlparser2 trees
-
-/**
- * Compute the character offset of a text node within a parent element's
- * full text content (depth-first text node walk), matching WADM TextPositionSelector.
- */
-function getTextOffset(root: Element, target: ChildNode): number {
-	let offset = 0;
-	function walk(node: ChildNode): boolean {
-		if (node === target) return true;
-		if (node.type === 'text') {
-			offset += ((node as any).data || '').length;
-		}
-		else if ('children' in node) {
-			for (let child of (node as Element).children || []) {
-				if (walk(child)) return true;
-			}
-		}
-		return false;
-	}
-	for (let child of root.children || []) {
-		if (walk(child)) break;
-	}
-	return offset;
-}
 
 function getUniqueSelector(el: Element, body: Element): string | null {
 	let current: Element | null = el;
