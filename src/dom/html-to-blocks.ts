@@ -362,10 +362,36 @@ function createTableCell(td: Element, isHeader: boolean, ctx: ConvertContext): B
 
 // Images & figures:
 
+/**
+ * Get an image's text content: aria-label if present, otherwise alt text.
+ * Alt text that's just a path/URL/filename (bad EPUB HTML) is ignored.
+ */
+function getImageText(imgNode: Element): string {
+	let ariaLabel = (getAttribute(imgNode, 'aria-label') || '').trim();
+	if (ariaLabel) {
+		return ariaLabel;
+	}
+	let alt = (getAttribute(imgNode, 'alt') || '').trim();
+	if (alt && !isPathLikeAltText(alt)) {
+		return alt;
+	}
+	return '';
+}
+
+function isPathLikeAltText(alt: string): boolean {
+	// Anything with whitespace reads as prose, not a path
+	if (/\s/.test(alt)) {
+		return false;
+	}
+	return /^(?:https?|file|data):/i.test(alt)
+		|| /[\\/]/.test(alt)
+		|| /\.(?:png|jpe?g|gif|svg|webp|bmp|tiff?|avif)$/i.test(alt);
+}
+
 function createImage(imgNode: Element, ctx: ConvertContext): Block {
-	let alt = getAttribute(imgNode, 'alt') || '';
+	let text = getImageText(imgNode);
 	let block = makeBlock('image', imgNode, ctx);
-	if (alt) block.content = [{ text: alt }];
+	if (text) block.content = [{ text }];
 	return block;
 }
 
@@ -419,8 +445,8 @@ function walkInline(node: Element, ctx: ConvertContext, textNodes: TextNode[], p
 			}
 
 			if (localName === 'img') {
-				let alt = getAttribute(el, 'alt');
-				if (alt) textNodes.push({ text: alt });
+				let text = getImageText(el);
+				if (text) textNodes.push({ text });
 				continue;
 			}
 

@@ -441,6 +441,45 @@ describe('Snapshot SDT: short document fallback', () => {
 	});
 });
 
+describe('Snapshot SDT: image text', () => {
+	let structure;
+	before(() => {
+		let html = `<!DOCTYPE html><html><head><title>Images</title></head><body><article>
+			<h1>Image Text Handling</h1>
+			<p>Inline prose alt <img src="a.png" alt="A widget diagram"> continues here with enough text to keep Readability happy.</p>
+			<p>Inline path alt <img src="../images/fig1.png" alt="../images/fig1.png"> continues here with enough text to keep Readability happy.</p>
+			<p>Inline filename alt <img src="b.png" alt="photo.jpeg"> continues here with enough text to keep Readability happy.</p>
+			<p>Inline aria-label <img src="c.png" alt="unused alt" aria-label="Diagram of the assembly"> continues here with enough text to keep Readability happy.</p>
+			<figure><img src="d.png" alt="../images/d.png"><figcaption>A figure caption</figcaption></figure>
+			<figure><img src="e.png" aria-label="Chart of results"></figure>
+		</article></body></html>`;
+		let encoded = new TextEncoder().encode(html);
+		let buf = encoded.buffer.slice(encoded.byteOffset, encoded.byteOffset + encoded.byteLength);
+		structure = getSnapshotStructure(buf, 'text/html', { sourceHash: 'test' });
+	});
+
+	it('keeps prose alt text', () => {
+		assert.match(allText(structure.content), /A widget diagram/);
+	});
+
+	it('ignores path-like and filename-like alt text', () => {
+		let text = allText(structure.content);
+		assert.doesNotMatch(text, /images\/fig1/);
+		assert.doesNotMatch(text, /images\/d\.png/);
+		assert.doesNotMatch(text, /photo\.jpeg/);
+	});
+
+	it('prefers aria-label over alt', () => {
+		let text = allText(structure.content);
+		assert.match(text, /Diagram of the assembly/);
+		assert.doesNotMatch(text, /unused alt/);
+	});
+
+	it('uses aria-label on images without alt', () => {
+		assert.match(allText(structure.content), /Chart of results/);
+	});
+});
+
 describe('Snapshot SDT: fulltext extraction', () => {
 	it('concatenates article text', () => {
 		let r = extractSnapshotFulltext('2.html');
