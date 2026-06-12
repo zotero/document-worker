@@ -1,6 +1,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { TextDecoder, TextEncoder } from 'node:util';
+import vm from 'node:vm';
 import {
 	SDT_PACK_VERSION,
 	SDT_PROCESSOR_VERSIONS,
@@ -32,5 +34,20 @@ describe('version constants', () => {
 			SDT_PACK_VERSION,
 			SDT_PROCESSOR_VERSIONS,
 		});
+	});
+
+	it('builds the bundled SDT reader module', async () => {
+		let source = await readFile('build/structured-document-text.js', 'utf8');
+		let module = { exports: {} };
+		vm.runInNewContext(source, {
+			module,
+			exports: module.exports,
+			TextDecoder,
+			TextEncoder,
+		});
+
+		assert.equal(typeof module.exports.openStructuredDocumentTextPack, 'function');
+		assert.equal(module.exports.SDT_SCHEMA_VERSION, SDT_SCHEMA_VERSION);
+		assert.equal(module.exports.SDT_PACK_VERSION, SDT_PACK_VERSION);
 	});
 });
