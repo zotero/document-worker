@@ -4,6 +4,7 @@ jobs:
   build:
     name: Build, Upload, Test
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -18,11 +19,8 @@ jobs:
       - name: Install Node modules
         run: npm ci
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
-
-      - name: Build document-worker
-        run: npm run build
+      - name: Run tests
+        run: npm run test
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -44,6 +42,3 @@ jobs:
           zip -r build-zip/$GITHUB_SHA.zip . -x 'build-zip/*'
           gem install --no-document dpl -v '>= 2.0'
           dpl s3 --bucket zotero-download --local_dir build-zip --upload_dir ci/document-worker --acl public_read
-
-      - name: Run tests
-        run: npm run test
