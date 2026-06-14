@@ -659,8 +659,18 @@ async function getStructure(buf, password, dataProvider, options = {}) {
 	let pdfManager = await getPdfManager(buf);
 	setHandler(pdfManager.pdfDocument, dataProvider);
 
-	let onnxRuntimeProvider = () => dataProvider('onnx/ort-wasm-simd.wasm');
-	let modelProvider = (name) => dataProvider(name.includes('/') ? name : name + '/model.onnx');
+	let useNativeONNX = typeof options.nativeONNXRun === 'function';
+	let onnxRuntimeProvider = useNativeONNX
+		? { type: 'native', run: options.nativeONNXRun }
+		: () => dataProvider('onnx/ort-wasm-simd.wasm');
+	let modelProvider = async (name) => {
+		let path = name.includes('/') ? name : name + '/model.onnx';
+		if (useNativeONNX && path.endsWith('.onnx')) {
+			return { nativeONNXModel: path };
+		}
+		let data = await dataProvider(path);
+		return data;
+	};
 	return await getFullStructure(pdfManager.pdfDocument, onnxRuntimeProvider, modelProvider, options);
 }
 

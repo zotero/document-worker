@@ -1,9 +1,13 @@
 import * as ort from './ort.wasm.min.js';
 import { Mutex } from '../../../mutex.js';
+import { createNativeRuntime } from './host-onnx-runtime.js';
 
 export let onnxMutex = new Mutex()
 
 export async function getRuntime(onnxRuntimeProvider) {
+	if (onnxRuntimeProvider?.type === 'native') {
+		return createNativeRuntime(onnxRuntimeProvider.run);
+	}
 	return await onnxMutex.runExclusive(async () => {
 		ort.env.wasm.simd = true;
 		ort.env.wasm.numThreads = 1;

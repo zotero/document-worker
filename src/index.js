@@ -40,6 +40,7 @@ async function createStructuredDocumentText(buf, options = {}) {
 		contentType,
 		password,
 		dataProvider,
+		nativeONNXRun,
 		sourceHash,
 	} = options;
 	assertSourceHash(sourceHash);
@@ -50,6 +51,7 @@ async function createStructuredDocumentText(buf, options = {}) {
 			: await getSnapshotStructure(buf, contentType, { sourceHash });
 	}
 	return await pdfGetStructure(buf, password, dataProvider, {
+		nativeONNXRun,
 		sourceHash,
 	});
 }
@@ -59,6 +61,7 @@ async function getStructuredDocumentText(buf, options = {}) {
 		contentType: options.contentType,
 		password: options.password,
 		dataProvider: options.dataProvider,
+		nativeONNXRun: options.nativeONNXRun,
 		sourceHash: options.sourceHash,
 	});
 	let buffer = packStructuredDocumentText(structure, {
@@ -110,9 +113,9 @@ if (typeof self !== 'undefined') {
 	let waitingPromises = {};
 
 	self.query = async function (action, data, transfer) {
-		return new Promise(function (resolve) {
+		return new Promise(function (resolve, reject) {
 			promiseID++;
-			waitingPromises[promiseID] = resolve;
+			waitingPromises[promiseID] = { resolve, reject };
 			self.postMessage({ id: promiseID, action, data }, transfer);
 		});
 	};
@@ -121,9 +124,15 @@ if (typeof self !== 'undefined') {
 		let message = e.data;
 
 		if (message.responseID) {
-			let resolve = waitingPromises[message.responseID];
-			if (resolve) {
-				resolve(message.data);
+			let waiting = waitingPromises[message.responseID];
+			if (waiting) {
+				delete waitingPromises[message.responseID];
+				if (message.error) {
+					waiting.reject(message.error);
+				}
+				else {
+					waiting.resolve(message.data);
+				}
 			}
 			return;
 		}
@@ -274,6 +283,7 @@ if (typeof self !== 'undefined') {
 					contentType: message.data.contentType,
 					password: message.data.password,
 					dataProvider: fetchData,
+					nativeONNXRun: message.data.nativeONNX ? data => query('NativeONNXRun', data) : null,
 					sourceHash: message.data.sourceHash,
 				});
 				self.postMessage({
