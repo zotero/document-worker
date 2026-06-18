@@ -1,56 +1,83 @@
-import { titles } from './titles.js';
-import { getSortIndex } from '../util.js';
-import { tokenizeReferenceText } from './utils.js';
+import { getReferenceSourceEvidence } from './evidence.js';
 import { getLogicalBlockText } from '../../../../structured-document-text/src/parts.js';
 
 
+const REFERENCE_LIST_DETECTION = {
+	MIN_YEAR_RATIO: 0.7,
+	MIN_SOURCE_LIKE_RATIO: 0.7,
+	PARAGRAPH_LEAD_MAX_WORDS: 12,
+};
 
-function expandList(list) {
 
-}
-
-function isListItemValid(regularWordsSet, text) {
-	let tokens = tokenizeReferenceText(text);
-	for (let { text, offset } of tokens) {
-		let type;
-		if (isName(text)) {
-			type = 'name';
+function getReferenceListDecision(list) {
+	let yearEntries = 0;
+	let sourceLikeEntries = 0;
+	for (const ref of list.references) {
+		const evidence = getReferenceSourceEvidence(ref.text || '');
+		if (evidence.hasYear) {
+			yearEntries++;
 		}
-		else if (isYear(text)) {
-			type = 'year';
-		}
-		else {
-			continue;
-		}
-
-		text = text.toLowerCase();
-
-		// Stop adding names if title begins
-		if (['“', '‘'].includes(text[0])) {
-			let addingNames = false;
-		}
-
-		if (
-			type === 'name' &&
-			(!addingNames || regularWordsSet.has(text))
-		) {
-			continue;
+		if (evidence.isSourceLike) {
+			sourceLikeEntries++;
 		}
 	}
+	const entryCount = list.references.length;
+	const yearRatio = entryCount ? yearEntries / entryCount : 0;
+	const sourceLikeRatio = entryCount ? sourceLikeEntries / entryCount : 0;
+	if (sourceLikeRatio >= REFERENCE_LIST_DETECTION.MIN_SOURCE_LIKE_RATIO) {
+		return { accepted: true, reason: 'source-like-ratio' };
+	}
+	if (yearRatio >= REFERENCE_LIST_DETECTION.MIN_YEAR_RATIO) {
+		return { accepted: true, reason: 'year-ratio' };
+	}
+	return { accepted: false, reason: 'insufficient-source-evidence' };
 }
+
 function isListValid(list) {
-	let numYears = 0;
-	for (let i = 0; i < list.references.length; i++) {
-		let ref = list.references[i];
-		// Count block.text that have a standalone 4-digit year in them.
-		if (/(^|[^\d])\d{4}($|[^\d])/.test(ref.text)) {
-			numYears++;
-		}
+	return getReferenceListDecision(list).accepted;
+}
+
+function startsAsProse(text) {
+	const normalized = text.trim();
+	return /^[•*-]\s*["“]/.test(normalized)
+		|| /^["“]/.test(normalized)
+		|| /^\d+\.\s*["“]/.test(normalized);
+}
+
+function getParagraphReferenceStartDecision(text) {
+	const normalized = text.trim();
+	if (normalized.length < 20) {
+		return { accepted: false, reason: 'too-short' };
 	}
-	if (numYears / list.references.length < 0.7) {
-		return false;
+	if (startsAsProse(normalized)) {
+		return { accepted: false, reason: 'prose-start' };
 	}
-	return true;
+	const evidence = getReferenceSourceEvidence(normalized, {
+		leadMaxWords: REFERENCE_LIST_DETECTION.PARAGRAPH_LEAD_MAX_WORDS,
+	});
+	if (getItemId(normalized) && (evidence.hasYear || evidence.hasBibliographicIdentifier)) {
+		return { accepted: true, reason: 'label-source' };
+	}
+	if (evidence.hasLeadYear && (evidence.hasBibliographicIdentifier || evidence.hasSourceDetail)) {
+		return { accepted: true, reason: 'lead-year-source' };
+	}
+	if (evidence.hasTerminalYearShape) {
+		return { accepted: true, reason: 'terminal-year-source' };
+	}
+	return { accepted: false, reason: 'insufficient-source-evidence' };
+}
+
+function isParagraphReferenceStart(text) {
+	return getParagraphReferenceStartDecision(text).accepted;
+}
+
+function addParagraphReferenceList(candidates, current) {
+	if (!current || current.references.length < 2) {
+		return;
+	}
+	if (isListValid(current)) {
+		candidates.push(current);
+	}
 }
 
 function getItemId(text) {
@@ -74,13 +101,11 @@ function getItemId(text) {
 	return null;
 }
 
-// TODO: Use regularWordsSet to eliminate to idetnify list_items that don't have author names (and year),
-//  and cut off adding list_items to the current reference list if after more than one bad list_items in a row
-//  are encountered
 export function getReferenceLists(structure, regularWordsSet) {
 	const candidates = [];
 	let prevBlock = null;
 	let prevBlockRef = null;
+	let paragraphCandidate = null;
 
 	for (let i = 0; i < structure.content.length; i++) {
 		const block = structure.content[i];
@@ -88,8 +113,11 @@ export function getReferenceLists(structure, regularWordsSet) {
 			continue;
 		}
 		if (block.type === 'list') {
+			addParagraphReferenceList(candidates, paragraphCandidate);
+			paragraphCandidate = null;
 			let candidate = {
 				ref: [i],
+				blockRefs: [],
 				references: [],
 			};
 
@@ -99,6 +127,12 @@ export function getReferenceLists(structure, regularWordsSet) {
 
 			for (let j = 0; j < block.content.length; j++) {
 				if (Array.isArray(block.content[j]?.previousPart)) {
+					const previousReference = candidate.references.at(-1);
+					if (previousReference) {
+						previousReference.continuationBlockRefs ||= [];
+						previousReference.continuationBlockRefs.push([i, j]);
+						candidate.blockRefs.push([i, j]);
+					}
 					continue;
 				}
 				let text = getLogicalBlockText(structure, [i, j]);
@@ -115,9 +149,43 @@ export function getReferenceLists(structure, regularWordsSet) {
 			continue;
 		}
 
+		if (block.type === 'paragraph') {
+			let text = getLogicalBlockText(structure, [i]);
+			if (isParagraphReferenceStart(text)) {
+				if (!paragraphCandidate) {
+					paragraphCandidate = {
+						ref: [i],
+						blockRefs: [],
+						references: [],
+					};
+					if (prevBlock?.type === 'heading') {
+						paragraphCandidate.titleRef = prevBlockRef;
+					}
+				}
+				paragraphCandidate.blockRefs.push([i]);
+				paragraphCandidate.references.push({
+					id: getItemId(text),
+					text,
+					src: { blockRef: [i] },
+				});
+			}
+			else {
+				addParagraphReferenceList(candidates, paragraphCandidate);
+				paragraphCandidate = null;
+			}
+			prevBlock = block;
+			prevBlockRef = [i];
+			continue;
+		}
+
+		addParagraphReferenceList(candidates, paragraphCandidate);
+		paragraphCandidate = null;
+
 		prevBlock = block;
 		prevBlockRef = [i];
 	}
+
+	addParagraphReferenceList(candidates, paragraphCandidate);
 
 	return candidates;
 }

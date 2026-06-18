@@ -1,162 +1,247 @@
-import { updateRegularWordsSet } from './regular-words.js';
 import { tokenizeReferenceText } from './utils.js';
+import { extractMatchableSourceIdentifiers } from './source-identifiers.js';
 
-function isYear(word) {
-	let number = parseInt(word);
-	return (
-		word.length === 4 &&
-		number == word &&
-		number >= 1800 &&
-		number <= new Date().getFullYear()
-	);
+function isYearToken(text) {
+	const match = text.match(/^(\d{4})([a-z])?$/i);
+	if (!match) {
+		return null;
+	}
+	const year = parseInt(match[1], 10);
+	if (year < 1800 || year > new Date().getFullYear()) {
+		return null;
+	}
+	return {
+		year: match[1],
+		suffix: match[2]?.toLowerCase() || null,
+	};
 }
 
-function isName(word) {
-	return (
-		word.length >= 2 &&
-		word[0] === word[0].toUpperCase() &&
-		word[0].toLowerCase() !== word[0].toUpperCase()
-	);
+function normalizeAuthorToken(text) {
+	let normalized = text
+		.normalize('NFKD')
+		.replace(/^[^\p{L}\p{M}]+|[^\p{L}\p{M}]+$/gu, '')
+		.toLowerCase();
+	if (normalized.length < 2) {
+		return null;
+	}
+	return normalized;
 }
 
-// Add leading reference number (if any) to the index, including bracketed forms like "[12]" or "(12)".
-export function addNumber(index, referenceLists) {
-	for (let referenceList of referenceLists) {
-		for (let reference of referenceList.references) {
-			const numberKey = reference.id; // the leading number as string
-			let refListsMap = index.get(numberKey);
-			let refList;
+function stripLeadingLabel(text) {
+	return text.replace(/^\s*[\[\(\{]*\s*\d+\s*[\]\)\}\.:,-]*/, '');
+}
 
-			if (refListsMap) {
-				refList = refListsMap.get(referenceList);
-				if (!refList) {
-					refList = new Map();
-					refListsMap.set(referenceList, refList);
-				}
-			}
-			else {
-				refListsMap = new Map();
-				refList = new Map();
-				refListsMap.set(referenceList, refList);
-				index.set(numberKey, refListsMap);
-			}
+function findYear(tokens) {
+	let years = [];
+	for (let i = 0; i < tokens.length; i++) {
+		const parsed = isYearToken(tokens[i].text);
+		if (parsed) {
+			years.push({ ...parsed, index: i });
+		}
+	}
+	if (!years.length) {
+		return null;
+	}
+	const modernYears = years.filter(year => parseInt(year.year, 10) >= 1900);
+	return parseInt(years[0].year, 10) < 1900 && modernYears.length ? modernYears.at(-1) : years[0];
+}
 
-			// Store under offset 0: Map<offset:number, references: Reference[]>
-			const wordOffsetFrom = 0;
-			let refsAtOffset = refList.get(wordOffsetFrom);
-			if (!refsAtOffset) {
-				refsAtOffset = [];
-				refList.set(wordOffsetFrom, refsAtOffset);
+function getAuthorPrefix(text, tokens, yearIndex) {
+	const yearOffset = Number.isInteger(yearIndex) ? tokens[yearIndex].offset : text.length;
+	const beforeYear = text.slice(0, yearOffset).trim();
+	for (const match of beforeYear.matchAll(/\.\s+/g)) {
+		const authorTokens = tokenizeReferenceText(beforeYear.slice(0, match.index));
+		const lastToken = authorTokens.at(-1)?.text || '';
+		if (authorTokens.length > 1 || lastToken.length > 1) {
+			return beforeYear.slice(0, match.index);
+		}
+	}
+	return beforeYear;
+}
+
+const AUTHOR_TOKEN_CONNECTORS = new Set([
+	'a', 'al', 'an', 'and', 'at', 'by', 'de', 'del', 'den', 'der', 'di', 'du',
+	'et', 'for', 'from', 'in', 'la', 'le', 'of', 'on', 'or', 'the', 'to',
+	'van', 'von', 'with',
+]);
+
+function startsLowercase(text) {
+	for (const char of text) {
+		if (/\p{L}/u.test(char)) {
+			return char === char.toLowerCase();
+		}
+	}
+	return false;
+}
+
+function isConnectorAuthorToken(prefix, token, value) {
+	if (!AUTHOR_TOKEN_CONNECTORS.has(value)) {
+		return false;
+	}
+	if (startsLowercase(token.text)) {
+		return false;
+	}
+	const after = prefix.slice(token.offset + token.text.length).trimStart();
+	return after.startsWith(',');
+}
+
+function getAuthorTokens(text, tokens, yearIndex, regularWordsSet) {
+	const prefix = getAuthorPrefix(text, tokens, yearIndex);
+	const values = [];
+	const positions = new Map();
+	const seen = new Set();
+	for (const token of tokenizeReferenceText(prefix)) {
+		const value = normalizeAuthorToken(token.text);
+		if (
+			!value
+			|| (AUTHOR_TOKEN_CONNECTORS.has(value) && !isConnectorAuthorToken(prefix, token, value))
+			|| (regularWordsSet?.has(value) && token.text[0] === token.text[0].toLowerCase())
+		) {
+			continue;
+		}
+		if (!seen.has(value)) {
+			seen.add(value);
+			positions.set(value, values.length);
+			values.push(value);
+		}
+	}
+	return { values, positions };
+}
+
+function getIdentifiers(text) {
+	return extractMatchableSourceIdentifiers(text).map(({ type, value }) => ({ type, value }));
+}
+
+function authorYearValue(authorToken, year, suffix = null) {
+	return suffix ? `${authorToken}|${year}${suffix}` : `${authorToken}|${year}`;
+}
+
+function addToMap(map, key, value) {
+	if (!key) {
+		return;
+	}
+	let values = map.get(key);
+	if (!values) {
+		values = [];
+		map.set(key, values);
+	}
+	values.push(value);
+}
+
+function addKey(reference, key) {
+	if (!key?.value) {
+		return;
+	}
+	reference.keys.push(key);
+}
+
+function getBlockRefKey(blockRef) {
+	return Array.isArray(blockRef) ? blockRef.join(',') : '';
+}
+
+export function parseReference(reference, regularWordsSet = new Set()) {
+	const text = reference.text || '';
+	const textWithoutLabel = stripLeadingLabel(text);
+	const tokens = tokenizeReferenceText(textWithoutLabel);
+	const year = findYear(tokens);
+	const authorTokens = getAuthorTokens(textWithoutLabel, tokens, year?.index, regularWordsSet);
+
+	reference.label = reference.id || null;
+	reference.year = year?.year || null;
+	reference.suffix = year?.suffix || null;
+	reference.authorTokens = authorTokens.values;
+	reference.authorTokenPositions = authorTokens.positions;
+	reference.keys = [];
+
+	if (reference.label) {
+		addKey(reference, { type: 'number', value: reference.label });
+	}
+	if (reference.year) {
+		for (const authorToken of reference.authorTokens) {
+			addKey(reference, {
+				type: 'authorYear',
+				value: authorYearValue(authorToken, reference.year, reference.suffix),
+				authorToken,
+			});
+		}
+	}
+	for (const key of getIdentifiers(text)) {
+		addKey(reference, key);
+	}
+
+	return reference;
+}
+
+export function getReferenceIndex(referenceLists, regularWordsSet = new Set()) {
+	const index = {
+		runs: referenceLists,
+		entries: [],
+		number: new Map(),
+		authorYear: new Map(),
+		identity: new Map(),
+		identifier: new Map(),
+		authorTokens: new Set(),
+		referenceBlocks: new Set(),
+		entryByBlock: new Map(),
+	};
+
+	for (const referenceList of referenceLists) {
+		index.referenceBlocks.add(getBlockRefKey(referenceList.ref));
+		for (const blockRef of referenceList.blockRefs || []) {
+			index.referenceBlocks.add(getBlockRefKey(blockRef));
+		}
+		for (const reference of referenceList.references) {
+			parseReference(reference, regularWordsSet);
+			reference.run = referenceList;
+			index.entries.push(reference);
+			index.referenceBlocks.add(getBlockRefKey(reference.src.blockRef));
+			index.entryByBlock.set(getBlockRefKey(reference.src.blockRef), reference);
+			for (const blockRef of reference.continuationBlockRefs || []) {
+				index.referenceBlocks.add(getBlockRefKey(blockRef));
+				index.entryByBlock.set(getBlockRefKey(blockRef), reference);
 			}
-			if (!refsAtOffset.includes(reference)) {
-				refsAtOffset.push(reference);
+			for (const authorToken of reference.authorTokens) {
+				index.authorTokens.add(authorToken);
+				addToMap(index.identity, authorToken, reference);
+			}
+			for (const key of reference.keys) {
+				addToMap(index[key.type], key.value, reference);
 			}
 		}
 	}
+
 	return index;
 }
 
-
-
-export function addNameYear(index, referenceLists, regularWordsSet) {
-	for (let referenceList of referenceLists) {
-		for (let reference of referenceList.references) {
-			if (!reference?.text) continue;
-
-			let addingNames = true;
-			let addingYear = true;
-
-			const tokens = tokenizeReferenceText(reference.text);
-
-			for (let { text, offset } of tokens) {
-				let type;
-				if (isName(text)) {
-					type = 'name';
-				}
-				else if (isYear(text)) {
-					type = 'year';
-				}
-				else {
-					continue;
-				}
-
-				text = text.toLowerCase();
-
-				// Stop adding names if title begins
-				if (['“', '‘'].includes(text[0])) {
-					addingNames = false;
-				}
-
-				if (
-					type === 'name' &&
-					(!addingNames || regularWordsSet.has(text))
-				) {
-					continue;
-				}
-
-				if (type === 'year' && !addingYear) {
-					continue;
-				}
-
-				let refListsMap = index.get(text);
-				let refList;
-
-				if (refListsMap) {
-					refList = refListsMap.get(referenceList);
-					if (!refList) {
-						refList = new Map();
-						refListsMap.set(referenceList, refList);
-					}
-				}
-				else {
-					refListsMap = new Map();
-					refList = new Map();
-					refListsMap.set(referenceList, refList);
-					index.set(text, refListsMap);
-				}
-
-				// Map<offset:number, references: Reference[]>
-				let refsAtOffset = refList.get(offset);
-				if (!refsAtOffset) {
-					refsAtOffset = [];
-					refList.set(offset, refsAtOffset);
-				}
-				if (!refsAtOffset.includes(reference)) {
-					refsAtOffset.push(reference);
-				}
-
-				// Stop adding words to the index after a year is encountered.
-				if (type === 'year') {
-					addingYear = false;
-					addingNames = false; // <--- also stop adding names after the first year
-				}
-			}
+export function isReferenceBlock(referenceIndex, blockRef) {
+	if (!Array.isArray(blockRef)) {
+		return false;
+	}
+	for (const run of referenceIndex.runs) {
+		if (blockRef[0] === run.ref[0]) {
+			return true;
 		}
 	}
-	return index;
+	return referenceIndex.referenceBlocks.has(getBlockRefKey(blockRef));
 }
 
-function sortMatches(index) {
-	for (const [_, refListsMap] of index) {
-		for (const [referenceList, refList] of refListsMap) {
-			// refList is Map<offset:number, references: Reference[]>
-			const pairs = [];
-			for (const [offset, refsAtOffset] of refList) {
-				for (const reference of refsAtOffset) {
-					pairs.push([offset, reference]);
-				}
-			}
-			pairs.sort((a, b) => a[0] - b[0]);
-			refListsMap.set(referenceList, pairs);
+export function getReferenceForBlock(referenceIndex, blockRef) {
+	if (!Array.isArray(blockRef)) {
+		return null;
+	}
+	for (let length = blockRef.length; length >= 1; length--) {
+		const reference = referenceIndex.entryByBlock.get(getBlockRefKey(blockRef.slice(0, length)));
+		if (reference) {
+			return reference;
 		}
 	}
-	return index;
+	return null;
 }
 
-export function getReferenceIndex(referenceLists, regularWordsSet) {
-	let index = new Map();
-	addNumber(index, referenceLists);
-	addNameYear(index, referenceLists, regularWordsSet);
-	sortMatches(index);
-	return index;
+export function getAuthorYearValue(authorToken, year, suffix = null) {
+	return authorYearValue(authorToken, year, suffix);
+}
+
+export function normalizeReferenceAuthorToken(text) {
+	return normalizeAuthorToken(text);
 }

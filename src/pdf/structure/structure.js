@@ -1,14 +1,16 @@
 import { buildInferenceErrorFallbackBlocks, inferenceBatch } from './model/block-seg/inference.js';
 import { getOutline } from './outline/outline.js';
 import { getReferenceLists } from './reference/reference.js';
-import { getCandidates } from './citations.js';
+import { getFigureAndMathCandidates } from './citations.js';
 import { getFigures } from './figure.js';
 import { getMathBlocks } from './math.js';
 import { updateRegularWordsSet } from './reference/regular-words.js';
 import { getReferenceIndex } from './reference/index.js';
+import { getSupportedReferenceLists } from './reference/support.js';
 // import { getLinkOverlays } from './link.js';
 import { addPageLabels } from './page-label.js';
 import { applyRefs, getRefsList } from './apply-refs.js';
+import { getCitationRefs } from './citation-refs.js';
 import {
 	charsToTextNodes,
 	charsToPreformattedTextNodes,
@@ -339,27 +341,42 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	let annotLinkRefs = getAnnotLinkRefs(structure, linkMap, structureIndex);
 	let parsedLinkRefs = getParsedLinkRefs(structure, structureIndex);
 
-	let referenceLists = getReferenceLists(structure, regularWordsSet);
+	let candidateReferenceLists = getReferenceLists(structure, regularWordsSet);
+	let candidateReferenceIndex = getReferenceIndex(candidateReferenceLists, regularWordsSet);
+	let referenceLists = getSupportedReferenceLists(structure, candidateReferenceIndex, structureIndex);
+	const markReferenceNode = (blockRef) => {
+		if (!Array.isArray(blockRef)) {
+			return;
+		}
+		let node = structure.content[blockRef[0]];
+		for (let i = 1; node && i < blockRef.length; i++) {
+			node = node.content?.[blockRef[i]];
+		}
+		if (node) {
+			node.reference = true;
+		}
+	};
 	for (let refList of referenceLists) {
+		for (let blockRef of refList.blockRefs || []) {
+			markReferenceNode(blockRef);
+		}
 		for (let ref of refList.references) {
-			let node = structure.content[ref.src.blockRef[0]]
-				?.content?.[ref.src.blockRef[1]];
-			if (node) {
-				node.reference = true;
-			}
+			markReferenceNode(ref.src.blockRef);
 		}
 	}
-	let refIndex = getReferenceIndex(referenceLists, regularWordsSet);
+	let referenceIndex = getReferenceIndex(referenceLists, regularWordsSet);
+	let citationRefs = getCitationRefs(structure, referenceIndex, annotLinkRefs, structureIndex);
 	let figures = getFigures(structure);
 	let mathBlocks = getMathBlocks(structure);
-	getCandidates(structure, candidateGroups, refIndex, figures, mathBlocks, structureIndex);
+	getFigureAndMathCandidates(structure, candidateGroups, figures, mathBlocks, structureIndex);
 	structureIndex.clearPageTextCache();
 	let mainRefs = getRefsList(candidateGroups);
 
 	addRefs(annotLinkRefs, parsedLinkRefs);
-	addRefs(mainRefs, annotLinkRefs);
+	addRefs(citationRefs, mainRefs);
+	addRefs(citationRefs, annotLinkRefs);
 
-	applyRefs(structure, mainRefs);
+	applyRefs(structure, citationRefs);
 
 	let outline = await getOutline(structure.content, [], pdfDocument);
 	if (outline.length) {

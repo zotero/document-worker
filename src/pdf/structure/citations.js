@@ -299,7 +299,6 @@ function parseSuperscriptRange(bt, startIndex, refIndex, blockRef) {
 	};
 }
 
-// ... existing code ...
 // Parse a single word starting at index if it begins at a word boundary.
 // Returns { text, start, end } or null
 function parseWord(bt, startIndex, blockRef) {
@@ -341,13 +340,13 @@ function parseYearAt(bt, startIndex, refIndex, blockRef) {
 	const key = word.text;
 	let newRefListsMap = new Map();
 	let refListsMap = refIndex.get(key);
-			if (refListsMap) {
-				for (let [refList, pairs] of refListsMap) {
-					if (blockRef[0] < refList.ref[0]) {
-						newRefListsMap.set(refList, pairs);
-					}
-				}
+	if (refListsMap) {
+		for (let [refList, pairs] of refListsMap) {
+			if (blockRef[0] < refList.ref[0]) {
+				newRefListsMap.set(refList, pairs);
 			}
+		}
+	}
 	if (newRefListsMap.size) {
 		referenceRelations.set(key, newRefListsMap);
 	}
@@ -542,11 +541,26 @@ function collectUrlSequence(bt, startIndex) {
 	return { from, to };
 }
 
-export function getCandidates(structure, candidateGroups, refIndex, figures, mathBlocks, structureIndex = createStructureIndex(structure)) {
-	// { type, blockIndex, rect, text, offsetStart, offsetEnd, char }
+function addParsedDelimitedItems(items, parsed, includeReferenceCandidates) {
+	if (!parsed.items?.length) {
+		return;
+	}
+	if (includeReferenceCandidates) {
+		items.push(...parsed.items);
+		return;
+	}
+	items.push(...parsed.items.filter(item => item.mathRelations?.length));
+}
 
-	// write a parser
-
+export function getCandidates(
+	structure,
+	candidateGroups,
+	refIndex,
+	figures,
+	mathBlocks,
+	structureIndex = createStructureIndex(structure),
+	{ includeReferenceCandidates = true } = {}
+) {
 	let items = [];
 
 	for (let entry of structureIndex.blockEntries()) {
@@ -559,27 +573,26 @@ export function getCandidates(structure, candidateGroups, refIndex, figures, mat
 				let parsed;
 
 				// Try delimited ranges; parser will validate openings
-				if ((parsed = parseDelimitedRange(bt, i, '[', ']', 'brackets', refIndex, mathBlocks, blockRef))) {
-					if (parsed.items && parsed.items.length) items.push(...parsed.items);
-					i = parsed.nextIndex;
-				}
-				else if ((parsed = parseDelimitedRange(bt, i, '(', ')', 'parentheses', refIndex, mathBlocks, blockRef))) {
-					if (parsed.items && parsed.items.length) items.push(...parsed.items);
-					i = parsed.nextIndex;
-				}
-				// Superscript detection
-				else
-				if ((parsed = parseSuperscriptRange(bt, i, refIndex, blockRef))) {
-					if (parsed.items && parsed.items.length) items.push(...parsed.items);
-					i = parsed.nextIndex;
-				}
+					if ((parsed = parseDelimitedRange(bt, i, '[', ']', 'brackets', refIndex, mathBlocks, blockRef))) {
+						addParsedDelimitedItems(items, parsed, includeReferenceCandidates);
+						i = parsed.nextIndex;
+					}
+					else if ((parsed = parseDelimitedRange(bt, i, '(', ')', 'parentheses', refIndex, mathBlocks, blockRef))) {
+						addParsedDelimitedItems(items, parsed, includeReferenceCandidates);
+						i = parsed.nextIndex;
+					}
+					// Superscript detection
+					else if (includeReferenceCandidates && (parsed = parseSuperscriptRange(bt, i, refIndex, blockRef))) {
+						if (parsed.items && parsed.items.length) items.push(...parsed.items);
+						i = parsed.nextIndex;
+					}
 				// Year token (e.g., 1998)
-				else if ((parsed = parseYearAt(bt, i, refIndex, blockRef))) {
+				else if (includeReferenceCandidates && (parsed = parseYearAt(bt, i, refIndex, blockRef))) {
 					items.push(parsed.item);
 					i = parsed.nextIndex;
 				}
 				// Name token (capitalized word, e.g., Smith)
-				else if ((parsed = parseNameAt(bt, i, refIndex, blockRef))) {
+				else if (includeReferenceCandidates && (parsed = parseNameAt(bt, i, refIndex, blockRef))) {
 					items.push(parsed.item);
 					i = parsed.nextIndex;
 				}
@@ -602,4 +615,22 @@ export function getCandidates(structure, candidateGroups, refIndex, figures, mat
 	}
 
 	return candidateGroups;
+}
+
+export function getFigureAndMathCandidates(
+	structure,
+	candidateGroups,
+	figures,
+	mathBlocks,
+	structureIndex = createStructureIndex(structure)
+) {
+	return getCandidates(
+		structure,
+		candidateGroups,
+		new Map(),
+		figures,
+		mathBlocks,
+		structureIndex,
+		{ includeReferenceCandidates: false }
+	);
 }
