@@ -90,6 +90,34 @@ function createDirectionalGapPageData() {
 	};
 }
 
+function createLateSeparatorObjectPageData() {
+	const objects = Array.from({ length: 300 }, (_, seq) => ({
+		type: 'path',
+		rect: [seq % 10, 0, (seq % 10) + 12, 0.1],
+		seq,
+	}));
+	objects[290] = { type: 'path', rect: [10, 75, 19, 75.1], seq: 290 };
+	return {
+		pageIndex: 4,
+		viewBox: [0, 0, 100, 100],
+		chars: [
+			{
+				c: 'A',
+				rect: [10, 80, 60, 90],
+				fontSize: 10,
+				lineBreakAfter: true,
+			},
+			{
+				c: 'B',
+				rect: [10, 60, 60, 70],
+				fontSize: 10,
+				lineBreakAfter: true,
+			},
+		],
+		objects,
+	};
+}
+
 describe('block segmentation input preparation', () => {
 	it('keeps object lines as model and graphic context', () => {
 		let page = prepareBlockSegPageInput(createPageData(2));
@@ -119,6 +147,18 @@ describe('block segmentation input preparation', () => {
 		assert.ok(seqs.includes(200));
 		assert.ok(seqs.includes(290));
 		assert.equal(seqs.includes(299), false);
+	});
+
+	it('promotes late horizontal separators into clusterer object features', () => {
+		let page = prepareBlockSegPageInput(createLateSeparatorObjectPageData());
+		let seqs = page.objectLines.map(object => object.seq);
+
+		assert.equal(page.objectLines.length, 256);
+		assert.deepEqual(seqs, seqs.slice().sort((a, b) => a - b));
+		assert.ok(seqs.includes(290));
+		assert.equal(seqs.includes(255), false);
+		assert.equal(page.clustererObjectLines[0].seq, 290);
+		assert.deepEqual(page.objectFeatures[0].slice(0, 4), [0.1, 0.249, 0.19, 0.25]);
 	});
 
 	it('emits clean-v3-directional line feature geometry', () => {

@@ -2,6 +2,15 @@
 const HASH_MOD = 32768; // produces 0..32767
 const LINE_TEXT_FEATURE_CACHE_LIMIT = 50000;
 const MAX_LAYOUT_OBJECTS_PER_PAGE = 256;
+// Current clusterer metadata consumes only the first 64 object feature rows.
+const CLUSTERER_OBJECT_FEATURE_LIMIT = 64;
+const MIN_SEPARATOR_WIDTH = 8;
+const MIN_SEPARATOR_WIDTH_PAGE_RATIO = 0.015;
+const MAX_SEPARATOR_HEIGHT_PAGE_RATIO = 0.006;
+const MAX_SEPARATOR_HEIGHT = 2.5;
+const MAX_SEPARATOR_HEIGHT_WIDTH_RATIO = 0.15;
+const MIN_SEPARATOR_TEXT_OVERLAP = 8;
+const MIN_SEPARATOR_TEXT_OVERLAP_RATIO = 0.04;
 const lineTextFeatureCache = new Map();
 export const BLOCK_SEG_LINE_FEATURE_DIM = 22;
 export const READING_ORDER_Y_BACKTRACK_TO_PREV_INDEX = 13;
@@ -589,29 +598,141 @@ function getLayoutObjectScore(object, pageRect) {
 	};
 }
 
-function filterLayoutObjects(objects, pageRect) {
+function filterLayoutObjects(objects, pageRect, adjacentTextGaps = []) {
 	if (!Array.isArray(objects)) {
 		return [];
 	}
 	if (objects.length <= MAX_LAYOUT_OBJECTS_PER_PAGE) {
 		return objects;
 	}
-	return objects
+	const items = objects
 		.map((object, index) => ({
 			object,
 			index,
 			...getLayoutObjectScore(object, pageRect),
-		}))
-		.sort((a, b) => b.perimeter - a.perimeter || b.area - a.area || a.index - b.index)
-		.slice(0, MAX_LAYOUT_OBJECTS_PER_PAGE)
+			isTextGapSeparator: isTextGapSeparator(object, adjacentTextGaps, pageRect),
+		}));
+	const selected = [];
+	const selectedIndexes = new Set();
+	for (const item of items) {
+		if (!item.isTextGapSeparator || selected.length >= MAX_LAYOUT_OBJECTS_PER_PAGE) {
+			continue;
+		}
+		selected.push(item);
+		selectedIndexes.add(item.index);
+	}
+
+	if (selected.length < MAX_LAYOUT_OBJECTS_PER_PAGE) {
+		selected.push(...items
+			.filter(item => !selectedIndexes.has(item.index))
+			.sort((a, b) => b.perimeter - a.perimeter || b.area - a.area || a.index - b.index)
+			.slice(0, MAX_LAYOUT_OBJECTS_PER_PAGE - selected.length));
+	}
+
+	return selected
 		.sort((a, b) => a.index - b.index)
 		.map(item => item.object);
 }
 
+function overlap1d(a1, a2, b1, b2) {
+	return Math.max(0, Math.min(a2, b2) - Math.max(a1, b1));
+}
+
+function getAdjacentTextGaps(textLines) {
+	if (!Array.isArray(textLines) || textLines.length < 2) {
+		return [];
+	}
+	const contexts = [];
+	for (let i = 1; i < textLines.length; i++) {
+		const prev = textLines[i - 1]?.rect;
+		const curr = textLines[i]?.rect;
+		if (!Array.isArray(prev) || !Array.isArray(curr)) {
+			continue;
+		}
+		let gapLow;
+		let gapHigh;
+		if (prev[1] > curr[3]) {
+			gapLow = curr[3];
+			gapHigh = prev[1];
+		}
+		else if (curr[1] > prev[3]) {
+			gapLow = prev[3];
+			gapHigh = curr[1];
+		}
+		else {
+			continue;
+		}
+		const prevHeight = Math.max(0, prev[3] - prev[1]);
+		const currHeight = Math.max(0, curr[3] - curr[1]);
+		const tolerance = Math.max(0.75, Math.min(3, (prevHeight + currHeight) * 0.15));
+		contexts.push({
+			gapLow: gapLow - tolerance,
+			gapHigh: gapHigh + tolerance,
+			spanX1: Math.min(prev[0], curr[0]),
+			spanX2: Math.max(prev[2], curr[2]),
+			minLineWidth: Math.max(1, Math.min(Math.abs(prev[2] - prev[0]), Math.abs(curr[2] - curr[0]))),
+		});
+	}
+	return contexts;
+}
+
+function isTextGapSeparator(object, adjacentTextGaps, pageRect) {
+	const rect = object?.rect;
+	if (!Array.isArray(rect) || rect.length !== 4 || !Array.isArray(adjacentTextGaps) || !adjacentTextGaps.length) {
+		return false;
+	}
+	const objectType = object.subtype || object.type;
+	if (objectType && objectType !== 'path') {
+		return false;
+	}
+	const pageWidth = Math.max(Math.abs((pageRect?.[2] ?? 1) - (pageRect?.[0] ?? 0)), 1);
+	const pageHeight = Math.max(Math.abs((pageRect?.[3] ?? 1) - (pageRect?.[1] ?? 0)), 1);
+	const width = Math.abs(rect[2] - rect[0]);
+	const height = Math.abs(rect[3] - rect[1]);
+	if (
+		width < MIN_SEPARATOR_WIDTH
+		|| width / pageWidth < MIN_SEPARATOR_WIDTH_PAGE_RATIO
+		|| height / pageHeight > MAX_SEPARATOR_HEIGHT_PAGE_RATIO
+		|| height > Math.max(MAX_SEPARATOR_HEIGHT, width * MAX_SEPARATOR_HEIGHT_WIDTH_RATIO)
+	) {
+		return false;
+	}
+
+	const centerY = (rect[1] + rect[3]) / 2;
+	for (const context of adjacentTextGaps) {
+		if (centerY < context.gapLow || centerY > context.gapHigh) {
+			continue;
+		}
+		const overlapX = overlap1d(rect[0], rect[2], context.spanX1, context.spanX2);
+		if (overlapX >= MIN_SEPARATOR_TEXT_OVERLAP || overlapX / context.minLineWidth >= MIN_SEPARATOR_TEXT_OVERLAP_RATIO) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function orderLayoutObjectsForClusterer(objectLines, adjacentTextGaps, pageRect) {
+	if (!Array.isArray(objectLines) || objectLines.length <= CLUSTERER_OBJECT_FEATURE_LIMIT) {
+		return objectLines;
+	}
+	const separators = [];
+	const rest = [];
+	for (const object of objectLines) {
+		if (isTextGapSeparator(object, adjacentTextGaps, pageRect)) {
+			separators.push(object);
+		}
+		else {
+			rest.push(object);
+		}
+	}
+	return separators.length ? [...separators, ...rest] : objectLines;
+}
+
 export function prepareBlockSegPageInput(pageDataItem) {
 	const textLines = getLines(pageDataItem?.chars || []);
+	const adjacentTextGaps = getAdjacentTextGaps(textLines);
 	let objectLines = [];
-	const rawObjects = filterLayoutObjects(pageDataItem?.objects, pageDataItem?.viewBox);
+	const rawObjects = filterLayoutObjects(pageDataItem?.objects, pageDataItem?.viewBox, adjacentTextGaps);
 
 	if (rawObjects.length) {
 		objectLines = rawObjects.map(object => ({
@@ -621,6 +742,7 @@ export function prepareBlockSegPageInput(pageDataItem) {
 			...(Number.isFinite(object.seq) ? { seq: object.seq } : {}),
 		}));
 	}
+	const clustererObjectLines = orderLayoutObjectsForClusterer(objectLines, adjacentTextGaps, pageDataItem?.viewBox);
 
 	const lineFeatures = getPageLines({
 		viewport: pageDataItem?.viewBox,
@@ -628,10 +750,10 @@ export function prepareBlockSegPageInput(pageDataItem) {
 	}).lines;
 	const objectFeatures = getPageLines({
 		viewport: pageDataItem?.viewBox,
-		lines: objectLines,
+		lines: clustererObjectLines,
 	}).lines;
 
-	return { textLines, objectLines, lineFeatures, objectFeatures };
+	return { textLines, objectLines, clustererObjectLines, lineFeatures, objectFeatures };
 }
 
 // ─────────────────── Preformatted (monospace code) detection ───────────────────
