@@ -251,6 +251,133 @@ describe('PDF citation references', () => {
 		assert.equal(refs.has('0'), false);
 	});
 
+	it('uses all author tokens in a multi-author citation before treating it as ambiguous', () => {
+		const structure = {
+			content: [
+				paragraph('Ignatiev and Marques-Silva, 2021 proved the result.'),
+				referenceList([
+					'Ignatiev, A., and Marques-Silva, J. (2021). SAT-based rigorous explanations.',
+					'Izza, Y., Ignatiev, A., Narodytska, N., Cooper, M. C., and Marques-Silva, J. (2021). Efficient explanations.',
+					'Izza, Y., and Marques-Silva, J. (2021). On explaining random forests.',
+					'Marques-Silva, J., Gerspacher, T., Cooper, M. C., Ignatiev, A., and Narodytska, N. (2021). Explanations.',
+				]),
+			],
+		};
+
+		const refs = getCitationRefs(structure, getIndex(structure));
+
+		assert.deepEqual(refs.get('0').map(ref => ref.dest.blockRef), [[1, 0]]);
+	});
+
+	it('does not guess between duplicate multi-author entries in one run', () => {
+		const structure = {
+			content: [
+				paragraph('Smith and Jones, 2020 is ambiguous here.'),
+				referenceList([
+					'Smith, A., and Jones, B. (2020). First title.',
+					'Smith, C., and Jones, D. (2020). Second title.',
+				]),
+			],
+		};
+
+		const refs = getCitationRefs(structure, getIndex(structure));
+
+		assert.equal(refs.has('0'), false);
+	});
+
+	it('uses only the terminal author group for multi-author disambiguation', () => {
+		const structure = {
+			content: [
+				paragraph('Remarks: the concept follows Smith and Jones, 2020.'),
+				referenceList([
+					'Smith and Jones (2020). Correct title.',
+					'Remarks Smith and Jones (2020). Wrong title.',
+				]),
+			],
+		};
+
+		const refs = getCitationRefs(structure, getIndex(structure));
+		const [ref] = refs.get('0');
+		const text = structure.content[0].content[0].text;
+
+		assert.deepEqual(refs.get('0').map(ref => ref.dest.blockRef), [[1, 0]]);
+		assert.equal(text.slice(ref.src.offsetStart, ref.src.offsetEnd + 1), 'Smith and Jones, 2020');
+	});
+
+	it('accepts a short lowercase word between matched author tokens', () => {
+		const structure = {
+			content: [
+				paragraph('Smith og Jones, 2020 proved the result.'),
+				referenceList([
+					'Smith and Jones (2020). Correct title.',
+					'Smith and Brown (2020). Wrong title.',
+					'Taylor and Jones (2020). Wrong title.',
+				]),
+			],
+		};
+
+		const refs = getCitationRefs(structure, getIndex(structure));
+		const [ref] = refs.get('0');
+		const text = structure.content[0].content[0].text;
+
+		assert.deepEqual(refs.get('0').map(ref => ref.dest.blockRef), [[1, 0]]);
+		assert.equal(text.slice(ref.src.offsetStart, ref.src.offsetEnd + 1), 'Smith og Jones, 2020');
+	});
+
+	it('does not absorb lowercase prose before a terminal author group', () => {
+		const structure = {
+			content: [
+				paragraph('The work by Smith and Jones, 2020 was discussed.'),
+				referenceList([
+					'Smith and Jones (2020). Correct title.',
+					'Work Smith and Jones (2020). Wrong title.',
+				]),
+			],
+		};
+
+		const refs = getCitationRefs(structure, getIndex(structure));
+		const [ref] = refs.get('0');
+		const text = structure.content[0].content[0].text;
+
+		assert.deepEqual(refs.get('0').map(ref => ref.dest.blockRef), [[1, 0]]);
+		assert.equal(text.slice(ref.src.offsetStart, ref.src.offsetEnd + 1), 'Smith and Jones, 2020');
+	});
+
+	it('does not absorb unsupported lead-in words before an author-year citation', () => {
+		const structure = {
+			content: [
+				paragraph('See also Kraut 1982 for a related account.'),
+				referenceList([
+					'Robert Kraut. Sensory States and Sensory Objects. 1982.',
+					'James See. Different topic. 1990.',
+				]),
+			],
+		};
+
+		const refs = getCitationRefs(structure, getIndex(structure));
+		const [ref] = refs.get('0');
+		const text = structure.content[0].content[0].text;
+
+		assert.deepEqual(refs.get('0').map(ref => ref.dest.blockRef), [[1, 0]]);
+		assert.equal(text.slice(ref.src.offsetStart, ref.src.offsetEnd + 1), 'Kraut 1982');
+	});
+
+	it('does not use date-shaped words as multi-author evidence', () => {
+		const structure = {
+			content: [
+				paragraph('The meeting happened on November 4th, 1912.'),
+				referenceList([
+					'November Th (1912). Date-shaped source.',
+					'November Source (1912). Another source.',
+				]),
+			],
+		};
+
+		const refs = getCitationRefs(structure, getIndex(structure));
+
+		assert.equal(refs.has('0'), false);
+	});
+
 	it('prefers the same-year reference where the token appears earliest in the author prefix', () => {
 		const structure = {
 			content: [
@@ -662,6 +789,67 @@ describe('PDF citation references', () => {
 		const refs = getCitationRefs(structure, getIndex(structure), annotLinkRefs);
 
 		assert.deepEqual(refs.get('0').map(ref => ref.dest.blockRef), [[1, 0]]);
+	});
+
+	it('expands same-reference embedded citation links to the detected citation span', () => {
+		const text = 'Concerns were raised by Lipton, 2018.';
+		const yearStart = text.indexOf('2018');
+		const structure = {
+			content: [
+				paragraph(text),
+				referenceList(['Lipton, Z. C. (2018). The mythos of model interpretability.']),
+			],
+		};
+		const annotLinkRefs = new Map([
+			['0', [{
+				src: {
+					blockRef: [0],
+					offsetStart: yearStart,
+					offsetEnd: yearStart + 3,
+					text: '2018',
+				},
+				dest: { blockRef: [1, 0] },
+			}]],
+		]);
+
+		const refs = getCitationRefs(structure, getIndex(structure), annotLinkRefs);
+		const [ref] = refs.get('0');
+
+		assert.equal(refs.get('0').length, 1);
+		assert.deepEqual(ref.dest.blockRef, [1, 0]);
+		assert.equal(text.slice(ref.src.offsetStart, ref.src.offsetEnd + 1), 'Lipton, 2018');
+	});
+
+	it('keeps conflicting embedded citation links instead of expanding them', () => {
+		const text = 'Smith 2020 established the baseline.';
+		const yearStart = text.indexOf('2020');
+		const structure = {
+			content: [
+				paragraph(text),
+				referenceList([
+					'Smith, J. 2020. Smith title.',
+					'Jones, A. 2020. Jones title.',
+				]),
+			],
+		};
+		const annotLinkRefs = new Map([
+			['0', [{
+				src: {
+					blockRef: [0],
+					offsetStart: yearStart,
+					offsetEnd: yearStart + 3,
+					text: '2020',
+				},
+				dest: { blockRef: [1, 1] },
+			}]],
+		]);
+
+		const refs = getCitationRefs(structure, getIndex(structure), annotLinkRefs);
+		const [ref] = refs.get('0');
+
+		assert.equal(refs.get('0').length, 1);
+		assert.deepEqual(ref.dest.blockRef, [1, 1]);
+		assert.equal(text.slice(ref.src.offsetStart, ref.src.offsetEnd + 1), '2020');
 	});
 
 	it('does not guess between duplicate author-year entries in one run', () => {

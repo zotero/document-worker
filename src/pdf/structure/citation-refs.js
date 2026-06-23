@@ -49,6 +49,14 @@ function rangesOverlap(a, b) {
 	return a.offsetStart <= b.offsetEnd && b.offsetStart <= a.offsetEnd;
 }
 
+function sameRange(a, b) {
+	return a?.offsetStart === b?.offsetStart && a?.offsetEnd === b?.offsetEnd;
+}
+
+function sourceContains(outer, inner) {
+	return outer?.offsetStart <= inner?.offsetStart && inner?.offsetEnd <= outer?.offsetEnd;
+}
+
 function parseYear(text) {
 	const match = text.match(/^(\d{4})([a-z])?$/i);
 	if (!match) {
@@ -406,10 +414,54 @@ function getMatchingAuthorTokens(words, start, end, referenceIndex) {
 		}
 		seen.add(value);
 		tokens.push({
+			text: word.text,
 			value,
 			start: word.start,
 			end: word.end,
 		});
+	}
+	return tokens;
+}
+
+function isConjunctiveAuthorToken(token) {
+	return token?.value && !/\p{N}/u.test(token.text || '');
+}
+
+function startsWithUppercaseLetter(text) {
+	for (const char of text || '') {
+		if (/\p{L}/u.test(char)) {
+			return /\p{Lu}/u.test(char);
+		}
+	}
+	return false;
+}
+
+function isAuthorGroupBridge(text, { allowStructuralConnector = false, leftToken = null } = {}) {
+	if (/^[\s,;&()[\]]*$/u.test(text)) {
+		return true;
+	}
+	if (/^[\s,;&()[\]]*(?:\b(?:and|et|und|y|e)\b[\s,;&()[\]]*)*$/iu.test(text)) {
+		return true;
+	}
+	return allowStructuralConnector
+		&& startsWithUppercaseLetter(leftToken?.text)
+		&& /^[\s,;&()[\]]*[\p{Ll}\p{M}]{1,3}[\s,;&()[\]]*$/u.test(text);
+}
+
+function getTerminalAuthorTokens(text, authorTokens, yearStart) {
+	const tokens = [];
+	let end = yearStart;
+	for (let i = authorTokens.length - 1; i >= 0; i--) {
+		const token = authorTokens[i];
+		const bridge = text.slice(token.end + 1, end);
+		if (!isConjunctiveAuthorToken(token) || !isAuthorGroupBridge(bridge, {
+			allowStructuralConnector: tokens.length > 0,
+			leftToken: token,
+		})) {
+			break;
+		}
+		tokens.unshift(token);
+		end = token.start;
 	}
 	return tokens;
 }
@@ -430,10 +482,12 @@ function getAuthorYearMention(text, words, yearWord, referenceIndex) {
 	if (!authorTokens.length) {
 		return null;
 	}
+	const terminalAuthorTokens = getTerminalAuthorTokens(text, authorTokens, yearWord.start);
 	return {
-		offsetStart: authorTokens[0].start,
+		offsetStart: (terminalAuthorTokens[0] || authorTokens[0]).start,
 		offsetEnd: yearWord.end,
 		tokens: authorTokens.map(token => token.value),
+		terminalTokens: terminalAuthorTokens.map(token => token.value),
 	};
 }
 
@@ -465,7 +519,7 @@ function addAuthorYearWindows(windows, bt, blockRef, referenceIndex, sourceStren
 				value: getAuthorYearValue(authorToken, parsedYear.year, parsedYear.suffix),
 				authorToken,
 			})),
-			{ sourceStrength },
+			{ sourceStrength, terminalAuthorTokens: mention.terminalTokens },
 		);
 	}
 }
@@ -736,12 +790,16 @@ function getAuthorCandidates(mention, referenceIndex, authorIdentity = null) {
 			if (!candidate) {
 				candidate = {
 					reference,
+					tokens: new Set(),
+					tokenPositions: new Map(),
 					positions: new Set(),
 					minPosition: Number.MAX_SAFE_INTEGER,
 					maxPosition: -1,
 				};
 				byReference.set(reference, candidate);
 			}
+			candidate.tokens.add(authorToken);
+			candidate.tokenPositions.set(authorToken, position);
 			candidate.positions.add(position);
 			candidate.minPosition = Math.min(candidate.minPosition, position);
 			candidate.maxPosition = Math.max(candidate.maxPosition, position);
@@ -751,6 +809,47 @@ function getAuthorCandidates(mention, referenceIndex, authorIdentity = null) {
 	return [...byReference.values()].filter((candidate) => {
 		return isCompatibleWithLearnedIdentity(candidate, authorIdentity);
 	});
+}
+
+function getMentionAuthorTokens(mention) {
+	const tokens = [];
+	const seen = new Set();
+	const authorTokens = Array.isArray(mention.terminalAuthorTokens)
+		? mention.terminalAuthorTokens
+		: mention.keys
+			.filter(key => key.type === 'authorYear')
+			.map(key => key.authorToken || key.value?.split('|')[0]);
+	for (const token of authorTokens) {
+		if (!token || seen.has(token)) {
+			continue;
+		}
+		seen.add(token);
+		tokens.push(token);
+	}
+	return tokens;
+}
+
+function hasCompatibleMentionAuthorOrder(candidate, authorTokens) {
+	let previousPosition = -1;
+	for (const token of authorTokens) {
+		const position = candidate.tokenPositions?.get(token);
+		if (!Number.isInteger(position) || position <= previousPosition) {
+			return false;
+		}
+		previousPosition = position;
+	}
+	return true;
+}
+
+function getCandidateAuthorPosition(candidate, authorTokens) {
+	let position = Number.MAX_SAFE_INTEGER;
+	for (const token of authorTokens) {
+		const tokenPosition = candidate.tokenPositions?.get(token);
+		if (Number.isInteger(tokenPosition)) {
+			position = Math.min(position, tokenPosition);
+		}
+	}
+	return position;
 }
 
 function getIdentityCandidates(
@@ -807,6 +906,24 @@ function chooseAuthorCandidate(mention, referenceIndex, authorIdentity = null) {
 	const candidates = getAuthorCandidates(mention, referenceIndex, authorIdentity);
 	if (!candidates.length) {
 		return null;
+	}
+	const authorTokens = getMentionAuthorTokens(mention);
+	if (authorTokens.length >= 2) {
+		const sharedCandidates = candidates.filter(candidate =>
+			authorTokens.every(token => candidate.tokens?.has(token))
+			&& hasCompatibleMentionAuthorOrder(candidate, authorTokens)
+		);
+		if (sharedCandidates.length > 0) {
+			const bestPosition = Math.min(
+				...sharedCandidates.map(candidate => getCandidateAuthorPosition(candidate, authorTokens))
+			);
+			return chooseCandidate(
+				sharedCandidates.filter(candidate =>
+					getCandidateAuthorPosition(candidate, authorTokens) === bestPosition
+				),
+				mention
+			);
+		}
 	}
 	const bestPosition = Math.min(...candidates.map(candidate => candidate.minPosition));
 	return chooseCandidate(candidates.filter(candidate => candidate.minPosition === bestPosition), mention);
@@ -982,9 +1099,48 @@ export function resolveAllowedMention(mention, referenceIndex, context = null) {
 		.filter(reference => isMentionReferenceAllowed(mention, reference, context));
 }
 
-function hasSourceOverlap(refsList, source) {
-	const group = refsList.get(blockKey(source.blockRef));
-	return !!group?.some(ref => ref.src?.blockRef && rangesOverlap(ref.src, source));
+function getOverlappingRefs(refsList, source) {
+	const group = refsList.get(blockKey(source.blockRef)) || [];
+	return group.filter(ref => ref.src?.blockRef && rangesOverlap(ref.src, source));
+}
+
+function matchesReferenceDest(ref, reference) {
+	return blockKey(ref.dest?.blockRef) === blockKey(reference.src?.blockRef);
+}
+
+function matchesAnyReferenceDest(ref, references) {
+	return references.some(reference => matchesReferenceDest(ref, reference));
+}
+
+function isContainedSameDestinationOverlap(ref, source, references) {
+	return matchesAnyReferenceDest(ref, references)
+		&& sourceContains(source, ref.src)
+		&& !sameRange(source, ref.src);
+}
+
+function hasBlockingSourceOverlap(refsList, source, references) {
+	return getOverlappingRefs(refsList, source).some(ref => {
+		if (sameRange(source, ref.src) && matchesAnyReferenceDest(ref, references)) {
+			return false;
+		}
+		return !isContainedSameDestinationOverlap(ref, source, references);
+	});
+}
+
+function replaceContainedSameDestinationOverlaps(refsList, source, references) {
+	const key = blockKey(source.blockRef);
+	const group = refsList.get(key);
+	if (!group) {
+		return;
+	}
+	const filtered = group.filter(ref =>
+		!isContainedSameDestinationOverlap(ref, source, references));
+	if (filtered.length) {
+		refsList.set(key, filtered);
+	}
+	else {
+		refsList.delete(key);
+	}
 }
 
 function addLocalReferenceEvidence(localRefsByBlock, mention, references) {
@@ -1082,9 +1238,7 @@ export function getCitationRefs(
 	}
 
 	for (const mention of mentionWindows) {
-		if (hasSourceOverlap(refsList, mention.src)) {
-			continue;
-		}
+		const references = [];
 		for (const reference of resolvedMentions.get(mention) || []) {
 			if (mention.kind === 'prose-identity') {
 				if (!hasLocalProseEvidence(
@@ -1094,6 +1248,15 @@ export function getCitationRefs(
 				)) {
 					continue;
 				}
+			}
+			references.push(reference);
+		}
+		if (!references.length || hasBlockingSourceOverlap(refsList, mention.src, references)) {
+			continue;
+		}
+		replaceContainedSameDestinationOverlaps(refsList, mention.src, references);
+		for (const reference of references) {
+			if (mention.kind === 'prose-identity') {
 				const sourceKey = blockKey(mention.src.blockRef);
 				const destKey = blockKey(reference.src.blockRef);
 				let proseRefs = proseRefsByBlock.get(sourceKey);
