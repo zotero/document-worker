@@ -22,6 +22,18 @@ const STANDALONE_IMAGE_MIN_WIDTH_RATIO = 0.15;
 const STANDALONE_IMAGE_MIN_HEIGHT_RATIO = 0.08;
 const STANDALONE_IMAGE_MIN_AREA_RATIO = 0.015;
 const STANDALONE_IMAGE_MIN_SIZE_MATCHES = 2;
+const RULED_TABLE_ORIENTATION_RATIO = 8;
+const RULED_TABLE_MIN_RULE_LENGTH_RATIO = 0.04;
+const RULED_TABLE_MAX_RULE_THICKNESS = 2.5;
+const RULED_TABLE_POSITION_TOLERANCE = 3;
+const RULED_TABLE_MIN_HORIZONTAL_POSITIONS = 2;
+const RULED_TABLE_MIN_TEXT_OVERLAP = 0.55;
+const RULED_TABLE_MIN_RULE_COVERAGE = 0.55;
+const RULED_TABLE_VERTICAL_PADDING_RATIO = 1.5;
+const RULED_TABLE_MAX_FRAGMENT_GAP_RATIO = 3;
+const RULED_TABLE_MIN_HEADER_FRAGMENTS = 8;
+const RULED_TABLE_MIN_HEADER_LINES = 8;
+const RULED_TABLE_TEXT_BLOCK_TYPES = new Set(['body', 'caption', 'footnote', 'list_item']);
 
 function getPageNumber(pageDataItem) {
 	return Number.isInteger(pageDataItem?.pageIndex) ? pageDataItem.pageIndex + 1 : '?';
@@ -363,6 +375,350 @@ function buildObjectRefinementContext(objectLines) {
 		});
 	}
 	return { validObjects };
+}
+
+function getHorizontalRuleCandidate(object, pageRect) {
+	if (object?.subtype !== 'path' || !isValidRect(object.bbox) || !isValidRect(pageRect)) {
+		return null;
+	}
+	const width = object.bbox[2] - object.bbox[0];
+	const height = object.bbox[3] - object.bbox[1];
+	const pageWidth = Math.max(1, pageRect[2] - pageRect[0]);
+	if (width <= 0 || height <= 0) {
+		return null;
+	}
+	if (
+		width >= height * RULED_TABLE_ORIENTATION_RATIO
+		&& width / pageWidth >= RULED_TABLE_MIN_RULE_LENGTH_RATIO
+		&& height <= RULED_TABLE_MAX_RULE_THICKNESS
+	) {
+		return {
+			bbox: object.bbox,
+			y: (object.bbox[1] + object.bbox[3]) / 2,
+		};
+	}
+	return null;
+}
+
+function clusterRulesByPosition(rules) {
+	const sortedRules = rules
+		.filter(rule => Number.isFinite(rule?.y))
+		.sort((a, b) => a.y - b.y);
+	const clusters = [];
+	for (const rule of sortedRules) {
+		const last = clusters[clusters.length - 1];
+		if (!last || rule.y - last.y > RULED_TABLE_POSITION_TOLERANCE) {
+			clusters.push({ y: rule.y, rules: [rule] });
+			continue;
+		}
+		last.y = (last.y * last.rules.length + rule.y) / (last.rules.length + 1);
+		last.rules.push(rule);
+	}
+	return clusters;
+}
+
+function hasDegradedTableText(lineIds, lines) {
+	let text = '';
+	for (const lineId of lineIds) {
+		text += lines[lineId]?.text || '';
+	}
+	const compactText = text.replace(/\s+/g, '');
+	if (!compactText) {
+		return false;
+	}
+	const replacementChars = (compactText.match(/\uFFFD/g) || []).length;
+	return replacementChars > compactText.length * 0.3;
+}
+
+function getHorizontalRules(objectContext, pageRect) {
+	if (!isValidRect(pageRect)) {
+		return [];
+	}
+	return objectContext.validObjects
+		.map(object => getHorizontalRuleCandidate(object, pageRect))
+		.filter(Boolean);
+}
+
+function horizontalOverlapRatio(a, b) {
+	const overlap = Math.max(0, Math.min(a[2], b[2]) - Math.max(a[0], b[0]));
+	const width = Math.max(1, Math.min(a[2] - a[0], b[2] - b[0]));
+	return overlap / width;
+}
+
+function horizontalOverlapLength(a, b) {
+	return Math.max(0, Math.min(a[2], b[2]) - Math.max(a[0], b[0]));
+}
+
+function horizontalCoverageRatio(rect, rules) {
+	const spans = [];
+	for (const rule of rules) {
+		const x1 = Math.max(rect[0], rule.bbox[0]);
+		const x2 = Math.min(rect[2], rule.bbox[2]);
+		if (x2 > x1) {
+			spans.push([x1, x2]);
+		}
+	}
+	if (!spans.length) {
+		return 0;
+	}
+	spans.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+	let covered = 0;
+	let [currentStart, currentEnd] = spans[0];
+	for (const [start, end] of spans.slice(1)) {
+		if (start > currentEnd) {
+			covered += currentEnd - currentStart;
+			currentStart = start;
+			currentEnd = end;
+			continue;
+		}
+		currentEnd = Math.max(currentEnd, end);
+	}
+	covered += currentEnd - currentStart;
+	return covered / Math.max(1, rect[2] - rect[0]);
+}
+
+function getRuleCoverageClusters(rules, textBbox) {
+	return clusterRulesByPosition(rules)
+		.filter(cluster => horizontalCoverageRatio(textBbox, cluster.rules) >= RULED_TABLE_MIN_RULE_COVERAGE);
+}
+
+function getCoveredRulesNearText(textBbox, lineHeight, horizontalRules) {
+	const verticalPadding = lineHeight * RULED_TABLE_VERTICAL_PADDING_RATIO;
+	const candidateRules = horizontalRules.filter(rule => (
+		horizontalOverlapLength(textBbox, rule.bbox) > 0
+		&& rule.y >= textBbox[1] - verticalPadding
+		&& rule.y <= textBbox[3] + verticalPadding
+	));
+	return getRuleCoverageClusters(candidateRules, textBbox);
+}
+
+function getTableRunTextBbox(blockIndexes, blocks, lines) {
+	const lineRects = blockIndexes
+		.flatMap(blockIndex => blocks[blockIndex].lines || [])
+		.map(lineId => getLineRect(lines, lineId))
+		.filter(Boolean);
+	if (lineRects.length) {
+		return unionRects(lineRects);
+	}
+	return unionRects(blockIndexes.map(blockIndex => blocks[blockIndex].bbox));
+}
+
+function getTableRunLineIds(blockIndexes, blocks, lines) {
+	return [...new Set(blockIndexes.flatMap(blockIndex => blocks[blockIndex].lines || []))]
+		.filter(lineId => getLineRect(lines, lineId));
+}
+
+function getTableBlockTextBbox(block, lines) {
+	const lineRects = (block?.lines || [])
+		.map(lineId => getLineRect(lines, lineId))
+		.filter(Boolean);
+	if (lineRects.length) {
+		return unionRects(lineRects);
+	}
+	return isValidRect(block?.bbox) ? block.bbox : null;
+}
+
+function isRuledTableTextBlock(block, lines, horizontalRules) {
+	if (!RULED_TABLE_TEXT_BLOCK_TYPES.has(block?.type)) {
+		return false;
+	}
+	const textBbox = getTableBlockTextBbox(block, lines);
+	if (!textBbox) {
+		return false;
+	}
+	const lineHeight = Math.max(getBlockLineHeight(block, lines), 1);
+	return getCoveredRulesNearText(textBbox, lineHeight, horizontalRules).length >= RULED_TABLE_MIN_HORIZONTAL_POSITIONS;
+}
+
+function verticalGap(a, b) {
+	return Math.max(0, Math.max(a[1], b[1]) - Math.min(a[3], b[3]));
+}
+
+function canContinueTableFragmentRun(first, second, lines) {
+	const firstBbox = getTableBlockTextBbox(first, lines);
+	const secondBbox = getTableBlockTextBbox(second, lines);
+	if (!firstBbox || !secondBbox) {
+		return true;
+	}
+	const lineHeight = Math.max(
+		getBlockLineHeight(first, lines),
+		getBlockLineHeight(second, lines),
+		1
+	);
+	const gap = verticalGap(firstBbox, secondBbox);
+	if (horizontalOverlapRatio(firstBbox, secondBbox) < RULED_TABLE_MIN_TEXT_OVERLAP) {
+		return gap <= lineHeight;
+	}
+	return gap <= lineHeight * RULED_TABLE_MAX_FRAGMENT_GAP_RATIO;
+}
+
+function getTableRunLineHeight(blockIndexes, blocks, lines) {
+	return Math.max(
+		...blockIndexes.map(blockIndex => getBlockLineHeight(blocks[blockIndex], lines)),
+		1
+	);
+}
+
+function getTableRunRuleEvidence(blockIndexes, blocks, lines, horizontalRules) {
+	const textBbox = getTableRunTextBbox(blockIndexes, blocks, lines);
+	const lineHeight = getTableRunLineHeight(blockIndexes, blocks, lines);
+	const ruleClusters = getCoveredRulesNearText(textBbox, lineHeight, horizontalRules);
+	if (ruleClusters.length < RULED_TABLE_MIN_HORIZONTAL_POSITIONS) {
+		return null;
+	}
+	const lineIds = getTableRunLineIds(blockIndexes, blocks, lines);
+	if (hasDegradedTableText(lineIds, lines)) {
+		return null;
+	}
+	const matchingRules = ruleClusters.flatMap(cluster => cluster.rules);
+	return {
+		bbox: unionRects([
+			textBbox,
+			...matchingRules.map(rule => rule.bbox),
+		]),
+	};
+}
+
+function getHeaderRuleTableRunEvidence(blockIndexes, blocks, lines, horizontalRules) {
+	if (blockIndexes.length < RULED_TABLE_MIN_HEADER_FRAGMENTS) {
+		return null;
+	}
+	const lineIds = getTableRunLineIds(blockIndexes, blocks, lines);
+	if (lineIds.length < RULED_TABLE_MIN_HEADER_LINES || hasDegradedTableText(lineIds, lines)) {
+		return null;
+	}
+	const textBbox = getTableRunTextBbox(blockIndexes, blocks, lines);
+	const verticalPadding = getTableRunLineHeight(blockIndexes, blocks, lines) * RULED_TABLE_VERTICAL_PADDING_RATIO;
+	const candidateRules = horizontalRules.filter(rule => (
+		horizontalOverlapLength(textBbox, rule.bbox) > 0
+		&& rule.y >= textBbox[3] - verticalPadding
+		&& rule.y <= textBbox[3] + verticalPadding
+	));
+	const ruleClusters = getRuleCoverageClusters(candidateRules, textBbox);
+	if (!ruleClusters.length) {
+		return null;
+	}
+	const matchingRules = ruleClusters.flatMap(cluster => cluster.rules);
+	return {
+		bbox: unionRects([
+			textBbox,
+			...matchingRules.map(rule => rule.bbox),
+		]),
+	};
+}
+
+function getConsecutiveTableRuns(blocks, lines, horizontalRules, { splitLargeGaps = true, includeRuledText = false } = {}) {
+	const runs = [];
+	let run = [];
+	let hasTable = false;
+	const flush = () => {
+		if (run.length >= 2 && hasTable) {
+			runs.push(run);
+		}
+		run = [];
+		hasTable = false;
+	};
+	for (let i = 0; i < blocks.length; i++) {
+		const block = blocks[i];
+		if (
+			block?.type === 'table'
+			|| (includeRuledText && isRuledTableTextBlock(block, lines, horizontalRules))
+		) {
+			const previousIndex = run[run.length - 1];
+			if (
+				splitLargeGaps
+				&& Number.isInteger(previousIndex)
+				&& !canContinueTableFragmentRun(blocks[previousIndex], block, lines)
+			) {
+				flush();
+			}
+			run.push(i);
+			hasTable ||= block.type === 'table';
+		}
+		else {
+			flush();
+		}
+	}
+	flush();
+	return runs;
+}
+
+function createMergedTableBlock(blockIndexes, blocks, lines, bbox) {
+	const sourceBlock = blocks[
+		blockIndexes.find(blockIndex => blocks[blockIndex]?.type === 'table')
+	] || blocks[blockIndexes[0]];
+	const lineIds = [];
+	for (const blockIndex of blockIndexes) {
+		lineIds.push(...(blocks[blockIndex].lines || []));
+	}
+	const uniqueLineIds = [...new Set(lineIds)]
+		.filter(lineId => getLineRect(lines, lineId))
+		.sort((a, b) => {
+			const lineA = lines[a];
+			const lineB = lines[b];
+			return (lineA?.startOffset ?? a) - (lineB?.startOffset ?? b);
+		});
+	const metrics = getLineBlockMetrics(uniqueLineIds, lines, sourceBlock.bbox);
+	return {
+		...sourceBlock,
+		type: 'table',
+		lines: uniqueLineIds,
+		bbox: unionRects([
+			bbox,
+			...blockIndexes.map(blockIndex => blocks[blockIndex].bbox),
+			metrics.bbox,
+		]),
+		startOffset: metrics.startOffset,
+		endOffset: metrics.endOffset,
+	};
+}
+
+function mergeRuledTableFragments(blocks, lines, objectContext, pageRect) {
+	const horizontalRules = getHorizontalRules(objectContext, pageRect);
+	if (horizontalRules.length < RULED_TABLE_MIN_HORIZONTAL_POSITIONS) {
+		return blocks;
+	}
+
+	const mergeByFirstIndex = new Map();
+	const skipIndexes = new Set();
+	for (const blockIndexes of getConsecutiveTableRuns(blocks, lines, horizontalRules, { includeRuledText: true })) {
+		const evidence = getTableRunRuleEvidence(blockIndexes, blocks, lines, horizontalRules);
+		if (!evidence) {
+			continue;
+		}
+		const firstIndex = blockIndexes[0];
+		mergeByFirstIndex.set(firstIndex, createMergedTableBlock(blockIndexes, blocks, lines, evidence.bbox));
+		for (const blockIndex of blockIndexes.slice(1)) {
+			skipIndexes.add(blockIndex);
+		}
+	}
+	for (const blockIndexes of getConsecutiveTableRuns(blocks, lines, horizontalRules, { splitLargeGaps: false })) {
+		if (blockIndexes.some(blockIndex => skipIndexes.has(blockIndex) || mergeByFirstIndex.has(blockIndex))) {
+			continue;
+		}
+		const evidence = getHeaderRuleTableRunEvidence(blockIndexes, blocks, lines, horizontalRules);
+		if (!evidence) {
+			continue;
+		}
+		const firstIndex = blockIndexes[0];
+		mergeByFirstIndex.set(firstIndex, createMergedTableBlock(blockIndexes, blocks, lines, evidence.bbox));
+		for (const blockIndex of blockIndexes.slice(1)) {
+			skipIndexes.add(blockIndex);
+		}
+	}
+
+	if (!mergeByFirstIndex.size) {
+		return blocks;
+	}
+
+	const result = [];
+	for (let i = 0; i < blocks.length; i++) {
+		if (skipIndexes.has(i)) {
+			continue;
+		}
+		result.push(mergeByFirstIndex.get(i) || blocks[i]);
+	}
+	return result;
 }
 
 function buildObjectComponents(objectContext, blockers = []) {
@@ -1001,6 +1357,7 @@ export function refineGraphicBlocks(blocks, lines, objectLines = [], pageRect = 
 		refinedBlockContext = buildBlockRefinementContext(refined, lines);
 		refined = expandGraphicBlocks(refined, refinedBlockContext, lines, objectContext).blocks;
 	}
+	refined = mergeRuledTableFragments(refined, lines, objectContext, pageRect);
 	refined = insertObjectImageBlocks(refined, objectContext, pageRect);
 	return refined;
 }

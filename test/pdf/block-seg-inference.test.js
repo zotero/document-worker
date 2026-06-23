@@ -15,6 +15,14 @@ function line(id, text, rect, startOffset = id) {
 	};
 }
 
+function ruledGridObjects() {
+	return [
+		{ type: 'object', subtype: 'path', rect: [5, 45, 85, 46] },
+		{ type: 'object', subtype: 'path', rect: [5, 65, 85, 66] },
+		{ type: 'object', subtype: 'path', rect: [5, 85, 85, 86] },
+	];
+}
+
 describe('applyBlockClassifierPredictions', () => {
 	it('uses the block classifier independently from flow class', () => {
 		const blocks = [
@@ -274,5 +282,196 @@ describe('refineGraphicBlocks', () => {
 		assert.equal(refined[0].type, 'image');
 		assert.deepEqual(refined[0].bbox, [99, 99, 301, 251]);
 		assert.deepEqual(refined[0].lines, []);
+	});
+
+	it('joins table fragments inside one ruled table grid', () => {
+		const lines = [
+			line(0, 'A1', [10, 70, 30, 80], 0),
+			line(1, 'B1', [60, 70, 80, 80], 1),
+			line(2, 'A2', [10, 50, 30, 60], 2),
+			line(3, 'B2', [60, 50, 80, 60], 3),
+		];
+		const blocks = [
+			{ type: 'table', bbox: [10, 70, 80, 80], lines: [0, 1], startOffset: 0, endOffset: 1 },
+			{ type: 'table', bbox: [10, 50, 80, 60], lines: [2, 3], startOffset: 2, endOffset: 3 },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, ruledGridObjects(), [0, 0, 100, 100]);
+
+		assert.equal(refined.length, 1);
+		assert.equal(refined[0].type, 'table');
+		assert.deepEqual(refined[0].lines, [0, 1, 2, 3]);
+		assert.deepEqual(refined[0].bbox, [5, 45, 85, 86]);
+	});
+
+	it('joins a ruled table row misclassified as text inside table fragments', () => {
+		const lines = [
+			line(0, 'Top row', [10, 80, 90, 90], 0),
+			line(1, 'Middle row', [10, 65, 90, 75], 1),
+			line(2, 'Bottom row', [10, 50, 90, 60], 2),
+		];
+		const blocks = [
+			{ type: 'table', bbox: [10, 80, 90, 90], lines: [0], startOffset: 0, endOffset: 0 },
+			{ type: 'caption', bbox: [10, 65, 90, 75], lines: [1], startOffset: 1, endOffset: 1 },
+			{ type: 'table', bbox: [10, 50, 90, 60], lines: [2], startOffset: 2, endOffset: 2 },
+		];
+		const objects = [
+			{ type: 'object', subtype: 'path', rect: [5, 95, 95, 96] },
+			{ type: 'object', subtype: 'path', rect: [5, 78, 95, 79] },
+			{ type: 'object', subtype: 'path', rect: [5, 62, 95, 63] },
+			{ type: 'object', subtype: 'path', rect: [5, 45, 95, 46] },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, objects, [0, 0, 100, 100]);
+
+		assert.equal(refined.length, 1);
+		assert.equal(refined[0].type, 'table');
+		assert.deepEqual(refined[0].lines, [0, 1, 2]);
+		assert.deepEqual(refined[0].bbox, [5, 45, 95, 96]);
+	});
+
+	it('keeps merged table metadata from a table seed when ruled text leads the run', () => {
+		const lines = [
+			line(0, 'Top row', [10, 80, 90, 90], 0),
+			line(1, 'Bottom row', [10, 65, 90, 75], 1),
+		];
+		const blocks = [
+			{ type: 'caption', flowClass: 'auxiliary', bbox: [10, 80, 90, 90], lines: [0], startOffset: 0, endOffset: 0 },
+			{ type: 'table', bbox: [10, 65, 90, 75], lines: [1], startOffset: 1, endOffset: 1 },
+		];
+		const objects = [
+			{ type: 'object', subtype: 'path', rect: [5, 95, 95, 96] },
+			{ type: 'object', subtype: 'path', rect: [5, 78, 95, 79] },
+			{ type: 'object', subtype: 'path', rect: [5, 60, 95, 61] },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, objects, [0, 0, 100, 100]);
+
+		assert.equal(refined.length, 1);
+		assert.equal(refined[0].type, 'table');
+		assert.equal(refined[0].flowClass, undefined);
+		assert.deepEqual(refined[0].lines, [0, 1]);
+	});
+
+	it('joins a large column-wise table fragment run with a header rule', () => {
+		const lines = [
+			line(0, 'Header', [10, 80, 90, 90], 0),
+			line(1, 'Left 1', [10, 60, 45, 70], 1),
+			line(2, 'Left 2', [10, 50, 45, 60], 2),
+			line(3, 'Left 3', [10, 40, 45, 50], 3),
+			line(4, 'Left 4', [10, 30, 45, 40], 4),
+			line(5, 'Right 1', [55, 60, 90, 70], 5),
+			line(6, 'Right 2', [55, 50, 90, 60], 6),
+			line(7, 'Right 3', [55, 40, 90, 50], 7),
+		];
+		const blocks = lines.map(item => ({
+			type: 'table',
+			bbox: item.rect.slice(),
+			lines: [item.id],
+			startOffset: item.startOffset,
+			endOffset: item.endOffset,
+		}));
+		const objects = [
+			{ type: 'object', subtype: 'path', rect: [5, 90, 95, 91] },
+			{ type: 'object', subtype: 'path', rect: [5, 10, 95, 11] },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, objects, [0, 0, 100, 100]);
+
+		assert.equal(refined.length, 1);
+		assert.equal(refined[0].type, 'table');
+		assert.deepEqual(refined[0].lines, [0, 1, 2, 3, 4, 5, 6, 7]);
+		assert.deepEqual(refined[0].bbox, [5, 30, 95, 91]);
+	});
+
+	it('does not let one-column rules merge table-labeled text from another column', () => {
+		const lines = [
+			line(0, 'Left 1', [10, 80, 45, 90], 0),
+			line(1, 'Left 2', [10, 70, 45, 80], 1),
+			line(2, 'Left 3', [10, 60, 45, 70], 2),
+			line(3, 'Left 4', [10, 50, 45, 60], 3),
+			line(4, 'Right 1', [55, 80, 90, 90], 4),
+			line(5, 'Right 2', [55, 70, 90, 80], 5),
+			line(6, 'Right 3', [55, 60, 90, 70], 6),
+			line(7, 'Right 4', [55, 50, 90, 60], 7),
+		];
+		const blocks = lines.map(item => ({
+			type: 'table',
+			bbox: item.rect.slice(),
+			lines: [item.id],
+			startOffset: item.startOffset,
+			endOffset: item.endOffset,
+		}));
+		const objects = [
+			{ type: 'object', subtype: 'path', rect: [55, 90, 95, 91] },
+			{ type: 'object', subtype: 'path', rect: [55, 45, 95, 46] },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, objects, [0, 0, 100, 100]);
+
+		assert.equal(refined.length, 5);
+		assert.deepEqual(refined.map(block => block.lines), [[0], [1], [2], [3], [4, 5, 6, 7]]);
+	});
+
+	it('does not join table fragments without two aligned horizontal rules', () => {
+		const lines = [
+			line(0, 'A1', [10, 70, 30, 80], 0),
+			line(1, 'B1', [60, 70, 80, 80], 1),
+			line(2, 'A2', [10, 50, 30, 60], 2),
+			line(3, 'B2', [60, 50, 80, 60], 3),
+		];
+		const blocks = [
+			{ type: 'table', bbox: [10, 70, 80, 80], lines: [0, 1], startOffset: 0, endOffset: 1 },
+			{ type: 'table', bbox: [10, 50, 80, 60], lines: [2, 3], startOffset: 2, endOffset: 3 },
+		];
+		const objects = [
+			{ type: 'object', subtype: 'path', rect: [5, 45, 85, 46] },
+			{ type: 'object', subtype: 'path', rect: [5, 10, 85, 11] },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, objects, [0, 0, 100, 100]);
+
+		assert.equal(refined.length, 2);
+		assert.deepEqual(refined.map(block => block.lines), [[0, 1], [2, 3]]);
+	});
+
+	it('does not join through a distant table-like fragment on the same rail', () => {
+		const lines = [
+			line(0, 'A1', [10, 70, 30, 80], 0),
+			line(1, 'B1', [60, 70, 80, 80], 1),
+			line(2, 'Footer text', [10, 10, 80, 20], 2),
+		];
+		const blocks = [
+			{ type: 'table', bbox: [10, 70, 80, 80], lines: [0, 1], startOffset: 0, endOffset: 1 },
+			{ type: 'table', bbox: [10, 10, 80, 20], lines: [2], startOffset: 2, endOffset: 2 },
+		];
+		const objects = [
+			{ type: 'object', subtype: 'path', rect: [5, 65, 85, 66] },
+			{ type: 'object', subtype: 'path', rect: [5, 85, 85, 86] },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, objects, [0, 0, 100, 100]);
+
+		assert.equal(refined.length, 2);
+		assert.deepEqual(refined.map(block => block.lines), [[0, 1], [2]]);
+	});
+
+	it('does not join ruled table fragments with degraded text extraction', () => {
+		const badText = String.fromCharCode(0xfffd).repeat(12);
+		const lines = [
+			line(0, badText, [10, 70, 30, 80], 0),
+			line(1, badText, [60, 70, 80, 80], 1),
+			line(2, badText, [10, 50, 30, 60], 2),
+			line(3, badText, [60, 50, 80, 60], 3),
+		];
+		const blocks = [
+			{ type: 'table', bbox: [10, 70, 80, 80], lines: [0, 1], startOffset: 0, endOffset: 1 },
+			{ type: 'table', bbox: [10, 50, 80, 60], lines: [2, 3], startOffset: 2, endOffset: 3 },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, ruledGridObjects(), [0, 0, 100, 100]);
+
+		assert.equal(refined.length, 2);
+		assert.deepEqual(refined.map(block => block.lines), [[0, 1], [2, 3]]);
 	});
 });
