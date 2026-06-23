@@ -13,6 +13,9 @@ function degradeSingleItemLists(structure) {
 		}
 
 		const item = items[0];
+		if (Array.isArray(item.previousPart) || Array.isArray(item.nextPart)) {
+			continue;
+		}
 		structure.content[i] = {
 			...item,
 			type: 'paragraph',

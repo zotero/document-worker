@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { markListItemParts, markParagraphParts } from '../../src/pdf/structure/block-cleanup.js';
 import { normalizePdfRawBlockFlow, normalizeTopLevelFlowClasses } from '../../src/pdf/structure/flow-policy.js';
 import { wrapListItems } from '../../src/pdf/structure/list-utils.js';
+import { excludeRepeatedPageFurniture } from '../../src/pdf/structure/page-furniture.js';
 import { postProcessStructure } from '../../src/pdf/structure/post-process.js';
 import { getFulltextFromStructuredText } from '../../structured-document-text/src/fulltext.js';
 import { getPageBlockSpan } from '../../structured-document-text/src/pages.js';
@@ -56,6 +57,154 @@ describe('PDF flow policy', () => {
 
 		assert.equal(block.type, 'table');
 		assert.equal(block.flowClass, undefined);
+	});
+});
+
+describe('excludeRepeatedPageFurniture', () => {
+	function repeatedPageStructure(blockFactory) {
+		return {
+			catalog: {
+				pages: Array.from({ length: 4 }, () => ({ viewRect: [0, 0, 600, 800] })),
+			},
+			content: Array.from({ length: 4 }, (_, pageIndex) => blockFactory(pageIndex)),
+		};
+	}
+
+	it('excludes repeated body text at stable page edges', () => {
+		const structure = repeatedPageStructure(pageIndex => ({
+			type: 'paragraph',
+			anchor: { pageRects: [[pageIndex, 100, 20, 260, 32]] },
+			content: [{ text: 'Journal running header' }],
+		}));
+
+		excludeRepeatedPageFurniture(structure);
+
+		assert.deepEqual(structure.content.map(block => block.flowClass), [
+			'excluded',
+			'excluded',
+			'excluded',
+			'excluded',
+		]);
+	});
+
+	it('keeps repeated body text away from page edges', () => {
+		const structure = repeatedPageStructure(pageIndex => ({
+			type: 'paragraph',
+			anchor: { pageRects: [[pageIndex, 100, 360, 260, 380]] },
+			content: [{ text: 'Repeated table row label' }],
+		}));
+
+		excludeRepeatedPageFurniture(structure);
+
+		assert.deepEqual(structure.content.map(block => block.flowClass), [
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+		]);
+	});
+
+	it('excludes repeated body text at stable side edges', () => {
+		const structure = repeatedPageStructure(pageIndex => ({
+			type: 'paragraph',
+			anchor: { pageRects: [[pageIndex, 560, 300, 590, 430]] },
+			content: [{ text: 'Vertical running header' }],
+		}));
+
+		excludeRepeatedPageFurniture(structure);
+
+		assert.deepEqual(structure.content.map(block => block.flowClass), [
+			'excluded',
+			'excluded',
+			'excluded',
+			'excluded',
+		]);
+	});
+
+	it('keeps repeated headings as structural content', () => {
+		const structure = repeatedPageStructure(pageIndex => ({
+			type: 'heading',
+			anchor: { pageRects: [[pageIndex, 100, 20, 260, 32]] },
+			content: [{ text: 'References' }],
+		}));
+
+		excludeRepeatedPageFurniture(structure);
+
+		assert.deepEqual(structure.content.map(block => block.flowClass), [
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+		]);
+	});
+
+	it('excludes repeated edge text when only numbers vary', () => {
+		const structure = repeatedPageStructure(pageIndex => ({
+			type: 'paragraph',
+			anchor: { pageRects: [[pageIndex, 30, 20, 420, 32]] },
+			content: [{ text: `journal_export.indd Page ${367 + pageIndex} 12/13/00 11:51 AM` }],
+		}));
+
+		excludeRepeatedPageFurniture(structure);
+
+		assert.deepEqual(structure.content.map(block => block.flowClass), [
+			'excluded',
+			'excluded',
+			'excluded',
+			'excluded',
+		]);
+	});
+
+	it('uses already-classified repeated edge text as evidence without overriding it', () => {
+		const structure = repeatedPageStructure(pageIndex => ({
+			type: 'paragraph',
+			...(pageIndex === 1 && { flowClass: 'auxiliary' }),
+			anchor: { pageRects: [[pageIndex, 30, 20, 420, 32]] },
+			content: [{ text: `journal_export.indd Page ${367 + pageIndex} 12/13/00 11:51 AM` }],
+		}));
+
+		excludeRepeatedPageFurniture(structure);
+
+		assert.deepEqual(structure.content.map(block => block.flowClass), [
+			'excluded',
+			'auxiliary',
+			'excluded',
+			'excluded',
+		]);
+	});
+
+	it('keeps repeated side-edge text when the page region is not stable', () => {
+		const structure = repeatedPageStructure(pageIndex => ({
+			type: 'paragraph',
+			anchor: { pageRects: [[pageIndex, 20, 120 + pageIndex * 120, 70, 135 + pageIndex * 120]] },
+			content: [{ text: 'Reference' }],
+		}));
+
+		excludeRepeatedPageFurniture(structure);
+
+		assert.deepEqual(structure.content.map(block => block.flowClass), [
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+		]);
+	});
+
+	it('keeps short repeated edge text as body content', () => {
+		const structure = repeatedPageStructure(pageIndex => ({
+			type: 'paragraph',
+			anchor: { pageRects: [[pageIndex, 20, 300, 50, 330]] },
+			content: [{ text: 'Sir:' }],
+		}));
+
+		excludeRepeatedPageFurniture(structure);
+
+		assert.deepEqual(structure.content.map(block => block.flowClass), [
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+		]);
 	});
 });
 
@@ -306,13 +455,13 @@ describe('wrapListItems page ranges', () => {
 		assert.equal(getFulltextFromStructuredText(structure, [1]), 'Third item');
 	});
 
-	it('sets wrapped list flow class from the item majority', () => {
+	it('sets wrapped list flow class from compatible item flow', () => {
 		let structure = {
 			catalog: { pages: [{ contentRange: [[0], [3]] }] },
 			content: [
 				{
 					type: 'listitem',
-					flowClass: 'body',
+					flowClass: 'auxiliary',
 					_metrics: { pageIndex: 0 },
 					content: [{ text: 'First item' }],
 				},
@@ -335,6 +484,156 @@ describe('wrapListItems page ranges', () => {
 
 		assert.equal(structure.content[0].type, 'list');
 		assert.equal(structure.content[0].flowClass, 'auxiliary');
+	});
+
+	it('does not wrap a marked item with incompatible unmarked footnote-like text', () => {
+		let structure = {
+			content: [
+				listItem(0, '• Late Chunking: We describe the technique.', {
+					rect: [135, 80, 504, 112],
+					firstCharFontSize: 10,
+					lastCharFontSize: 10,
+				}),
+				listItem(0, '2https://github.com/jina-ai/late-chunking', {
+					rect: [120, 60, 340, 70],
+					firstCharFontSize: 8,
+					lastCharFontSize: 8,
+				}),
+			],
+		};
+
+		wrapListItems(structure);
+		markListItemParts(structure);
+		postProcessStructure(structure);
+
+		assert.deepEqual(structure.content.map(block => block.type), ['paragraph', 'paragraph']);
+		assert.equal(structure.content[0].nextPart, undefined);
+		assert.equal(structure.content[1].previousPart, undefined);
+	});
+
+	it('wraps marked list items with indented continuations and later siblings', () => {
+		let structure = {
+			content: [
+				listItem(0, '[1] Smith 2020 Long reference title', {
+					rect: [50, 120, 500, 140],
+					firstCharFontSize: 10,
+					lastCharFontSize: 10,
+					lastLineRag: 0,
+				}),
+				listItem(0, 'continued title on the next line.', {
+					rect: [70, 100, 500, 115],
+					firstCharFontSize: 10,
+					lastCharFontSize: 10,
+				}),
+				listItem(0, '[2] Jones 2021 Another reference.', {
+					rect: [50, 80, 500, 95],
+					firstCharFontSize: 10,
+					lastCharFontSize: 10,
+				}),
+			],
+		};
+
+		wrapListItems(structure);
+		markListItemParts(structure);
+
+		assert.equal(structure.content.length, 1);
+		assert.equal(structure.content[0].type, 'list');
+		assert.equal(structure.content[0].content.length, 3);
+		assert.deepEqual(structure.content[0].content[0].nextPart, [0, 1]);
+		assert.deepEqual(structure.content[0].content[1].previousPart, [0, 0]);
+		assert.equal(structure.content[0].content[2].previousPart, undefined);
+	});
+
+	it('keeps singleton continuation lists when they are linked across pages', () => {
+		let structure = {
+			content: [
+				listItem(0, '[2] Brown 2020 Long reference title', {
+					rect: [50, 120, 500, 140],
+					firstCharFontSize: 10,
+					lastCharFontSize: 10,
+				}),
+				listItem(1, 'continued on the next page.', {
+					rect: [70, 700, 500, 720],
+					firstCharFontSize: 10,
+					lastCharFontSize: 10,
+				}),
+			],
+		};
+
+		wrapListItems(structure);
+		markListItemParts(structure);
+		postProcessStructure(structure);
+
+		assert.deepEqual(structure.content.map(block => block.type), ['list', 'list']);
+		assert.deepEqual(structure.content[0].content[0].nextPart, [1, 0]);
+		assert.deepEqual(structure.content[1].content[0].previousPart, [0, 0]);
+	});
+
+	it('does not link same-rail unmarked list siblings as continuations', () => {
+		let structure = {
+			content: [
+				listItem(0, 'i=4. First loop iteration.', {
+					rect: [50, 120, 500, 140],
+					firstCharFontSize: 10,
+					lastCharFontSize: 10,
+					lastLineRag: 0,
+				}),
+				listItem(0, 'i=5. Second loop iteration.', {
+					rect: [50, 100, 500, 115],
+					firstCharFontSize: 10,
+					lastCharFontSize: 10,
+					lastLineRag: 0,
+				}),
+			],
+		};
+
+		wrapListItems(structure);
+		markListItemParts(structure);
+
+		assert.equal(structure.content[0].content[0].nextPart, undefined);
+		assert.equal(structure.content[0].content[1].previousPart, undefined);
+	});
+
+	it('keeps unmarked legal references in one list run', () => {
+		let structure = {
+			content: [
+				listItem(0, 'Robinow v. Vancouver (City), (2003) B.C.J. No. 989', {
+					rect: [50, 120, 500, 140],
+				}),
+				listItem(0, 'R. v. Bottrell (1981), 60 C.C.C. (2d) 211', {
+					rect: [55, 100, 500, 115],
+				}),
+				listItem(0, 'Smith, R. (2009). Police and suspects.', {
+					rect: [50, 80, 500, 95],
+				}),
+			],
+		};
+
+		wrapListItems(structure);
+
+		assert.equal(structure.content.length, 1);
+		assert.equal(structure.content[0].content.length, 3);
+	});
+
+	it('keeps mixed ordered statutory markers in one list run', () => {
+		let structure = {
+			content: [
+				listItem(0, '25. (1) Every one who is authorized by law', {
+					rect: [50, 140, 500, 160],
+				}),
+				listItem(0, '(a) as a private person,', {
+					rect: [70, 120, 500, 135],
+				}),
+				listItem(0, '(b) as a peace officer or public officer,', {
+					rect: [70, 100, 500, 115],
+				}),
+			],
+		};
+
+		wrapListItems(structure);
+
+		assert.equal(structure.content.length, 1);
+		assert.equal(structure.content[0].content.length, 3);
 	});
 });
 

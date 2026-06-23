@@ -1,5 +1,11 @@
 import { mergePageRects } from './util.js';
 import { normalizeFlowClass, resolveFlowClass } from './flow-policy.js';
+import {
+	getListItemContinuationRelation,
+	getListItemLeadingContinuationRelation,
+	getListItemSiblingRelation,
+	hasListItemMarker,
+} from './list-relations.js';
 
 function getMajorityFlowClass(blocks) {
 	const counts = {
@@ -20,6 +26,30 @@ function getMajorityFlowClass(blocks) {
 	}
 
 	return normalizeFlowClass(majorityFlowClass);
+}
+
+function getJoinRelation(structure, items, lastSiblingItem, next) {
+	const previousItem = items.at(-1);
+
+	const continuation = getListItemContinuationRelation(previousItem, next, { structure });
+	if (continuation) {
+		return { lastSiblingItem };
+	}
+
+	if (!lastSiblingItem) {
+		const leadingContinuation = getListItemLeadingContinuationRelation(previousItem, next);
+		if (leadingContinuation) {
+			return { lastSiblingItem: next };
+		}
+	}
+
+	const siblingBase = lastSiblingItem || previousItem;
+	const sibling = getListItemSiblingRelation(siblingBase, next);
+	if (sibling) {
+		return { lastSiblingItem: next };
+	}
+
+	return null;
 }
 
 // Wrap continuous 'listitem' blocks into 'list' blocks.
@@ -43,12 +73,20 @@ export function wrapListItems(structure) {
 			const oldStart = i;
 			const items = [];
 			const pageIndex = block._metrics?.pageIndex;
+			let lastSiblingItem = hasListItemMarker(block) ? block : null;
 
 			while (
 				i < originalContent.length
 				&& originalContent[i]?.type === 'listitem'
 				&& originalContent[i]?._metrics?.pageIndex === pageIndex
 			) {
+				if (items.length > 0) {
+					const join = getJoinRelation(structure, items, lastSiblingItem, originalContent[i]);
+					if (!join) {
+						break;
+					}
+					lastSiblingItem = join.lastSiblingItem;
+				}
 				listItemMap.set(i, { listIndex, itemIndex: items.length });
 				items.push(originalContent[i]);
 				i++;
@@ -183,7 +221,7 @@ export function wrapListItems(structure) {
 		updateNodeRefs(block);
 	}
 
-	if (Array.isArray(structure.catalog.pages)) {
+	if (Array.isArray(structure.catalog?.pages)) {
 		for (const page of structure.catalog.pages) {
 			if (!Array.isArray(page?.contentRange)) {
 				continue;

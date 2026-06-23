@@ -1,4 +1,5 @@
 import { canCrossPagePartLink, isBodyFlowBlock, isTransparentBetweenParts } from './flow-policy.js';
+import { getListItemContinuationRelation } from './list-relations.js';
 
 function getNodeByRef(structure, ref) {
 	let node = { content: structure?.content };
@@ -215,18 +216,7 @@ export function markListItemParts(structure) {
 			return false;
 		}
 
-		// First list item must end with a hyphen (word break across columns/pages)
-		if (m1.lastChar !== '-') {
-			return false;
-		}
-
-		// Second list item must start with lowercase letter (continuation of hyphenated word)
-		const c = m2.firstChar?.charAt(0);
-		if (!c || c < 'a' || c > 'z') {
-			return false;
-		}
-
-		return true;
+		return !!getListItemContinuationRelation(first, second, { structure });
 	};
 
 	const areAdjacentListParts = (first, second) => {

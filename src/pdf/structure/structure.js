@@ -23,6 +23,7 @@ import { createBlockAnchor, ensureBlockPageRects } from './util.js';
 import { createStructureIndex } from './structure-index.js';
 import { extractStructuredTable, extractStructuredTables } from './table/extract.js';
 import { postProcessStructure } from './post-process.js';
+import { excludeRepeatedPageFurniture } from './page-furniture.js';
 import {
 	SDT_PROCESSOR_VERSIONS,
 	SDT_SCHEMA_VERSION,
@@ -326,9 +327,10 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 	// Block transformations
 	wrapListItems(structure);
-	postProcessStructure(structure);
 	markListItemParts(structure);
+	postProcessStructure(structure);
 	markParagraphParts(structure);
+	excludeRepeatedPageFurniture(structure);
 	normalizeTopLevelFlowClasses(structure);
 
 	// After this only text node transformations are allowed
