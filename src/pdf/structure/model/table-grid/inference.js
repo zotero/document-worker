@@ -1,7 +1,7 @@
 import { getRuntime } from '../onnx/runtime.js';
 import { createCompactTableRuntime } from './runtime.js';
 
-const TABLE_GRID_MODEL_ENABLED = false;
+const TABLE_GRID_MODEL_ENABLED = true;
 
 let runtimePromise = null;
 
