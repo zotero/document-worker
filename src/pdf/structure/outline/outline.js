@@ -1,12 +1,44 @@
 import { getBlockPlainText } from '../../../../structured-document-text/src/pdf/index.js';
+import { titles as REFERENCE_TITLES } from '../reference/titles.js';
 import { resolveDestination } from '../util.js';
 
-const FORCE_TOP_TITLES = [
+const ACKNOWLEDGMENT_TOP_TITLES = [
+	'acknowledgment',
 	'acknowledgments',
+	'acknowledgement',
 	'acknowledgements',
+];
+const ABSTRACT_TERMINAL_TITLES = [
+	'abstract',
+	'resume',
+	'résumé',
+	'resumé',
+	'resumen',
+	'summary',
+	'zusammenfassung',
+];
+const KEYWORD_TERMINAL_TITLES = [
+	'index terms',
+	'key word',
+	'key words',
+	'keyword',
+	'keywords',
+	'mots clés',
+	'mots cles',
+	'palabras clave',
+	'schlagworter',
+	'schlagwörter',
+	'schlüsselwörter',
+	'subject terms',
+];
+const COPYRIGHT_TERMINAL_TITLES = [
+	'copyright',
+];
+const REFERENCE_TOP_TITLES = [
 	'references',
 	'bibliography',
 ];
+const REFERENCE_TERMINAL_TITLES = new Set(REFERENCE_TITLES.map(normalizeLooseTitle));
 
 // Match outline numbers like "1.2.3", "A.1", "IV.2", but not regular words.
 const OUTLINE_NUMBER_RE = /^\s*((?:\d+|[A-Za-z]+)(?:[.-](?:\d+|[A-Za-z]+))*)(?=\s|[.)\-:]|$)/;
@@ -116,9 +148,13 @@ function computeItemStyle(item) {
 	return item;
 }
 
-function normalizeTitle(title) {
+function normalizeLooseTitle(title) {
 	if (!title || typeof title !== 'string') return '';
-	return title.replace(/[^\x00-\x7F]/g, '').toLowerCase().trim();
+	return title
+		.normalize('NFKC')
+		.replace(/[^\p{L}\p{N}]+/gu, ' ')
+		.trim()
+		.toLowerCase();
 }
 
 function buildAllBlocksByPage(blocks) {
@@ -293,6 +329,7 @@ function matchNativeToBlocks(nativeNodes, allBlocksByPage) {
 		const pageBlocks = allBlocksByPage.get(native._pageIndex) || [];
 		for (const block of pageBlocks) {
 			if (usedBlocks.has(block)) continue;
+			if (block.type !== 'heading') continue;
 			if (textMatches(native.title, block.title)) {
 				usedBlocks.add(block);
 				matches.push({ native, block });
@@ -421,30 +458,69 @@ function computeStyleStats(items) {
 	return stats;
 }
 
-function markForceTop(items, titleRef) {
-	const titleRefIndex = Array.isArray(titleRef) && titleRef.length ? titleRef[0] : null;
-	for (const item of items) {
-		const titleNorm = normalizeTitle(item.title);
-		if (FORCE_TOP_TITLES.includes(titleNorm)) {
-			item._forceTop = true;
-			continue;
+function getTitleRefIndexes(titleRefs) {
+	const refs = Array.isArray(titleRefs?.[0]) ? titleRefs : [titleRefs];
+	const indexes = new Set();
+	for (const ref of refs) {
+		if (Array.isArray(ref) && Number.isInteger(ref[0])) {
+			indexes.add(ref[0]);
 		}
-		if (Number.isInteger(titleRefIndex) && Array.isArray(item.ref) && item.ref[0] === titleRefIndex) {
+	}
+	return indexes;
+}
+
+function isReferenceTopTitle(title) {
+	return REFERENCE_TOP_TITLES.includes(normalizeLooseTitle(title));
+}
+
+function isReferenceTerminalTitle(title) {
+	return REFERENCE_TERMINAL_TITLES.has(normalizeLooseTitle(title)) || isReferenceTopTitle(title);
+}
+
+function isAcknowledgmentTopTitle(title) {
+	return ACKNOWLEDGMENT_TOP_TITLES.includes(normalizeLooseTitle(title));
+}
+
+function isAbstractTerminalTitle(title) {
+	return ABSTRACT_TERMINAL_TITLES.includes(normalizeLooseTitle(title));
+}
+
+function isKeywordTerminalTitle(title) {
+	return KEYWORD_TERMINAL_TITLES.includes(normalizeLooseTitle(title));
+}
+
+function isCopyrightTerminalTitle(title) {
+	return COPYRIGHT_TERMINAL_TITLES.includes(normalizeLooseTitle(title));
+}
+
+function markForceTop(items, titleRefs = []) {
+	const titleRefIndexes = getTitleRefIndexes(titleRefs);
+	for (const item of items) {
+		const isReferenceTitleRef = Array.isArray(item.ref) && titleRefIndexes.has(item.ref[0]);
+		if (isReferenceTopTitle(item.title) || isAcknowledgmentTopTitle(item.title) || isReferenceTitleRef) {
 			item._forceTop = true;
+			item._forceTopTerminal = true;
+		}
+		else if (isAbstractTerminalTitle(item.title)) {
+			item._forceTopTerminal = true;
+		}
+		else if (isCopyrightTerminalTitle(item.title)) {
+			item._forceTopTerminal = true;
+		}
+	}
+}
+
+function markKeywordTitleTerminals(items) {
+	for (const item of collectOutlineItems(items)) {
+		if (isKeywordTerminalTitle(item?.title)) {
+			item._forceTopTerminal = true;
 		}
 	}
 }
 
 function getNodeOrderKey(node) {
-	const pageIndex = Number.isFinite(node._pageIndex) ? node._pageIndex : Number.POSITIVE_INFINITY;
-	const rect = node._rect;
-	let y = 0;
-	if (Array.isArray(rect)) {
-		if (Number.isFinite(rect[3])) y = rect[3];
-		else if (Number.isFinite(rect[1])) y = rect[1];
-	}
-	const orderIndex = Number.isFinite(node._orderIndex) ? node._orderIndex : 0;
-	return [pageIndex, -y, orderIndex];
+	const orderIndex = Number.isFinite(node._orderIndex) ? node._orderIndex : Number.POSITIVE_INFINITY;
+	return [orderIndex];
 }
 
 function compareOrderKey(a, b) {
@@ -589,6 +665,326 @@ function unwrapUniqueStyleParents(items, styleCounts) {
 	return result;
 }
 
+function collectOutlineItems(items, out = []) {
+	for (const item of items || []) {
+		out.push(item);
+		collectOutlineItems(item.children, out);
+	}
+	return out;
+}
+
+function flattenOutlineNodes(items, parent = null, out = []) {
+	for (const item of items || []) {
+		item._parentItem = parent;
+		out.push(item);
+		flattenOutlineNodes(item.children, item, out);
+	}
+	return out;
+}
+
+function clearParentLinks(items) {
+	for (const item of items || []) {
+		delete item._parentItem;
+		clearParentLinks(item.children);
+	}
+}
+
+function isAncestorOf(ancestor, item) {
+	let parent = item?._parentItem || null;
+	while (parent) {
+		if (parent === ancestor) {
+			return true;
+		}
+		parent = parent._parentItem || null;
+	}
+	return false;
+}
+
+function getOutlineOrderIndex(item) {
+	if (Array.isArray(item?.ref) && Number.isInteger(item.ref[0])) {
+		return item.ref[0];
+	}
+	return Number.isFinite(item?._orderIndex) ? item._orderIndex : Number.POSITIVE_INFINITY;
+}
+
+function removeFromCurrentParent(rootItems, item) {
+	const siblings = item._parentItem ? item._parentItem.children : rootItems;
+	if (!Array.isArray(siblings)) {
+		return;
+	}
+	const index = siblings.indexOf(item);
+	if (index !== -1) {
+		siblings.splice(index, 1);
+	}
+}
+
+function insertByOrder(parent, item) {
+	parent.children = Array.isArray(parent.children) ? parent.children : [];
+	const orderIndex = getOutlineOrderIndex(item);
+	let index = parent.children.findIndex(child => getOutlineOrderIndex(child) > orderIndex);
+	if (index === -1) {
+		index = parent.children.length;
+	}
+	parent.children.splice(index, 0, item);
+	item._parentItem = parent;
+}
+
+function numericPartsStartWith(parts, prefix) {
+	return Array.isArray(parts)
+		&& Array.isArray(prefix)
+		&& prefix.length > 0
+		&& parts.length > prefix.length
+		&& prefix.every((part, index) => part === parts[index]);
+}
+
+function findNumericParent(item, nodes) {
+	if (!Array.isArray(item?._numericParts) || item._numericParts.length <= 1) {
+		return null;
+	}
+	const currentParentParts = item._parentItem?._numericParts || [];
+	if (currentParentParts.length > 0 && numericPartsStartWith(item._numericParts, currentParentParts)) {
+		return null;
+	}
+	if (item._parentItem && currentParentParts.length === 0) {
+		return null;
+	}
+
+	const itemOrderIndex = getOutlineOrderIndex(item);
+	let best = null;
+	for (const candidate of nodes) {
+		if (candidate === item || !Array.isArray(candidate?._numericParts)) {
+			continue;
+		}
+		if (!numericPartsStartWith(item._numericParts, candidate._numericParts)) {
+			continue;
+		}
+		if (getOutlineOrderIndex(candidate) > itemOrderIndex) {
+			continue;
+		}
+		if (!best
+			|| candidate._numericParts.length > best._numericParts.length
+			|| (
+				candidate._numericParts.length === best._numericParts.length
+				&& getOutlineOrderIndex(candidate) > getOutlineOrderIndex(best)
+			)) {
+			best = candidate;
+		}
+	}
+	return best;
+}
+
+function repairNumericHierarchy(items) {
+	if (!Array.isArray(items) || !items.length) {
+		return items;
+	}
+	const nodes = flattenOutlineNodes(items);
+	for (const item of nodes.slice().sort((a, b) => getOutlineOrderIndex(a) - getOutlineOrderIndex(b))) {
+		const parent = findNumericParent(item, nodes);
+		if (!parent || item._parentItem === parent || isAncestorOf(item, parent)) {
+			continue;
+		}
+		removeFromCurrentParent(items, item);
+		insertByOrder(parent, item);
+	}
+	clearParentLinks(items);
+	return items;
+}
+
+function conflictsWithNumericHierarchy(parent, child) {
+	const parentParts = parent?._numericParts || [];
+	const childParts = child?._numericParts || [];
+	return parentParts.length > 0
+		&& childParts.length > 0
+		&& !numericPartsStartWith(childParts, parentParts);
+}
+
+function buildNativeItemMap(nativeMatches, items) {
+	const itemByBlockIndex = new Map();
+	for (const item of collectOutlineItems(items)) {
+		if (Array.isArray(item.ref) && Number.isInteger(item.ref[0])) {
+			itemByBlockIndex.set(item.ref[0], item);
+		}
+	}
+
+	const nativeItemMap = new Map();
+	for (const { native, block } of nativeMatches) {
+		const item = itemByBlockIndex.get(block._blockIndex);
+		if (item) {
+			nativeItemMap.set(native, item);
+		}
+	}
+	return nativeItemMap;
+}
+
+function isTerminalTitleItem(item) {
+	return !!item?._forceTopTerminal
+		|| isReferenceTerminalTitle(item?.title)
+		|| isAcknowledgmentTopTitle(item?.title);
+}
+
+function repairNativeParentHierarchy(items, nativeMatches) {
+	if (!Array.isArray(items) || !items.length || !nativeMatches.length) {
+		return items;
+	}
+
+	flattenOutlineNodes(items);
+	const nativeItemMap = buildNativeItemMap(nativeMatches, items);
+	for (const { native } of nativeMatches) {
+		const item = nativeItemMap.get(native);
+		const parent = nativeItemMap.get(native?._parent);
+		if (!item || !parent || item._parentItem === parent || isAncestorOf(item, parent)) {
+			continue;
+		}
+		if (getOutlineOrderIndex(parent) > getOutlineOrderIndex(item)) {
+			continue;
+		}
+		if (isTerminalTitleItem(item)
+			|| isTerminalTitleItem(parent)
+			|| conflictsWithNumericHierarchy(parent, item)) {
+			continue;
+		}
+		removeFromCurrentParent(items, item);
+		insertByOrder(parent, item);
+	}
+	clearParentLinks(items);
+	return items;
+}
+
+function getSinglePartExplicitMarker(item) {
+	if (!Array.isArray(item?._numericParts) || item._numericParts.length !== 1) {
+		return null;
+	}
+	const match = /^\s*([A-Za-z]+|\d+)([.)])\s+/u.exec(item.title || '');
+	if (!match) {
+		return null;
+	}
+	const value = match[1];
+	let kind;
+	if (/^\d+$/u.test(value)) {
+		kind = 'decimal';
+	}
+	else if (/^[ivx]+$/u.test(value)) {
+		kind = 'roman';
+	}
+	else if (/^[a-z]$/u.test(value)) {
+		kind = 'lower-alpha';
+	}
+	else if (/^[A-Z]$/u.test(value)) {
+		kind = 'upper-alpha';
+	}
+	else {
+		return null;
+	}
+	return { kind, value: value.toLowerCase() };
+}
+
+function getMarkerTransitionKey(parentMarker, childMarker) {
+	if (!parentMarker || !childMarker || parentMarker.kind === childMarker.kind) {
+		return null;
+	}
+	return `${parentMarker.kind}\0${childMarker.kind}`;
+}
+
+function getRepeatedMarkerTransitions(items) {
+	const counts = new Map();
+	function visit(siblings) {
+		let previous = null;
+		for (const item of siblings || []) {
+			const marker = getSinglePartExplicitMarker(item);
+			const previousMarker = getSinglePartExplicitMarker(previous);
+			const key = getMarkerTransitionKey(previousMarker, marker);
+			if (key) {
+				counts.set(key, (counts.get(key) || 0) + 1);
+			}
+			visit(item.children);
+			previous = item;
+		}
+	}
+	visit(items);
+	return new Set([...counts].filter(([, count]) => count >= 2).map(([key]) => key));
+}
+
+function findLastMarkerKindIndex(stack, kind) {
+	for (let i = stack.length - 1; i >= 0; i--) {
+		if (stack[i].marker?.kind === kind) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+function appendMixedMarkerItem(result, stack, repeatedTransitions, item) {
+	const marker = getSinglePartExplicitMarker(item);
+	if (!marker) {
+		result.push(item);
+		stack.length = 0;
+		return;
+	}
+
+	const sameKindIndex = findLastMarkerKindIndex(stack, marker.kind);
+	if (sameKindIndex !== -1) {
+		const parentEntry = stack[sameKindIndex - 1] || null;
+		if (parentEntry) {
+			insertByOrder(parentEntry.item, item);
+		}
+		else {
+			result.push(item);
+		}
+		stack.length = sameKindIndex;
+		stack.push({ item, marker });
+		return;
+	}
+
+	for (let i = stack.length - 1; i >= 0; i--) {
+		const key = getMarkerTransitionKey(stack[i].marker, marker);
+		if (repeatedTransitions.has(key)) {
+			insertByOrder(stack[i].item, item);
+			stack.length = i + 1;
+			stack.push({ item, marker });
+			return;
+		}
+	}
+
+	result.push(item);
+	stack.length = 0;
+	stack.push({ item, marker });
+}
+
+function repairMixedMarkerHierarchy(items) {
+	const repeatedTransitions = getRepeatedMarkerTransitions(items);
+	if (!repeatedTransitions.size) {
+		return items;
+	}
+	function repairSiblings(siblings) {
+		const result = [];
+		const stack = [];
+		for (const item of siblings || []) {
+			item.children = repairSiblings(item.children);
+			appendMixedMarkerItem(result, stack, repeatedTransitions, item);
+		}
+		return result;
+	}
+	return repairSiblings(items);
+}
+
+function liftTerminalChildren(items) {
+	if (!Array.isArray(items) || !items.length) {
+		return items;
+	}
+	const result = [];
+	for (const item of items) {
+		item.children = liftTerminalChildren(item.children);
+		if (isTerminalTitleItem(item) && item.children?.length) {
+			const children = item.children;
+			item.children = [];
+			result.push(item, ...children);
+			continue;
+		}
+		result.push(item);
+	}
+	return result;
+}
+
 function normalizeLevels(items, depth = 1) {
 	for (const item of items) {
 		item._level = depth;
@@ -640,7 +1036,7 @@ export async function getOutline(blocks, titleRef, pdfDocument) {
 	const recoveredItems = recoverInlineHeadings(allBlocksByPage, confirmedStyles, usedBlockIndices);
 	combined.push(...recoveredItems);
 
-	// Sort by document order
+	// Sort by SDT block order; visual y-order breaks multi-column outlines.
 	for (const item of combined) {
 		item._orderKey = getNodeOrderKey(item);
 	}
@@ -664,6 +1060,11 @@ export async function getOutline(blocks, titleRef, pdfDocument) {
 		styleCounts.set(key, stat.count);
 	}
 	const unwrapped = unwrapUniqueStyleParents(outline, styleCounts);
-	normalizeLevels(unwrapped, 1);
-	return unwrapped.map(filterOutlineItem).filter(Boolean);
+	markKeywordTitleTerminals(unwrapped);
+	repairNativeParentHierarchy(unwrapped, nativeMatches);
+	repairNumericHierarchy(unwrapped);
+	const markerRepaired = repairMixedMarkerHierarchy(unwrapped);
+	const terminalLifted = liftTerminalChildren(markerRepaired);
+	normalizeLevels(terminalLifted, 1);
+	return terminalLifted.map(filterOutlineItem).filter(Boolean);
 }

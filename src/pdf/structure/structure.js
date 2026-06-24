@@ -389,7 +389,10 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 	applyRefs(structure, citationRefs);
 
-	let outline = await getOutline(structure.content, [], pdfDocument);
+	let referenceTitleRefs = referenceLists
+		.map(referenceList => referenceList.titleRef)
+		.filter(Array.isArray);
+	let outline = await getOutline(structure.content, referenceTitleRefs, pdfDocument);
 	if (outline.length) {
 		structure.catalog.outline = outline;
 	}

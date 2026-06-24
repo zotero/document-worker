@@ -41,8 +41,8 @@
 				"title": "3. Trace Trees",
 				"ref": [55],
 				"children": [
-					{"title": "Type specialization.", "ref": [68]},
 					{"title": "3.1 Traces", "ref": [57]},
+					{"title": "Type specialization.", "ref": [68]},
 					{"title": "3.2 Trace Trees", "ref": [78]},
 					{"title": "3.3 Blacklisting", "ref": [91]}
 				]
@@ -58,25 +58,24 @@
 			{
 				"title": "5. Trace Tree Optimization",
 				"ref": [127],
-				"children": [{"title": "5.1 Optimizations", "ref": [129]}]
+				"children": [
+					{"title": "5.1 Optimizations", "ref": [129]},
+					{"title": "5.2 Register Allocation", "ref": [138]}
+				]
 			},
 			{
 				"title": "6. Implementation",
 				"ref": [146],
 				"children": [
 					{"title": "6.1 Calling Compiled Traces", "ref": [152]},
-					{"title": "5.2 Register Allocation", "ref": [138]},
 					{"title": "6.2 Trace Stitching", "ref": [158]},
 					{"title": "6.3 Trace Recording", "ref": [163]},
 					{"title": "6.4 Preemption", "ref": [170]},
-					{"title": "6.5 Calling External Functions", "ref": [174]}
+					{"title": "6.5 Calling External Functions", "ref": [174]},
+					{"title": "6.6 Correctness", "ref": [185]}
 				]
 			},
-			{
-				"title": "7. Evaluation",
-				"ref": [191],
-				"children": [{"title": "6.6 Correctness", "ref": [185]}]
-			},
+			{"title": "7. Evaluation", "ref": [191]},
 			{"title": "8. Related Work", "ref": [214]},
 			{"title": "9. Conclusions", "ref": [237]},
 			{"title": "10. Future Work", "ref": [240]},

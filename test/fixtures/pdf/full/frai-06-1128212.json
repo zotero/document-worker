@@ -40,6 +40,7 @@
 		],
 		"outline": [
 			{"title": "COPYRIGHT", "ref": [7]},
+			{"title": "No silver bullet: interpretable ML models must be explained", "ref": [9]},
 			{"title": "KEYWORDS", "ref": [13]},
 			{"title": "1. Introduction", "ref": [15]},
 			{
@@ -50,13 +51,12 @@
 					{
 						"title": "2.2. ML models regarded as interpretable",
 						"ref": [33],
-						"children": [{"title": "2.2.1. Decision trees", "ref": [35]}]
+						"children": [
+							{"title": "2.2.1. Decision trees", "ref": [35]},
+							{"title": "2.2.2. Decision lists and sets", "ref": [40]}
+						]
 					},
-					{
-						"title": "2.3. Logic foundations",
-						"ref": [50],
-						"children": [{"title": "2.2.2. Decision lists and sets", "ref": [40]}]
-					}
+					{"title": "2.3. Logic foundations", "ref": [50]}
 				]
 			},
 			{
@@ -73,19 +73,19 @@
 				"title": "4. How to understand interpretable ML models?",
 				"ref": [106],
 				"children": [
-					{"title": "4.2. Defining model comprehensibility", "ref": [118]},
 					{
 						"title": "4.1. How to comprehend predictions?",
 						"ref": [108],
-						"children": [
-							{"title": "“Given an instance (v, c), why is the prediction c?”", "ref": [110]},
-							{"title": "4.3.2. Decision lists", "ref": [142]}
-						]
+						"children": [{"title": "“Given an instance (v, c), why is the prediction c?”", "ref": [110]}]
 					},
+					{"title": "4.2. Defining model comprehensibility", "ref": [118]},
 					{
 						"title": "4.3. Are interpretable models indeed comprehensible?",
 						"ref": [129],
-						"children": [{"title": "4.3.1. Decision trees", "ref": [131]}]
+						"children": [
+							{"title": "4.3.1. Decision trees", "ref": [131]},
+							{"title": "4.3.2. Decision lists", "ref": [142]}
+						]
 					}
 				]
 			},
@@ -96,27 +96,26 @@
 					{"title": "5.1. Non-comprehensibility of decision trees", "ref": [168]},
 					{"title": "5.2. Non-comprehensibility of decision lists", "ref": [174]},
 					{"title": "5.3. Non-comprehensibility of decision sets", "ref": [178]},
-					{"title": "5.4. Answering WHYNOT questions can be hard", "ref": [180]},
-					{"title": "6.1. Measuring explanation redundancy", "ref": [209]}
+					{"title": "5.4. Answering WHYNOT questions can be hard", "ref": [180]}
 				]
 			},
 			{
 				"title": "6. Experimental evidence",
 				"ref": [203],
-				"children": [{"title": "6.2. Redundancy of default explanations", "ref": [216]}]
+				"children": [
+					{"title": "6.1. Measuring explanation redundancy", "ref": [209]},
+					{"title": "6.2. Redundancy of default explanations", "ref": [216]},
+					{"title": "6.3. Additional classifiers", "ref": [220]}
+				]
 			},
-			{
-				"title": "7. Discussion",
-				"ref": [223],
-				"children": [{"title": "6.3. Additional classifiers", "ref": [220]}]
-			},
+			{"title": "7. Discussion", "ref": [223]},
 			{"title": "8. Conclusion and research directions", "ref": [235]},
+			{"title": "Data availability statement", "ref": [244]},
+			{"title": "Author contributions", "ref": [246]},
 			{"title": "Funding", "ref": [248]},
 			{"title": "Acknowledgments", "ref": [250]},
 			{"title": "Conflict of interest", "ref": [252]},
-			{"title": "Data availability statement", "ref": [244]},
 			{"title": "Publisher’s note", "ref": [254]},
-			{"title": "Author contributions", "ref": [246]},
 			{"title": "References", "ref": [256]}
 		]
 	},

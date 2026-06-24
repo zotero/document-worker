@@ -245,18 +245,13 @@
 					}
 				]
 			},
+			{"title": "References", "ref": [121]},
 			{
-				"title": "References",
-				"ref": [121],
-				"children": [
-					{
-						"title": "2.1 Major Ethical Systems",
-						"ref": [126],
-						"children": [{"title": "Overview of Ethical Theories", "ref": [131]}]
-					},
-					{"title": "2.2 Utilitarian Ethics", "ref": [143]}
-				]
+				"title": "2.1 Major Ethical Systems",
+				"ref": [126],
+				"children": [{"title": "Overview of Ethical Theories", "ref": [131]}]
 			},
+			{"title": "2.2 Utilitarian Ethics", "ref": [143]},
 			{
 				"title": "Q. How can utilitarian theory assist law enforcement in moral dilemmas?",
 				"ref": [160],
@@ -358,13 +353,7 @@
 								"children": [{"title": "Text Attribution", "ref": [436]}]
 							}
 						]
-					}
-				]
-			},
-			{
-				"title": "Media Attributions",
-				"ref": [438],
-				"children": [
+					},
 					{
 						"title": "4.4 Person, Gender, and Cultural Differences in Conformity",
 						"ref": [441],
@@ -382,13 +371,7 @@
 								"children": [{"title": "Text Attribution", "ref": [484]}]
 							}
 						]
-					}
-				]
-			},
-			{
-				"title": "Media Attributions",
-				"ref": [486],
-				"children": [
+					},
 					{
 						"title": "4.5 Ethical Issues during an Investigation",
 						"ref": [489],
@@ -412,6 +395,8 @@
 					}
 				]
 			},
+			{"title": "Media Attributions", "ref": [438]},
+			{"title": "Media Attributions", "ref": [486]},
 			{"title": "Situation:", "ref": [561]},
 			{"title": "Subject Behaviour", "ref": [567]},
 			{
@@ -526,8 +511,8 @@
 				"ref": [1062],
 				"children": [
 					{"title": "1.00 March 14, 2015 Book published", "ref": [1068]},
-					{"title": "Accessibility remediation:", "ref": [1072]},
 					{"title": "2.00 July 11, 2019 Entire book revised for accessibility.", "ref": [1071]},
+					{"title": "Accessibility remediation:", "ref": [1072]},
 					{"title": "2.02 September 9, 2021 New content added", "ref": [1076]}
 				]
 			},
