@@ -662,7 +662,7 @@ async function getStructure(buf, password, dataProvider, options = {}) {
 	let useNativeONNX = typeof options.nativeONNXRun === 'function';
 	let onnxRuntimeProvider = useNativeONNX
 		? { type: 'native', run: options.nativeONNXRun }
-		: () => dataProvider('onnx/ort-wasm-simd.wasm');
+		: () => dataProvider('onnx/ort-wasm-simd-threaded.wasm');
 	let modelProvider = async (name) => {
 		let path = name.includes('/') ? name : name + '/model.onnx';
 		if (useNativeONNX && path.endsWith('.onnx')) {

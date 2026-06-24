@@ -1,4 +1,4 @@
-import * as ort from './ort.wasm.min.js';
+import * as ort from 'onnxruntime-web/wasm';
 import { Mutex } from '../../../mutex.js';
 import { createNativeRuntime } from './host-onnx-runtime.js';
 

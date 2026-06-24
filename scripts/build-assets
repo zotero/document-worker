@@ -15,7 +15,7 @@ cp pdf.js/external/openjpeg/openjpeg.wasm build/wasm/
 
 # ONNX runtime
 mkdir -p build/onnx
-cp src/pdf/structure/model/onnx/ort-wasm-simd.wasm build/onnx/
+cp node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm build/onnx/
 
 # ML model binaries
 mkdir -p build/block-seg/clusterer
