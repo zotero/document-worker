@@ -317,6 +317,12 @@ let currentFilePath = null;
 let currentPdfDoc = null;
 let currentPages = null;
 const PREVIEW_SOURCE_HASH = '00000000000000000000000000000000';
+const PDFJS_DOCUMENT_OPTIONS = {
+  cMapUrl: '/build/cmaps/',
+  cMapPacked: true,
+  standardFontDataUrl: '/build/standard_fonts/',
+  wasmUrl: '/build/wasm/'
+};
 
 // ── URL hash helpers ──
 
@@ -411,13 +417,13 @@ async function loadFromPath(filePath, savedScroll) {
   }
 
   try {
-    const resp = await fetch('/' + filePath);
+    const resp = await fetchPdfPath(filePath);
     if (!resp.ok) throw new Error(`Failed to fetch ${filePath}: ${resp.status}`);
     const buf = await resp.arrayBuffer();
 
     statusEl.textContent = 'Extracting structure...';
     const [pdfDoc, structure] = await Promise.all([
-      getDocument({ data: buf.slice(0) }).promise,
+      openPdfDocument(buf.slice(0)),
       extractStructure(buf.slice(0))
     ]);
 
@@ -486,7 +492,7 @@ async function loadFile(file) {
 
     statusEl.textContent = 'Extracting structure...';
     const [pdfDoc, structure] = await Promise.all([
-      getDocument({ data: buf.slice(0) }).promise,
+      openPdfDocument(buf.slice(0)),
       extractStructure(buf.slice(0))
     ]);
 
@@ -506,6 +512,20 @@ async function loadFile(file) {
     console.error(err);
     statusEl.textContent = `Error: ${err.message}`;
   }
+}
+
+function fetchPdfPath(filePath) {
+  if (filePath.startsWith('/')) {
+    return fetch('/__api/local-pdf?path=' + encodeURIComponent(filePath));
+  }
+  return fetch('/' + filePath);
+}
+
+function openPdfDocument(data) {
+  return getDocument({
+    data,
+    ...PDFJS_DOCUMENT_OPTIONS
+  }).promise;
 }
 
 async function extractStructure(buf) {

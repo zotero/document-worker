@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
-import { existsSync, readdirSync, statSync } from 'fs';
+import { createReadStream, existsSync, readdirSync, statSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEST_PDF_DIRS = ['test/fixtures/pdf/full', 'test/fixtures/pdf/extra'];
@@ -58,6 +58,30 @@ export default {
         const entries = TEST_PDF_DIRS.flatMap(collectPdfEntries).sort(comparePdfEntries);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(entries));
+      });
+      server.middlewares.use('/__api/local-pdf', (req, res) => {
+        const url = new URL(req.url, 'http://localhost');
+        const filePath = url.searchParams.get('path');
+        if (!filePath?.startsWith('/') || !filePath.toLowerCase().endsWith('.pdf')) {
+          res.statusCode = 400;
+          res.end('Expected an absolute .pdf path');
+          return;
+        }
+
+        try {
+          const stat = statSync(filePath);
+          if (!stat.isFile()) {
+            res.statusCode = 404;
+            res.end('Not a file');
+            return;
+          }
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader('Content-Length', String(stat.size));
+          createReadStream(filePath).pipe(res);
+        } catch {
+          res.statusCode = 404;
+          res.end('File not found');
+        }
       });
     }
   }, {

@@ -12,6 +12,7 @@ mkdir -p build/standard_fonts
 rsync -a --delete --exclude='.*' pdf.js/external/standard_fonts/ build/standard_fonts/
 mkdir -p build/wasm
 cp pdf.js/external/openjpeg/openjpeg.wasm build/wasm/
+cp pdf.js/external/jbig2/jbig2.wasm build/wasm/
 
 # ONNX runtime
 mkdir -p build/onnx
