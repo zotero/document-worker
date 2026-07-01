@@ -144,6 +144,141 @@ describe('refineGraphicBlocks', () => {
 		assert.deepEqual(refined[0].bbox, [10, 35, 50, 55]);
 	});
 
+	it('merges visually joined equation fragments without text continuation signals', () => {
+		const lines = [
+			line(0, 'Then, the following robust error estimate holds for QCBP ‖', [10, 78, 190, 108], 0),
+			line(1, 'x̂(η) − x‖2 ≤ √Cs σs(x)1 + Dη + E L 1', [80, 70, 158, 92], 1),
+			line(2, '2 max{‖n‖2 − η, 0}, (20)', [156, 64, 210, 88], 2),
+		];
+		const blocks = [
+			{ type: 'body', bbox: [10, 78, 190, 108], lines: [0], startOffset: 0, endOffset: 0 },
+			{ type: 'equation', flowClass: 'auxiliary', bbox: [80, 70, 158, 92], lines: [1], startOffset: 1, endOffset: 1 },
+			{ type: 'equation', flowClass: 'auxiliary', bbox: [156, 64, 210, 88], lines: [2], startOffset: 2, endOffset: 2 },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, []);
+
+		assert.equal(refined.length, 2);
+		assert.deepEqual(refined.map(block => block.type), ['body', 'equation']);
+		assert.deepEqual(refined[1].lines, [1, 2]);
+		assert.deepEqual(refined[1].bbox, [80, 64, 210, 92]);
+	});
+
+	it('does not merge stacked equations with only incidental bbox overlap', () => {
+		const lines = [
+			line(0, 'body blocker', [10, 85, 130, 105], 0),
+			line(1, 'abcdefghijklmnopqrstuvwxyz abcdefghijklmnopqrstuvwxyz', [20, 80, 120, 100], 1),
+			line(2, 'mnopqrstuvwxyz abcdefghijklmnopqrstuvwxyz abcdefghij', [20, 99.5, 120, 119.5], 2),
+		];
+		const blocks = [
+			{ type: 'body', bbox: [10, 85, 130, 105], lines: [0], startOffset: 0, endOffset: 0 },
+			{ type: 'equation', flowClass: 'auxiliary', bbox: [20, 80, 120, 100], lines: [1], startOffset: 1, endOffset: 1 },
+			{ type: 'equation', flowClass: 'auxiliary', bbox: [20, 99.5, 120, 119.5], lines: [2], startOffset: 2, endOffset: 2 },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, []);
+
+		assert.equal(refined.length, 3);
+		assert.deepEqual(refined.map(block => block.lines), [[0], [1], [2]]);
+	});
+
+	it('merges stacked display equation fragments with small gaps', () => {
+		const lines = [
+			line(0, 'λ := min', [80, 80, 125, 90], 0),
+			line(1, 'J⊂Hs K(J)≥2K(s)', [92, 63, 138, 78], 1),
+			line(2, '⎛', [140, 95, 148, 105], 2),
+			line(3, 'max', [150, 88, 170, 97], 3),
+			line(4, '|cν|/ων', [172, 88, 210, 98], 4),
+			line(5, 'min', [150, 70, 170, 79], 5),
+			line(6, 'ν∈J |cν|/ων', [150, 54, 210, 69], 6),
+			line(7, '⎞', [212, 95, 220, 105], 7),
+			line(8, '(4.15) ⎠ − 1.', [20, 78, 238, 90], 8),
+		];
+		const blocks = lines.map(item => ({
+			type: 'equation',
+			flowClass: 'auxiliary',
+			bbox: item.rect.slice(),
+			lines: [item.id],
+			startOffset: item.startOffset,
+			endOffset: item.endOffset,
+		}));
+
+		const refined = refineGraphicBlocks(blocks, lines, []);
+
+		assert.equal(refined.length, 1);
+		assert.equal(refined[0].type, 'equation');
+		assert.deepEqual(refined[0].lines, [0, 1, 2, 3, 4, 5, 6, 7, 8]);
+		assert.deepEqual(refined[0].bbox, [20, 54, 238, 105]);
+	});
+
+	it('merges display equation lines that continue with a leading operator', () => {
+		const lines = [
+			line(0, '∣∣∣‖Az‖22 − ‖z‖22∣∣∣ ≤ 4δ∫U |ψ(y,z)|2d + 5δ', [20, 80, 240, 110], 0),
+			line(1, '≤ 12δ + δ/3 + (1 + 4δ)', [60, 61, 180, 72], 1),
+			line(2, '∑ l∈L', [182, 50, 196, 80], 2),
+			line(3, '(1 + δ)2lκl,', [198, 61, 250, 74], 3),
+		];
+		const blocks = lines.map(item => ({
+			type: 'equation',
+			flowClass: 'auxiliary',
+			bbox: item.rect.slice(),
+			lines: [item.id],
+			startOffset: item.startOffset,
+			endOffset: item.endOffset,
+		}));
+
+		const refined = refineGraphicBlocks(blocks, lines, []);
+
+		assert.equal(refined.length, 1);
+		assert.deepEqual(refined[0].lines, [0, 1, 2, 3]);
+		assert.deepEqual(refined[0].bbox, [20, 50, 250, 110]);
+	});
+
+	it('merges display equation fragments across a small horizontal gap', () => {
+		const lines = [
+			line(0, 'g(y) =', [20, 60, 52, 69], 0),
+			line(1, '[ ∏ d/2', [58, 70, 96, 84], 1),
+			line(2, 'k=1 (1+4ky2 k)', [82, 58, 140, 68], 2),
+			line(3, '∏d', [30, 46, 44, 55], 3),
+			line(4, 'k=4 (100+5yk)', [46, 38, 120, 48], 4),
+			line(5, ']1/d', [152, 70, 170, 84], 5),
+		];
+		const blocks = lines.map(item => ({
+			type: 'equation',
+			flowClass: 'auxiliary',
+			bbox: item.rect.slice(),
+			lines: [item.id],
+			startOffset: item.startOffset,
+			endOffset: item.endOffset,
+		}));
+
+		const refined = refineGraphicBlocks(blocks, lines, []);
+
+		assert.equal(refined.length, 1);
+		assert.deepEqual(refined[0].lines, [0, 1, 2, 3, 4, 5]);
+		assert.deepEqual(refined[0].bbox, [20, 38, 170, 84]);
+	});
+
+	it('does not merge prose-like math blocks into the previous equation', () => {
+		const lines = [
+			line(0, '|ψ(y, z)| > (1 + δ)l−1 − δ/2', [40, 80, 220, 110], 0),
+			line(1, 'If y is not in the set, then ψ(y, z) = 0.', [42, 50, 218, 78], 1),
+		];
+		const blocks = lines.map(item => ({
+			type: 'equation',
+			flowClass: 'auxiliary',
+			bbox: item.rect.slice(),
+			lines: [item.id],
+			startOffset: item.startOffset,
+			endOffset: item.endOffset,
+		}));
+
+		const refined = refineGraphicBlocks(blocks, lines, []);
+
+		assert.equal(refined.length, 2);
+		assert.deepEqual(refined.map(block => block.lines), [[0], [1]]);
+	});
+
 	it('does not swallow an object that is closer to a nearby non-graphic block', () => {
 		const lines = [
 			line(0, 'Figure label', [10, 10, 20, 20], 0),

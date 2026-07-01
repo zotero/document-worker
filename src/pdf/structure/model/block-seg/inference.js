@@ -44,6 +44,12 @@ const SCANNED_TABLE_HEADER_MIN_UPPERCASE_RATIO = 0.7;
 const SCANNED_TABLE_JUNK_MAX_TEXT_LENGTH = 8;
 const SCANNED_TABLE_JUNK_MAX_WIDTH_RATIO = 0.08;
 const SCANNED_TABLE_MAX_FRAGMENT_GAP_RATIO = 4;
+const DISPLAY_EQUATION_MAX_FRAGMENT_GAP_RATIO = 2.5;
+const DISPLAY_EQUATION_MAX_HORIZONTAL_GAP_RATIO = 1.5;
+const DISPLAY_EQUATION_FRAGMENT_MAX_TEXT_LENGTH = 32;
+const DISPLAY_EQUATION_SHORT_TEXT_LENGTH = 12;
+const DISPLAY_EQUATION_VISUAL_JOIN_MIN_VERTICAL_OVERLAP_RATIO = 0.5;
+const DISPLAY_EQUATION_VISUAL_JOIN_MAX_HORIZONTAL_GAP_RATIO = 0.25;
 
 function getPageNumber(pageDataItem) {
 	return Number.isInteger(pageDataItem?.pageIndex) ? pageDataItem.pageIndex + 1 : '?';
@@ -1381,6 +1387,215 @@ function canMergeEquationBlocks(first, second, blockContext) {
 	return clearSightRect(unionRects([first.bbox, second.bbox]), blockers);
 }
 
+function getEquationFragmentText(block, lines) {
+	return getBlockLineText(block, lines).replace(/\s+/g, ' ').trim();
+}
+
+function hasEquationFragmentSignal(block, lines) {
+	const text = getEquationFragmentText(block, lines);
+	if (!text) {
+		return false;
+	}
+	if (text.length <= DISPLAY_EQUATION_SHORT_TEXT_LENGTH) {
+		return true;
+	}
+	if (/^[()[\]{}⎛⎝⎞⎠|∣∥√∑∏,.;:]+$/u.test(text)) {
+		return true;
+	}
+	if (text.length <= DISPLAY_EQUATION_FRAGMENT_MAX_TEXT_LENGTH) {
+		if (/^(?:[()[\]{}⎛⎝⎞⎠]|[=≤≥<>+\-−*/]|√|∑|∏|max\b|min\b|sup\b|inf\b)/u.test(text)) {
+			return true;
+		}
+		if (/(?:[=≤≥<>+\-−*/]|\bmax\b|\bmin\b|\bsup\b|\binf\b|[([{⎛⎝√∑∏])$/u.test(text)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function startsDisplayEquationContinuation(block, lines) {
+	const text = getEquationFragmentText(block, lines);
+	return /^(?:[=≤≥<>+\-−*/|]|\)|\]|\}|⎞|⎠|∣|∥|√|∑|∏|max\b|min\b|sup\b|inf\b)/u.test(text);
+}
+
+function endsDisplayEquationContinuation(block, lines) {
+	const text = getEquationFragmentText(block, lines);
+	return /(?:[=≤≥<>+\-−*/]|\bmax\b|\bmin\b|\bsup\b|\binf\b|[([{⎛⎝√∑∏])$/u.test(text);
+}
+
+function isProseLikeMathBlock(block, lines) {
+	const text = getEquationFragmentText(block, lines);
+	if (!/^(?:If|Then|For|Since|Thus|Hence|Therefore)\b/.test(text)) {
+		return false;
+	}
+	const words = text.match(/[A-Za-z]{2,}/g) || [];
+	return words.length >= 3;
+}
+
+function hasDisplayEquationContinuationSignal(first, second, lines) {
+	if (isProseLikeMathBlock(second, lines)) {
+		return false;
+	}
+	return hasEquationFragmentSignal(first, lines)
+		|| hasEquationFragmentSignal(second, lines)
+		|| endsDisplayEquationContinuation(first, lines)
+		|| startsDisplayEquationContinuation(second, lines);
+}
+
+function horizontalGap(a, b) {
+	if (!isValidRect(a) || !isValidRect(b)) {
+		return Infinity;
+	}
+	if (b[0] > a[2]) {
+		return b[0] - a[2];
+	}
+	if (a[0] > b[2]) {
+		return a[0] - b[2];
+	}
+	return 0;
+}
+
+function displayEquationHorizontallyRelated(first, second, lineHeight) {
+	return horizontallyRelated(first.bbox, second.bbox)
+		|| horizontalGap(first.bbox, second.bbox) <= lineHeight * DISPLAY_EQUATION_MAX_HORIZONTAL_GAP_RATIO;
+}
+
+function verticalOverlapRatio(a, b) {
+	if (!isValidRect(a) || !isValidRect(b)) {
+		return 0;
+	}
+	const overlap = Math.min(a[3], b[3]) - Math.max(a[1], b[1]);
+	if (overlap <= 0) {
+		return 0;
+	}
+	const minHeight = Math.max(Math.min(a[3] - a[1], b[3] - b[1]), MIN_SIGHT_OVERLAP);
+	return overlap / minHeight;
+}
+
+function visuallyJoinedEquationFragments(first, second, lineHeight) {
+	return verticalOverlapRatio(first.bbox, second.bbox) >= DISPLAY_EQUATION_VISUAL_JOIN_MIN_VERTICAL_OVERLAP_RATIO
+		&& horizontalGap(first.bbox, second.bbox) <= lineHeight * DISPLAY_EQUATION_VISUAL_JOIN_MAX_HORIZONTAL_GAP_RATIO;
+}
+
+function canContinueDisplayEquationRun(first, second, lines) {
+	if (first?.type !== 'equation' || second?.type !== 'equation') {
+		return false;
+	}
+	if (!isValidRect(first.bbox) || !isValidRect(second.bbox)) {
+		return false;
+	}
+	const lineHeight = Math.max(
+		getBlockLineHeight(first, lines),
+		getBlockLineHeight(second, lines),
+		1
+	);
+	if (visuallyJoinedEquationFragments(first, second, lineHeight)) {
+		return true;
+	}
+	if (verticalGap(first.bbox, second.bbox) > lineHeight * DISPLAY_EQUATION_MAX_FRAGMENT_GAP_RATIO) {
+		return false;
+	}
+	if (!displayEquationHorizontallyRelated(first, second, lineHeight)) {
+		return false;
+	}
+	if (!hasDisplayEquationContinuationSignal(first, second, lines)) {
+		return false;
+	}
+	return true;
+}
+
+function createMergedGraphicBlockRun(blockIndexes, blocks, lines) {
+	const sourceBlock = blocks[blockIndexes[0]];
+	const lineIds = [];
+	for (const blockIndex of blockIndexes) {
+		lineIds.push(...(blocks[blockIndex].lines || []));
+	}
+	const uniqueLineIds = [...new Set(lineIds)]
+		.filter(lineId => getLineRect(lines, lineId))
+		.sort((a, b) => {
+			const lineA = lines[a];
+			const lineB = lines[b];
+			return (lineA?.startOffset ?? a) - (lineB?.startOffset ?? b);
+		});
+	const bbox = unionRects(blockIndexes.map(blockIndex => blocks[blockIndex].bbox));
+	const metrics = getLineBlockMetrics(uniqueLineIds, lines, bbox);
+	return {
+		...sourceBlock,
+		flowClass: blockIndexes
+			.map(blockIndex => blocks[blockIndex].flowClass)
+			.find(Boolean) || sourceBlock.flowClass,
+		lines: uniqueLineIds,
+		bbox,
+		startOffset: metrics.startOffset,
+		endOffset: metrics.endOffset,
+	};
+}
+
+function mergeDisplayEquationFragmentRunsOnce(blocks, lines) {
+	const mergeByFirstIndex = new Map();
+	const skipIndexes = new Set();
+
+	for (let start = 0; start < blocks.length;) {
+		if (blocks[start]?.type !== 'equation') {
+			start++;
+			continue;
+		}
+
+		let end = start;
+		while (end + 1 < blocks.length && blocks[end + 1]?.type === 'equation') {
+			end++;
+		}
+
+		let i = start;
+		while (i <= end) {
+			const run = [i];
+			while (run[run.length - 1] < end) {
+				const previousIndex = run[run.length - 1];
+				const nextIndex = previousIndex + 1;
+				if (!canContinueDisplayEquationRun(blocks[previousIndex], blocks[nextIndex], lines)) {
+					break;
+				}
+				run.push(nextIndex);
+			}
+			if (run.length > 1) {
+				mergeByFirstIndex.set(run[0], createMergedGraphicBlockRun(run, blocks, lines));
+				for (const blockIndex of run.slice(1)) {
+					skipIndexes.add(blockIndex);
+				}
+			}
+			i = run[run.length - 1] + 1;
+		}
+
+		start = end + 1;
+	}
+
+	if (!mergeByFirstIndex.size) {
+		return { blocks, changed: false };
+	}
+
+	const result = [];
+	for (let i = 0; i < blocks.length; i++) {
+		if (skipIndexes.has(i)) {
+			continue;
+		}
+		result.push(mergeByFirstIndex.get(i) || blocks[i]);
+	}
+	return { blocks: result, changed: true };
+}
+
+function mergeDisplayEquationFragmentRuns(blocks, lines) {
+	let result = blocks;
+	let didMerge = false;
+	let changed = true;
+	while (changed) {
+		const merged = mergeDisplayEquationFragmentRunsOnce(result, lines);
+		result = merged.blocks;
+		changed = merged.changed;
+		didMerge ||= changed;
+	}
+	return { blocks: result, changed: didMerge };
+}
+
 function mergeAdjacentGraphicBlocks(blocks, lines) {
 	let result = blocks;
 	let didMerge = false;
@@ -1557,7 +1772,9 @@ export function refineGraphicBlocks(blocks, lines, objectLines = [], pageRect = 
 	refined = expanded.blocks;
 	let merged = mergeAdjacentGraphicBlocks(refined, lines);
 	refined = merged.blocks;
-	if (expanded.changed || merged.changed) {
+	let displayMerged = mergeDisplayEquationFragmentRuns(refined, lines);
+	refined = displayMerged.blocks;
+	if (expanded.changed || merged.changed || displayMerged.changed) {
 		refinedBlockContext = buildBlockRefinementContext(refined, lines);
 		refined = expandGraphicBlocks(refined, refinedBlockContext, lines, objectContext).blocks;
 	}
