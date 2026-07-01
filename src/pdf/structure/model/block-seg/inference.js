@@ -34,6 +34,16 @@ const RULED_TABLE_MAX_FRAGMENT_GAP_RATIO = 3;
 const RULED_TABLE_MIN_HEADER_FRAGMENTS = 8;
 const RULED_TABLE_MIN_HEADER_LINES = 8;
 const RULED_TABLE_TEXT_BLOCK_TYPES = new Set(['body', 'caption', 'footnote', 'list_item']);
+const SCANNED_TABLE_MIN_FRAGMENTS = 4;
+const SCANNED_TABLE_CAPTION_GAP_RATIO = 4;
+const SCANNED_TABLE_MIN_PAGE_IMAGE_COVERAGE = 0.8;
+const SCANNED_TABLE_MAX_WIDTH_RATIO = 0.6;
+const SCANNED_TABLE_HEADER_TOP_BAND_RATIO = 0.12;
+const SCANNED_TABLE_HEADER_MAX_TEXT_LENGTH = 40;
+const SCANNED_TABLE_HEADER_MIN_UPPERCASE_RATIO = 0.7;
+const SCANNED_TABLE_JUNK_MAX_TEXT_LENGTH = 8;
+const SCANNED_TABLE_JUNK_MAX_WIDTH_RATIO = 0.08;
+const SCANNED_TABLE_MAX_FRAGMENT_GAP_RATIO = 4;
 
 function getPageNumber(pageDataItem) {
 	return Number.isInteger(pageDataItem?.pageIndex) ? pageDataItem.pageIndex + 1 : '?';
@@ -191,6 +201,14 @@ function rectsEqual(a, b) {
 function getLineRect(lines, lineId) {
 	const line = lines[lineId];
 	return isValidRect(line?.rect) ? line.rect : null;
+}
+
+function getBlockLineText(block, lines) {
+	return (block?.lines || [])
+		.map(lineId => lines[lineId]?.text || '')
+		.join(' ')
+		.replace(/\s+/g, ' ')
+		.trim();
 }
 
 function getBlockLineHeight(block, lines) {
@@ -671,6 +689,192 @@ function createMergedTableBlock(blockIndexes, blocks, lines, bbox) {
 		startOffset: metrics.startOffset,
 		endOffset: metrics.endOffset,
 	};
+}
+
+function hasFullPageImageObject(objectContext, pageRect) {
+	if (!isValidRect(pageRect)) {
+		return false;
+	}
+	const pageArea = validRectArea(pageRect);
+	if (pageArea <= 0) {
+		return false;
+	}
+	return objectContext.validObjects.some(object => (
+		OBJECT_IMAGE_SUBTYPES.has(object.subtype)
+		&& validRectArea(object.bbox) / pageArea >= SCANNED_TABLE_MIN_PAGE_IMAGE_COVERAGE
+	));
+}
+
+function isNearbyTableCaption(block, tableBbox, lines) {
+	if (block?.type !== 'caption') {
+		return false;
+	}
+	const captionBbox = getTableBlockTextBbox(block, lines);
+	if (!captionBbox || !tableBbox) {
+		return false;
+	}
+	const lineHeight = Math.max(getBlockLineHeight(block, lines), 1);
+	return verticalGap(captionBbox, tableBbox) <= lineHeight * SCANNED_TABLE_CAPTION_GAP_RATIO
+		&& horizontalOverlapRatio(captionBbox, tableBbox) >= RULED_TABLE_MIN_TEXT_OVERLAP;
+}
+
+function startsScannedTableCaption(block, lines) {
+	return /^table\b/i.test(getBlockLineText(block, lines));
+}
+
+function isLeadingScannedHeaderFragment(block, lines, pageRect) {
+	if (block?.type !== 'table' || !isValidRect(block.bbox) || !isValidRect(pageRect)) {
+		return false;
+	}
+	const text = getBlockLineText(block, lines);
+	if (!text || text.length > SCANNED_TABLE_HEADER_MAX_TEXT_LENGTH || startsScannedTableCaption(block, lines)) {
+		return false;
+	}
+	const pageHeight = Math.max(1, pageRect[3] - pageRect[1]);
+	const centerY = (block.bbox[1] + block.bbox[3]) / 2;
+	if (centerY < pageRect[3] - pageHeight * SCANNED_TABLE_HEADER_TOP_BAND_RATIO) {
+		return false;
+	}
+	const letters = text.match(/\p{L}/gu) || [];
+	if (!letters.length || /\d/u.test(text)) {
+		return false;
+	}
+	const uppercaseLetters = letters.filter(letter => letter === letter.toUpperCase()).length;
+	return uppercaseLetters / letters.length >= SCANNED_TABLE_HEADER_MIN_UPPERCASE_RATIO;
+}
+
+function createExcludedTextBlock(block) {
+	return {
+		...block,
+		type: 'body',
+		flowClass: 'excluded',
+	};
+}
+
+function isTinyScannedTableJunk(block, lines, pageRect) {
+	if (block?.type !== 'table' || !isValidRect(block.bbox) || !isValidRect(pageRect)) {
+		return false;
+	}
+	const text = getBlockLineText(block, lines);
+	if (!text || text.length > SCANNED_TABLE_JUNK_MAX_TEXT_LENGTH || /\p{L}/u.test(text)) {
+		return false;
+	}
+	const pageWidth = Math.max(1, pageRect[2] - pageRect[0]);
+	return (block.bbox[2] - block.bbox[0]) / pageWidth <= SCANNED_TABLE_JUNK_MAX_WIDTH_RATIO;
+}
+
+function cleanupScannedTableJunkFragments(blocks, lines, objectContext, pageRect) {
+	if (!hasFullPageImageObject(objectContext, pageRect)) {
+		return blocks;
+	}
+	let changed = false;
+	const result = blocks.map(block => {
+		if (!isTinyScannedTableJunk(block, lines, pageRect)) {
+			return block;
+		}
+		changed = true;
+		return createExcludedTextBlock(block);
+	});
+	return changed ? result : blocks;
+}
+
+function canContinueDenseScannedTableRun(first, second, lines) {
+	const firstBbox = getTableBlockTextBbox(first, lines);
+	const secondBbox = getTableBlockTextBbox(second, lines);
+	if (!firstBbox || !secondBbox) {
+		return false;
+	}
+	const lineHeight = Math.max(
+		getBlockLineHeight(first, lines),
+		getBlockLineHeight(second, lines),
+		1
+	);
+	return verticalGap(firstBbox, secondBbox) <= lineHeight * SCANNED_TABLE_MAX_FRAGMENT_GAP_RATIO;
+}
+
+function getDenseScannedTableRuns(blocks, lines) {
+	const runs = [];
+	let run = [];
+	const flush = () => {
+		if (run.length >= SCANNED_TABLE_MIN_FRAGMENTS) {
+			runs.push(run);
+		}
+		run = [];
+	};
+
+	for (let i = 0; i < blocks.length; i++) {
+		const block = blocks[i];
+		if (block?.type !== 'table') {
+			flush();
+			continue;
+		}
+		if (run.length && !canContinueDenseScannedTableRun(blocks[run[run.length - 1]], block, lines)) {
+			flush();
+		}
+		run.push(i);
+	}
+	flush();
+	return runs;
+}
+
+function getScannedTableMergeSegment(blockIndexes, blocks, lines, textBbox) {
+	if (isNearbyTableCaption(blocks[blockIndexes[0] - 1], textBbox, lines)) {
+		return blockIndexes;
+	}
+	const captionOffset = blockIndexes.findIndex(blockIndex => startsScannedTableCaption(blocks[blockIndex], lines));
+	if (captionOffset < 0) {
+		return null;
+	}
+	return blockIndexes.slice(captionOffset);
+}
+
+function mergeDenseScannedTableFragments(blocks, lines, objectContext, pageRect) {
+	if (!hasFullPageImageObject(objectContext, pageRect)) {
+		return blocks;
+	}
+
+	const pageWidth = isValidRect(pageRect) ? Math.max(1, pageRect[2] - pageRect[0]) : 1;
+	const mergeByFirstIndex = new Map();
+	const replaceByIndex = new Map();
+	const skipIndexes = new Set();
+
+	for (const blockIndexes of getDenseScannedTableRuns(blocks, lines)) {
+		const textBbox = getTableRunTextBbox(blockIndexes, blocks, lines);
+		if (!textBbox || (textBbox[2] - textBbox[0]) / pageWidth > SCANNED_TABLE_MAX_WIDTH_RATIO) {
+			continue;
+		}
+		const mergeIndexes = getScannedTableMergeSegment(blockIndexes, blocks, lines, textBbox);
+		if (!mergeIndexes || mergeIndexes.length < SCANNED_TABLE_MIN_FRAGMENTS) {
+			continue;
+		}
+		const mergeBbox = getTableRunTextBbox(mergeIndexes, blocks, lines) || textBbox;
+		const firstIndex = mergeIndexes[0];
+		mergeByFirstIndex.set(firstIndex, createMergedTableBlock(mergeIndexes, blocks, lines, mergeBbox));
+		for (const blockIndex of mergeIndexes.slice(1)) {
+			skipIndexes.add(blockIndex);
+		}
+		for (const blockIndex of blockIndexes) {
+			if (blockIndex >= firstIndex) {
+				break;
+			}
+			if (isLeadingScannedHeaderFragment(blocks[blockIndex], lines, pageRect)) {
+				replaceByIndex.set(blockIndex, createExcludedTextBlock(blocks[blockIndex]));
+			}
+		}
+	}
+
+	if (!mergeByFirstIndex.size && !replaceByIndex.size) {
+		return blocks;
+	}
+
+	const result = [];
+	for (let i = 0; i < blocks.length; i++) {
+		if (skipIndexes.has(i)) {
+			continue;
+		}
+		result.push(mergeByFirstIndex.get(i) || replaceByIndex.get(i) || blocks[i]);
+	}
+	return result;
 }
 
 function mergeRuledTableFragments(blocks, lines, objectContext, pageRect) {
@@ -1358,6 +1562,8 @@ export function refineGraphicBlocks(blocks, lines, objectLines = [], pageRect = 
 		refined = expandGraphicBlocks(refined, refinedBlockContext, lines, objectContext).blocks;
 	}
 	refined = mergeRuledTableFragments(refined, lines, objectContext, pageRect);
+	refined = mergeDenseScannedTableFragments(refined, lines, objectContext, pageRect);
+	refined = cleanupScannedTableJunkFragments(refined, lines, objectContext, pageRect);
 	refined = insertObjectImageBlocks(refined, objectContext, pageRect);
 	return refined;
 }

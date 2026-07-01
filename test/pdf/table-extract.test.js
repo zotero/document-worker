@@ -53,4 +53,14 @@ describe('table grid extraction gates', () => {
 		assert.equal(isUsableTableGrid(grid(2, 2, 2), atoms(4)), false);
 		assert.equal(isUsableTableGrid(grid(10, 10, 4), atoms(4)), false);
 	});
+
+	it('rejects sparse grids even when every atom is placed', () => {
+		assert.equal(isUsableTableGrid(grid(5, 6, 13), atoms(13)), false);
+		assert.equal(isUsableTableGrid(grid(5, 6, 15), atoms(15)), true);
+	});
+
+	it('rejects wide grids unless the filled-cell density is strong', () => {
+		assert.equal(isUsableTableGrid(grid(5, 14, 40), atoms(40)), false);
+		assert.equal(isUsableTableGrid(grid(5, 14, 46), atoms(46)), true);
+	});
 });

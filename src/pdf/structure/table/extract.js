@@ -12,7 +12,9 @@ export const TABLE_GRID_LIMITS = {
 	maxCols: 24,
 	maxCells: 1000,
 	minAtomCoverage: 0.9,
-	minFilledCellDensity: 0.12,
+	minFilledCellDensity: 0.5,
+	wideGridMinCols: 10,
+	wideGridMinFilledCellDensity: 0.65,
 };
 
 function createFallbackNode({ pageIndex, block, chars }) {
@@ -85,6 +87,10 @@ export function isUsableTableGrid(grid, atoms) {
 		&& quality.cells <= TABLE_GRID_LIMITS.maxCells
 		&& quality.atomCoverage >= TABLE_GRID_LIMITS.minAtomCoverage
 		&& quality.filledCellDensity >= TABLE_GRID_LIMITS.minFilledCellDensity
+		&& (
+			quality.cols < TABLE_GRID_LIMITS.wideGridMinCols
+			|| quality.filledCellDensity >= TABLE_GRID_LIMITS.wideGridMinFilledCellDensity
+		)
 	);
 }
 

@@ -384,6 +384,140 @@ describe('refineGraphicBlocks', () => {
 		assert.deepEqual(refined[0].bbox, [5, 30, 95, 91]);
 	});
 
+	it('joins dense scanned table fragments after a nearby caption', () => {
+		const lines = [
+			line(0, 'TABLE I.-Smoking by disease group', [10, 90, 90, 98], 0),
+			line(1, 'Disease Group', [10, 75, 45, 83], 1),
+			line(2, 'Males:', [10, 65, 25, 73], 2),
+			line(3, 'Lung-carcinoma', [10, 55, 45, 63], 3),
+			line(4, 'patients (647)', [16, 45, 45, 53], 4),
+			line(5, '24 208 196 174 45', [52, 55, 95, 63], 5),
+			line(6, '(3.7%) (32.1%)', [52, 45, 90, 53], 6),
+		];
+		const blocks = [
+			{ type: 'caption', flowClass: 'auxiliary', bbox: [10, 90, 90, 98], lines: [0], startOffset: 0, endOffset: 0 },
+			{ type: 'table', flowClass: 'auxiliary', bbox: [10, 75, 45, 83], lines: [1], startOffset: 1, endOffset: 1 },
+			{ type: 'table', flowClass: 'auxiliary', bbox: [10, 65, 25, 73], lines: [2], startOffset: 2, endOffset: 2 },
+			{ type: 'table', flowClass: 'auxiliary', bbox: [10, 55, 45, 63], lines: [3], startOffset: 3, endOffset: 3 },
+			{ type: 'table', flowClass: 'auxiliary', bbox: [16, 45, 45, 53], lines: [4], startOffset: 4, endOffset: 4 },
+			{ type: 'table', flowClass: 'auxiliary', bbox: [52, 55, 95, 63], lines: [5], startOffset: 5, endOffset: 5 },
+			{ type: 'table', flowClass: 'auxiliary', bbox: [52, 45, 90, 53], lines: [6], startOffset: 6, endOffset: 6 },
+		];
+		const objects = [
+			{ type: 'object', subtype: 'image', rect: [0, 0, 200, 100] },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, objects, [0, 0, 200, 100]);
+
+		assert.equal(refined.length, 2);
+		assert.equal(refined[0].type, 'caption');
+		assert.equal(refined[1].type, 'table');
+		assert.equal(refined[1].flowClass, 'auxiliary');
+		assert.deepEqual(refined[1].lines, [1, 2, 3, 4, 5, 6]);
+		assert.deepEqual(refined[1].bbox, [10, 45, 95, 83]);
+	});
+
+	it('joins dense scanned table fragments from an in-run caption', () => {
+		const lines = [
+			line(0, 'BRITISH', [70, 90, 85, 98], 0),
+			line(1, 'MEDICAL JOURNAL', [64, 86, 90, 94], 1),
+			line(2, 'TABLE I.-Caption mislabeled as table', [10, 72, 90, 80], 2),
+			line(3, 'Age 0 1-4 5-14', [10, 62, 90, 70], 3),
+			line(4, '25- 0 11 2', [10, 52, 90, 60], 4),
+			line(5, '35- 2 9 43', [10, 42, 90, 50], 5),
+		];
+		const blocks = lines.map(item => ({
+			type: 'table',
+			flowClass: 'auxiliary',
+			bbox: item.rect.slice(),
+			lines: [item.id],
+			startOffset: item.startOffset,
+			endOffset: item.endOffset,
+		}));
+		const objects = [
+			{ type: 'object', subtype: 'image', rect: [0, 0, 200, 100] },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, objects, [0, 0, 200, 100]);
+
+		assert.equal(refined.length, 3);
+		assert.deepEqual(refined.map(block => block.type), ['body', 'body', 'table']);
+		assert.deepEqual(refined.map(block => block.flowClass), ['excluded', 'excluded', 'auxiliary']);
+		assert.deepEqual(refined.map(block => block.lines), [[0], [1], [2, 3, 4, 5]]);
+		assert.deepEqual(refined[2].bbox, [10, 42, 90, 80]);
+	});
+
+	it('does not join dense scanned table fragments across a large visual gap', () => {
+		const lines = [
+			line(0, 'TABLE I.-One table', [10, 90, 90, 98], 0),
+			line(1, 'A 1', [10, 80, 90, 88], 1),
+			line(2, 'B 2', [10, 70, 90, 78], 2),
+			line(3, 'C 3', [10, 20, 90, 28], 3),
+			line(4, 'D 4', [10, 10, 90, 18], 4),
+		];
+		const blocks = lines.map(item => ({
+			type: 'table',
+			flowClass: 'auxiliary',
+			bbox: item.rect.slice(),
+			lines: [item.id],
+			startOffset: item.startOffset,
+			endOffset: item.endOffset,
+		}));
+		const objects = [
+			{ type: 'object', subtype: 'image', rect: [0, 0, 200, 100] },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, objects, [0, 0, 200, 100]);
+
+		assert.equal(refined.length, blocks.length);
+		assert.deepEqual(refined.map(block => block.lines), [[0], [1], [2], [3], [4]]);
+	});
+
+	it('does not join dense scanned table fragments without a caption signal', () => {
+		const lines = [
+			line(0, 'Age 0 1-4 5-14', [10, 72, 90, 80], 0),
+			line(1, '0 Cigs. Cigs. Cigs.', [10, 62, 90, 70], 1),
+			line(2, '25- 0 11 2', [10, 52, 90, 60], 2),
+			line(3, '35- 2 9 43', [10, 42, 90, 50], 3),
+		];
+		const blocks = lines.map(item => ({
+			type: 'table',
+			flowClass: 'auxiliary',
+			bbox: item.rect.slice(),
+			lines: [item.id],
+			startOffset: item.startOffset,
+			endOffset: item.endOffset,
+		}));
+		const objects = [
+			{ type: 'object', subtype: 'image', rect: [0, 0, 100, 100] },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, objects, [0, 0, 100, 100]);
+
+		assert.equal(refined.length, blocks.length);
+		assert.deepEqual(refined.map(block => block.lines), [[0], [1], [2], [3]]);
+	});
+
+	it('excludes tiny scanned table junk fragments', () => {
+		const lines = [
+			line(0, '-1', [10, 72, 13, 80], 0),
+			line(1, '25- 0 11 2 6 28 - 4', [10, 52, 130, 60], 1),
+		];
+		const blocks = [
+			{ type: 'table', flowClass: 'auxiliary', bbox: [10, 72, 13, 80], lines: [0], startOffset: 0, endOffset: 0 },
+			{ type: 'table', flowClass: 'auxiliary', bbox: [10, 52, 130, 60], lines: [1], startOffset: 1, endOffset: 1 },
+		];
+		const objects = [
+			{ type: 'object', subtype: 'image', rect: [0, 0, 200, 100] },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, objects, [0, 0, 200, 100]);
+
+		assert.deepEqual(refined.map(block => block.type), ['body', 'table']);
+		assert.deepEqual(refined.map(block => block.flowClass), ['excluded', 'auxiliary']);
+		assert.deepEqual(refined.map(block => block.lines), [[0], [1]]);
+	});
+
 	it('does not let one-column rules merge table-labeled text from another column', () => {
 		const lines = [
 			line(0, 'Left 1', [10, 80, 45, 90], 0),
