@@ -21,7 +21,7 @@ import { cleanupBlockMetrics, cleanupTextNodeStyles, getHeadingMetrics, getParag
 import { normalizePdfRawBlockFlow, normalizeTopLevelFlowClasses, setNormalizedFlowClass } from './flow-policy.js';
 import { createBlockAnchor, ensureBlockPageRects } from './util.js';
 import { createStructureIndex } from './structure-index.js';
-import { extractStructuredTable, extractStructuredTables } from './table/extract.js';
+import { createTableNode } from './table/output.js';
 import { postProcessStructure } from './post-process.js';
 import { excludeRepeatedPageFurniture } from './page-furniture.js';
 import {
@@ -98,7 +98,6 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 	// internal and external links
 	let linkMap = new Map();
-	let tableGridCache = new Map();
 
 	let regularWordsSet = new Set();
 	let catalogPageLabels = await pdfDocument.pdfManager.ensureCatalog("pageLabels");
@@ -152,16 +151,11 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 				}
 			}
 			else if (block.type === 'table') {
-				node = context.tableNodes?.get(bi)
-					|| await extractStructuredTable({
-						pageIndex: i,
-						viewBox: page.view,
-						block,
-						chars: charsRange,
-						onnxRuntimeProvider,
-						modelProvider,
-						tableGridCache,
-					});
+				node = createTableNode({
+					pageIndex: i,
+					block,
+					chars: charsRange,
+				});
 			}
 			else if (block.type === 'footnote') {
 				node = {
@@ -216,44 +210,6 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 		};
 
 		structure.catalog.pages.push(newPage);
-	}
-
-	async function prepareTableNodesForContexts(contexts) {
-		let requests = [];
-		let targets = [];
-
-		for (let context of contexts) {
-			let { i, chars, page, blocks } = context;
-			for (let blockIndex = 0; blockIndex < blocks.length; blockIndex++) {
-				let block = blocks[blockIndex];
-				if (block.type !== 'table') {
-					continue;
-				}
-				requests.push({
-					pageIndex: i,
-					viewBox: page.view,
-					block,
-					chars: chars.slice(block.startOffset, block.endOffset + 1),
-					onnxRuntimeProvider,
-					modelProvider,
-					tableGridCache,
-				});
-				targets.push({ context, blockIndex });
-			}
-		}
-
-		if (!requests.length) {
-			return;
-		}
-
-		let nodes = await extractStructuredTables(requests);
-		for (let index = 0; index < nodes.length; index++) {
-			let { context, blockIndex } = targets[index];
-			if (!context.tableNodes) {
-				context.tableNodes = new Map();
-			}
-			context.tableNodes.set(blockIndex, nodes[index]);
-		}
 	}
 
 	async function inferBlockListsWithFallback(inferenceInputs, inferenceVals) {
@@ -326,8 +282,6 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 				}
 			}
 		}
-
-		await prepareTableNodesForContexts(contexts);
 
 		for (let context of contexts) {
 			await appendPageContext(context);

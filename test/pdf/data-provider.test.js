@@ -81,14 +81,4 @@ describe('dataProvider integration', { timeout: 30000 }, () => {
 		assert.ok(bytes.byteLength > 0);
 		assert.deepEqual(Array.from(bytes.subarray(0, 4)), [0x00, 0x61, 0x73, 0x6d]);
 	});
-
-	it('loads table-grid model assets through the data provider', () => {
-		for (let path of [
-			'table-grid/samecell_aux_dynamic.compact.int8.onnx',
-			'table-grid/axis_row_merger_mlp.compact.int8.onnx',
-			'table-grid/axis_col_merger_mlp.compact.int8.onnx',
-		]) {
-			assert.ok(dataProvider(path).byteLength > 0);
-		}
-	});
 });
