@@ -35,6 +35,30 @@ function assertSourceHash(value) {
 	}
 }
 
+function createProgressReporter(onProgress) {
+	if (typeof onProgress !== 'function') {
+		return () => {};
+	}
+	let lastProgress = -1;
+	return (progress) => {
+		progress = Math.round(Number(progress));
+		if (!Number.isFinite(progress)) {
+			return;
+		}
+		progress = Math.max(0, Math.min(100, progress));
+		if (progress <= lastProgress) {
+			return;
+		}
+		lastProgress = progress;
+		try {
+			onProgress(progress);
+		}
+		catch {
+			// Progress reporting is best-effort and must not affect extraction.
+		}
+	};
+}
+
 async function createStructuredDocumentText(buf, options = {}) {
 	let {
 		contentType,
@@ -42,6 +66,7 @@ async function createStructuredDocumentText(buf, options = {}) {
 		dataProvider,
 		nativeONNXRun,
 		sourceHash,
+		onProgress,
 	} = options;
 	assertSourceHash(sourceHash);
 
@@ -53,21 +78,27 @@ async function createStructuredDocumentText(buf, options = {}) {
 	return await pdfGetStructure(buf, password, dataProvider, {
 		nativeONNXRun,
 		sourceHash,
+		onProgress,
 	});
 }
 
 async function getStructuredDocumentText(buf, options = {}) {
+	let onProgress = createProgressReporter(options.onProgress);
+	onProgress(0);
 	let structure = await createStructuredDocumentText(buf, {
 		contentType: options.contentType,
 		password: options.password,
 		dataProvider: options.dataProvider,
 		nativeONNXRun: options.nativeONNXRun,
 		sourceHash: options.sourceHash,
+		onProgress,
 	});
+	onProgress(95);
 	let buffer = packStructuredDocumentText(structure, {
 		destructive: true,
 		deflate: bytes => deflateSync(bytes),
 	});
+	onProgress(100);
 	return { buf: buffer };
 }
 
@@ -279,12 +310,19 @@ if (typeof self !== 'undefined') {
 		}
 		else if (message.action === 'getStructuredDocumentText') {
 			try {
+				let reportProgress = !!message.data.reportProgress;
 				let data = await getStructuredDocumentText(message.data.buf, {
 					contentType: message.data.contentType,
 					password: message.data.password,
 					dataProvider: fetchData,
 					nativeONNXRun: message.data.nativeONNX ? data => query('NativeONNXRun', data) : null,
 					sourceHash: message.data.sourceHash,
+					onProgress: reportProgress
+						? progress => self.postMessage({
+							progressID: message.id,
+							data: { progress },
+						}, [])
+						: null,
 				});
 				self.postMessage({
 					responseID: message.id,

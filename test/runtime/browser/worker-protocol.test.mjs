@@ -76,6 +76,14 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 					return;
 				}
 
+				if ('progressID' in message) {
+					const pendingCall = pending.get(message.progressID);
+					if (pendingCall?.progress) {
+						pendingCall.progress.push(message.data.progress);
+					}
+					return;
+				}
+
 				const pendingCall = pending.get(message.responseID);
 				if (!pendingCall) {
 					return;
@@ -89,17 +97,17 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 				}
 			};
 
-			function callWorker(action, data, transfer = []) {
+			function callWorker(action, data, transfer = [], progress = null) {
 				return new Promise((resolve, reject) => {
 					const id = ++nextID;
-					pending.set(id, { resolve, reject });
+					pending.set(id, { resolve, reject, progress });
 					worker.postMessage({ id, action, data }, transfer);
 				});
 			}
 
-			function callWorkerWithBuffer(action, sourceBuf, data = {}) {
+			function callWorkerWithBuffer(action, sourceBuf, data = {}, progress = null) {
 				const buf = sourceBuf.slice(0);
-				return callWorker(action, { buf, ...data }, [buf]);
+				return callWorker(action, { buf, ...data }, [buf], progress);
 			}
 
 			async function fetchArrayBuffer(path) {
@@ -169,16 +177,19 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 				password: '',
 			});
 
+			const packedPdfProgress = [];
 			const packedPdfStructure = await callWorkerWithBuffer('getStructuredDocumentText', pdf, {
 				contentType: 'application/pdf',
 				password: '',
 				sourceHash: pdfHash,
-			});
+				reportProgress: true,
+			}, packedPdfProgress);
 
+			const packedEpubProgress = [];
 			const packedEpubStructure = await callWorkerWithBuffer('getStructuredDocumentText', epub, {
 				contentType: 'application/epub+zip',
 				sourceHash: epubHash,
-			});
+			}, packedEpubProgress);
 
 			const packedSnapshotStructure = await callWorkerWithBuffer('getStructuredDocumentText', snapshot, {
 				contentType: 'text/html',
@@ -214,8 +225,10 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 				citaviAnnotations,
 				packedPdfIsSdt: isSdtBuffer(packedPdfStructure.buf),
 				packedPdfByteLength: packedPdfStructure.buf.byteLength,
+				packedPdfProgress,
 				packedEpubIsSdt: isSdtBuffer(packedEpubStructure.buf),
 				packedEpubByteLength: packedEpubStructure.buf.byteLength,
+				packedEpubProgress,
 				packedSnapshotIsSdt: isSdtBuffer(packedSnapshotStructure.buf),
 				packedSnapshotByteLength: packedSnapshotStructure.buf.byteLength,
 				renderedAnnotationCount,
@@ -241,8 +254,13 @@ test('browser Web Worker protocol supports public document APIs', async ({ page 
 		expect(result.citaviAnnotations.length).toBeGreaterThan(0);
 		expect(result.packedPdfIsSdt).toBe(true);
 		expect(result.packedPdfByteLength).toBeGreaterThan(100);
+		expect(result.packedPdfProgress[0]).toBe(0);
+		expect(result.packedPdfProgress.at(-1)).toBe(100);
+		expect(result.packedPdfProgress).toEqual(result.packedPdfProgress.slice().sort((a, b) => a - b));
+		expect(result.packedPdfProgress.some(progress => progress > 0 && progress < 100)).toBe(true);
 		expect(result.packedEpubIsSdt).toBe(true);
 		expect(result.packedEpubByteLength).toBeGreaterThan(100);
+		expect(result.packedEpubProgress).toEqual([]);
 		expect(result.packedSnapshotIsSdt).toBe(true);
 		expect(result.packedSnapshotByteLength).toBeGreaterThan(100);
 		expect(result.renderedAnnotationCount).toBe(1);

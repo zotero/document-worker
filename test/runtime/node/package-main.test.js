@@ -134,13 +134,19 @@ describe('package main export in Node.js', { timeout: 120000 }, () => {
 	});
 
 	it('extracts structured document text for PDF, EPUB, and snapshot', async () => {
+		let pdfProgress = [];
 		let pdfResult = await worker.getStructuredDocumentText(pdf1(), {
 			contentType: 'application/pdf',
 			password: '',
 			dataProvider,
 			sourceHash: readFixtureSourceHash('pdf', 'full', '1.pdf'),
+			onProgress: progress => pdfProgress.push(progress),
 		});
 		await assertPackedStructuredDocumentText(pdfResult, 'pdf');
+		assert.deepEqual(pdfProgress, pdfProgress.slice().sort((a, b) => a - b));
+		assert.equal(pdfProgress[0], 0);
+		assert.equal(pdfProgress.at(-1), 100);
+		assert.ok(pdfProgress.some(progress => progress > 0 && progress < 100));
 
 		let epubResult = await worker.getStructuredDocumentText(
 			readFixtureArrayBuffer('epub', '1.epub'),

@@ -42,10 +42,30 @@ function applyFlowClassMetadata(node, block) {
 	setNormalizedFlowClass(node, block);
 }
 
+function reportPageProgress(onProgress, pagesProcessed, pageCount) {
+	if (typeof onProgress !== 'function') {
+		return;
+	}
+	let progress;
+	if (!pageCount) {
+		progress = 90;
+	}
+	else {
+		progress = 5 + (85 * pagesProcessed / pageCount);
+	}
+	try {
+		onProgress(progress);
+	}
+	catch {
+		// Progress reporting is best-effort and must not affect extraction.
+	}
+}
+
 export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelProvider, options = {}) {
 	const pageCount = pdfDocument.numPages;
 	const inferenceBatchSize = Math.max(1, options.inferenceBatchSize || 8);
 	const sourceHash = options.sourceHash;
+	const onProgress = options.onProgress;
 
 	let structure = {
 		schemaVersion: SDT_SCHEMA_VERSION,
@@ -101,6 +121,8 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 	let regularWordsSet = new Set();
 	let catalogPageLabels = await pdfDocument.pdfManager.ensureCatalog("pageLabels");
+	let pagesProcessed = 0;
+	reportPageProgress(onProgress, 0, pageCount);
 
 	async function appendPageContext(context) {
 		let { i, chars, page, blocks, extractionDegraded } = context;
@@ -210,6 +232,8 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 		};
 
 		structure.catalog.pages.push(newPage);
+		pagesProcessed++;
+		reportPageProgress(onProgress, pagesProcessed, pageCount);
 	}
 
 	async function inferBlockListsWithFallback(inferenceInputs, inferenceVals) {
