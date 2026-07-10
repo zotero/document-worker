@@ -3,6 +3,8 @@ import {
 	getLocalName,
 	getAttribute,
 	getElementChildren,
+	getTextContent,
+	queryTagAll,
 } from './epub/xml';
 import { mergeTextNodes } from '../../structured-document-text/src/text.js';
 import { composeDeltaMaps } from '../../structured-document-text/src/dom/deltamap.js';
@@ -160,6 +162,11 @@ function processNode(node: ChildNode, ctx: ConvertContext): void {
 	let blockType = BLOCK_ELEMENT_MAP[localName];
 
 	if (blockType === 'heading' || blockType === 'paragraph' || blockType === 'caption') {
+		let images = extractStandaloneImages(el, ctx);
+		if (images) {
+			ctx.blocks.push(...images);
+			return;
+		}
 		let block = makeBlock(blockType, el, ctx);
 		block.content = collectInlineContent(el, ctx);
 		ctx.blocks.push(block);
@@ -238,6 +245,11 @@ function processNode(node: ChildNode, ctx: ConvertContext): void {
 			processChildren(el, ctx);
 		}
 		else {
+			let images = extractStandaloneImages(el, ctx);
+			if (images) {
+				ctx.blocks.push(...images);
+				return;
+			}
 			let block = makeBlock('paragraph', el, ctx);
 			let content = collectInlineContent(el, ctx);
 			if (content.length > 0) {
@@ -394,6 +406,24 @@ function createImage(imgNode: Element, ctx: ConvertContext): Block {
 	let block = makeBlock('image', imgNode, ctx);
 	if (text) block.content = [{ text }];
 	return block;
+}
+
+/**
+ * If `el`'s only meaningful content is one or more images (everything else is
+ * whitespace), return image blocks for them. This pulls out a standalone figure
+ * like `<p><img></p>` that would otherwise collapse to an empty paragraph and
+ * drop the image entirely. Returns null when the element has text.
+ */
+function extractStandaloneImages(el: Element, ctx: ConvertContext): Block[] | null {
+	if (getTextContent(el).trim()) {
+		return null;
+	}
+	let images = queryTagAll(el, 'img')
+		.filter(img => ctx.hooks.shouldInclude?.(img) !== false);
+	if (!images.length) {
+		return null;
+	}
+	return images.map(img => createImage(img, ctx));
 }
 
 function processFigure(figureNode: Element, ctx: ConvertContext): void {
