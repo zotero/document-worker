@@ -572,6 +572,59 @@ describe('Snapshot SDT: image text', () => {
 	});
 });
 
+describe('Snapshot SDT: standalone images', () => {
+	let structure;
+	before(() => {
+		let html = `<!DOCTYPE html><html><head><title>Standalone Images</title></head><body><article>
+			<h1>Standalone Image Handling</h1>
+			<p>An opening paragraph with enough prose to keep Readability happy and treat this document as a real article worth extracting.</p>
+			<p>
+				<img src="solo.png" alt="A solo diagram">
+			</p>
+			<p>
+				<img src="two-a.png" alt="First of a pair">
+				<img src="two-b.png" alt="Second of a pair">
+			</p>
+			<p>Inline prose <img src="inline.png" alt="An inline image"> keeps flowing here with enough text to remain a paragraph and stay in the article.</p>
+			<p>A closing paragraph with enough prose to keep Readability happy and treat this document as a real article worth extracting.</p>
+		</article></body></html>`;
+		let encoded = new TextEncoder().encode(html);
+		let buf = encoded.buffer.slice(encoded.byteOffset, encoded.byteOffset + encoded.byteLength);
+		structure = getSnapshotStructure(buf, 'text/html', { sourceHash: 'test' });
+	});
+
+	function imageBlocks() {
+		let out = [];
+		forEachBlock(structure.content, b => {
+			if (b.type === 'image') out.push(b);
+		});
+		return out;
+	}
+
+	it('pulls a whitespace-only <p><img></p> out as an image block', () => {
+		let images = imageBlocks();
+		let solo = images.find(b => allText([b]).includes('A solo diagram'));
+		assert.ok(solo, 'expected a standalone image block for the solo image');
+	});
+
+	it('emits a separate image block per image when several share a wrapper', () => {
+		let images = imageBlocks();
+		assert.ok(images.some(b => allText([b]).includes('First of a pair')));
+		assert.ok(images.some(b => allText([b]).includes('Second of a pair')));
+	});
+
+	it('leaves inline images alone when the wrapper also has text', () => {
+		// The wrapper still has prose, so it stays a paragraph and the image is
+		// not pulled out into its own block.
+		let inlineImage = imageBlocks().find(b => allText([b]).includes('An inline image'));
+		assert.equal(inlineImage, undefined);
+		let para = structure.content.find(
+			b => b.type === 'paragraph' && allText([b]).includes('An inline image')
+		);
+		assert.ok(para, 'inline image text should remain within its paragraph');
+	});
+});
+
 describe('Snapshot SDT: fulltext extraction', () => {
 	it('concatenates article text', () => {
 		let r = extractSnapshotFulltext('2.html');
