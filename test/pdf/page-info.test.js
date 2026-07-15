@@ -91,4 +91,26 @@ describe('PDF SDT page info', () => {
 		assert.equal(Object.hasOwn(page, 'rotation'), false);
 		assert.equal(Object.hasOwn(page, 'userUnit'), false);
 	});
+
+	it('falls back for malformed page geometry in packed output', async () => {
+		let oversizedNumber = '9'.repeat(400);
+		let { structure } = await getPackedStructure(createPDF([{
+			mediaBox: `0 0 ${oversizedNumber} ${oversizedNumber}`,
+		}]));
+		let [page] = structure.catalog.pages;
+
+		assert.deepEqual(page.viewRect, [0, 0, 612, 792]);
+		assert.equal(page.viewRect.every(Number.isFinite), true);
+		assert.equal(page.extractionDegraded, true);
+	});
+
+	it('preserves valid page geometry with a negative origin', async () => {
+		let { structure } = await getPackedStructure(createPDF([{
+			mediaBox: '-50 -50 562 742',
+		}]));
+		let [page] = structure.catalog.pages;
+
+		assert.deepEqual(page.viewRect, [-50, -50, 562, 742]);
+		assert.equal(Object.hasOwn(page, 'extractionDegraded'), false);
+	});
 });

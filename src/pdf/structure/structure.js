@@ -33,10 +33,27 @@ const DEGRADED_EXTRACTION_FALLBACK_REASONS = new Set([
 	'inference_error',
 	'too_many_lines',
 ]);
+// Match PDF.js's fallback for an invalid MediaBox.
+const DEFAULT_PAGE_VIEW_RECT = [0, 0, 612, 792];
 const VALID_PAGE_ROTATIONS = new Set([0, 90, 180, 270]);
 
 function hasDegradedExtractionFallbacks(layoutFallbacks) {
 	return layoutFallbacks?.some(fallback => DEGRADED_EXTRACTION_FALLBACK_REASONS.has(fallback.reason));
+}
+
+function normalizePageViewRect(viewRect) {
+	if (
+		Array.isArray(viewRect)
+		&& viewRect.length === 4
+		&& viewRect.every(Number.isFinite)
+		&& Number.isFinite(viewRect[2] - viewRect[0])
+		&& Number.isFinite(viewRect[3] - viewRect[1])
+		&& viewRect[2] > viewRect[0]
+		&& viewRect[3] > viewRect[1]
+	) {
+		return viewRect;
+	}
+	return DEFAULT_PAGE_VIEW_RECT.slice();
 }
 
 function applyFlowClassMetadata(node, block) {
@@ -126,7 +143,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	reportPageProgress(onProgress, 0, pageCount);
 
 	async function appendPageContext(context) {
-		let { i, chars, page, blocks, extractionDegraded } = context;
+		let { i, chars, page, viewRect, blocks, extractionDegraded } = context;
 		let prevContentLength = structure.content.length;
 
 		for (let j = 0; j < blocks.length; j++) {
@@ -229,7 +246,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 		let rotation = VALID_PAGE_ROTATIONS.has(page.rotate) ? page.rotate : 0;
 		let userUnit = Number.isFinite(page.userUnit) && page.userUnit > 0 ? page.userUnit : 1;
 		let newPage = {
-			viewRect: page.view,
+			viewRect,
 			...(rotation !== 0 ? { rotation } : {}),
 			...(userUnit !== 1 ? { userUnit } : {}),
 			...(extractionDegraded ? { extractionDegraded: true } : {}),
@@ -281,16 +298,26 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 			updateRegularWordsSet(chars, regularWordsSet);
 
 			let page = await pdfDocument.getPage(i);
+			let pageView = page.view;
+			let viewRect = normalizePageViewRect(pageView);
 
 			let links = await getLinksFromAnnotations(pdfDocument, page);
 			if (links.length) {
 				linkMap.set(i, links);
 			}
 
-			let context = { i, chars, objects, page, blocks: [], extractionDegraded: false };
+			let context = {
+				i,
+				chars,
+				objects,
+				page,
+				viewRect,
+				blocks: [],
+				extractionDegraded: viewRect !== pageView,
+			};
 			if (chars.length || objects?.length) {
 				let val = {};
-				inferenceInputs.push({ chars, objects, viewBox: page.view, pageIndex: i });
+				inferenceInputs.push({ chars, objects, viewBox: viewRect, pageIndex: i });
 				inferenceVals.push(val);
 				inferenceContextIndexes.push(contexts.length);
 			}
@@ -307,7 +334,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 					normalizePdfRawBlockFlow(block);
 				}
 				if (val.layoutFallbacks?.length) {
-					context.extractionDegraded = hasDegradedExtractionFallbacks(val.layoutFallbacks);
+					context.extractionDegraded ||= hasDegradedExtractionFallbacks(val.layoutFallbacks);
 				}
 			}
 		}
