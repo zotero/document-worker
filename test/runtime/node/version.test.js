@@ -14,12 +14,14 @@ import {
 } from '../../../structured-document-text/src/version.js';
 
 describe('version constants', () => {
-	it('uses explicit integer processor versions', () => {
-		assert.deepEqual(Object.keys(SDT_PROCESSOR_VERSIONS).sort(), ['epub', 'pdf', 'snapshot']);
-		for (let version of Object.values(SDT_PROCESSOR_VERSIONS)) {
-			assert.equal(Number.isInteger(version), true);
-			assert.ok(version > 0);
-		}
+	it('uses the expected current versions', () => {
+		assert.equal(SDT_PACK_VERSION, 1);
+		assert.equal(SDT_SCHEMA_VERSION, '1.1.0');
+		assert.deepEqual(SDT_PROCESSOR_VERSIONS, {
+			pdf: 3,
+			epub: 1,
+			snapshot: 1,
+		});
 	});
 
 	it('keeps exported SDT versions in sync with structured-document-text', () => {

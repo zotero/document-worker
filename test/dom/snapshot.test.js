@@ -12,6 +12,7 @@ import {
 	generateDomMapSelector,
 } from '../../structured-document-text/src/dom/snapshot/dommap.js';
 import { nfcToOriginal } from '../../structured-document-text/src/dom/deltamap.js';
+import { SDT_PROCESSOR_VERSIONS, SDT_SCHEMA_VERSION } from '../../src/versions.js';
 import { readFixtureSourceHash } from '../helpers/fixtures.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -150,9 +151,9 @@ describe('Snapshot SDT: document shape', () => {
 	});
 
 	it('identifies as a snapshot processor result', () => {
+		assert.equal(structure.schemaVersion, SDT_SCHEMA_VERSION);
 		assert.equal(structure.metadata.processor.type, 'snapshot');
-		assert.equal(Number.isInteger(structure.metadata.processor.version), true);
-		assert.ok(structure.metadata.processor.version > 0);
+		assert.equal(structure.metadata.processor.version, SDT_PROCESSOR_VERSIONS.snapshot);
 	});
 
 	it('records the source content type', () => {

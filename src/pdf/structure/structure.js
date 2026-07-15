@@ -33,6 +33,7 @@ const DEGRADED_EXTRACTION_FALLBACK_REASONS = new Set([
 	'inference_error',
 	'too_many_lines',
 ]);
+const VALID_PAGE_ROTATIONS = new Set([0, 90, 180, 270]);
 
 function hasDegradedExtractionFallbacks(layoutFallbacks) {
 	return layoutFallbacks?.some(fallback => DEGRADED_EXTRACTION_FALLBACK_REASONS.has(fallback.reason));
@@ -225,8 +226,12 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 			}
 		}
 
+		let rotation = VALID_PAGE_ROTATIONS.has(page.rotate) ? page.rotate : 0;
+		let userUnit = Number.isFinite(page.userUnit) && page.userUnit > 0 ? page.userUnit : 1;
 		let newPage = {
 			viewRect: page.view,
+			...(rotation !== 0 ? { rotation } : {}),
+			...(userUnit !== 1 ? { userUnit } : {}),
 			...(extractionDegraded ? { extractionDegraded: true } : {}),
 			contentRange: [[prevContentLength], [structure.content.length]]
 		};

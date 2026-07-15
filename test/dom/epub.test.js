@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { getEpubStructure, getEpubFulltext } from '../../src/dom/epub/index';
 import stringify from 'json-stringify-pretty-compact';
+import { SDT_PROCESSOR_VERSIONS, SDT_SCHEMA_VERSION } from '../../src/versions.js';
 import { readFixtureSourceHash } from '../helpers/fixtures.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -39,8 +40,9 @@ describe('EPUB structure extraction', { timeout: 30000 }, () => {
 			});
 
 			it('has correct top-level fields', () => {
-				assert.equal(structure.schemaVersion, '1.0.0');
+				assert.equal(structure.schemaVersion, SDT_SCHEMA_VERSION);
 				assert.equal(structure.metadata.processor.type, 'epub');
+				assert.equal(structure.metadata.processor.version, SDT_PROCESSOR_VERSIONS.epub);
 				assert.equal(structure.metadata.source.contentType, 'application/epub+zip');
 				assert.ok(structure.metadata.dateCreated);
 				assert.ok(typeof structure.metadata.source.fileSize === 'number');

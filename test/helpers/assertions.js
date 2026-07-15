@@ -1,5 +1,9 @@
 import assert from 'node:assert/strict';
 import { Buffer } from 'node:buffer';
+import {
+	SDT_PROCESSOR_VERSIONS,
+	SDT_SCHEMA_VERSION,
+} from '../../src/versions.js';
 
 export function assertFulltextResult(result) {
 	assert.equal(typeof result, 'object');
@@ -11,9 +15,8 @@ export function assertFulltextResult(result) {
 
 export function assertStructuredDocumentText(result, type) {
 	assert.equal(result.metadata?.processor?.type, type);
-	assert.equal(Number.isInteger(result.metadata?.processor?.version), true);
-	assert.ok(result.metadata.processor.version > 0);
-	assert.equal(result.schemaVersion, '1.0.0');
+	assert.equal(result.metadata?.processor?.version, SDT_PROCESSOR_VERSIONS[type]);
+	assert.equal(result.schemaVersion, SDT_SCHEMA_VERSION);
 	assert.match(result.metadata?.source?.hash, /^[0-9a-f]{32}$/u);
 	assert.ok(Array.isArray(result.catalog?.pages));
 	assert.ok(result.catalog.pages.length > 0);
