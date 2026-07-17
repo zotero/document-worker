@@ -2023,7 +2023,7 @@
 			]
 		},
 		{
-			"type": "image",
+			"type": "paragraph",
 			"anchor": {"pageRects": [[10, 47.69, 57.68, 64.56, 79.11]]},
 			"content": [
 				{"text": "1.", "anchor": {"textMap": "[[0,10,47.7,67.5,54.4,75.3,4.5,1.5]]"}},
@@ -13047,7 +13047,7 @@
 			"flowClass": "auxiliary"
 		},
 		{
-			"type": "image",
+			"type": "paragraph",
 			"anchor": {"pageRects": [[69, 56.6929, 500.0171, 555.3071, 709.91]]},
 			"content": [
 				{
@@ -13114,7 +13114,7 @@
 			"flowClass": "auxiliary"
 		},
 		{
-			"type": "image",
+			"type": "paragraph",
 			"anchor": {"pageRects": [[69, 62.3, 151.41, 540.21, 424.19]]},
 			"content": [
 				{

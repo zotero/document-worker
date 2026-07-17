@@ -68,7 +68,6 @@ describe('dataProvider integration', { timeout: 30000 }, () => {
 		assert.ok(Array.isArray(result.catalog.pages));
 		assert.ok(Array.isArray(result.content));
 		assert.ok(result.content.length > 0);
-
 		let onnxPaths = fetched.filter(p => p.startsWith('onnx/'));
 		assert.ok(onnxPaths.length > 0);
 

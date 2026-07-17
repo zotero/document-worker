@@ -119,6 +119,40 @@ function createLateSeparatorObjectPageData() {
 }
 
 describe('block segmentation input preparation', () => {
+	it('preserves common Form XObject provenance on text lines', () => {
+		const pageData = createPageData(0);
+		const formXObjectSeqs = [12, 42];
+		pageData.chars[0].formXObjectSeqs = formXObjectSeqs;
+		pageData.chars[0].paintGlyph = 7;
+		pageData.chars[0].lineBreakAfter = false;
+		pageData.chars.push({
+			...pageData.chars[0],
+			c: 'B',
+			formXObjectSeqs: [...formXObjectSeqs],
+			lineBreakAfter: true,
+		});
+		pageData.forms = [{
+			seq: 42,
+			rect: [0, 0, 100, 100],
+			paintRect: [10, 10, 90, 90],
+			paintObjectCount: 50,
+			textCharCount: 1,
+			formXObjectSeqs: [12, 42],
+		}];
+
+		const prepared = prepareBlockSegPageInput(pageData);
+
+		assert.deepEqual(prepared.textLines[0].formXObjectSeqs, [12, 42]);
+		assert.equal(prepared.textLines[0].chars[0].paintGlyph, 7);
+		assert.deepEqual(prepared.formScenes, [{
+			seq: 42,
+			rect: [10, 10, 90, 90],
+			paintObjectCount: 50,
+			textCharCount: 1,
+			formXObjectSeqs: [12, 42],
+		}]);
+	});
+
 	it('keeps object lines as model and graphic context', () => {
 		let page = prepareBlockSegPageInput(createPageData(2));
 

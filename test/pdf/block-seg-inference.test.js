@@ -2,6 +2,10 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
 	applyBlockClassifierPredictions,
+	collapsePaintScenes,
+	compactExcessiveImageBlocks,
+	enforceStandaloneGraphicQuality,
+	MAX_IMAGE_BLOCKS_PER_PAGE,
 	refineGraphicBlocks,
 } from '../../src/pdf/structure/model/block-seg/inference.js';
 
@@ -13,6 +17,17 @@ function line(id, text, rect, startOffset = id) {
 		startOffset,
 		endOffset: startOffset,
 	};
+}
+
+function countImages(blocks) {
+	return blocks.filter(block => block.type === 'image').length;
+}
+
+function rectContains(outer, inner) {
+	return outer[0] <= inner[0]
+		&& outer[1] <= inner[1]
+		&& outer[2] >= inner[2]
+		&& outer[3] >= inner[3];
 }
 
 function ruledGridObjects() {
@@ -43,6 +58,556 @@ describe('applyBlockClassifierPredictions', () => {
 			{ type: 'table', flowClass: 'body' },
 		]);
 		assert.equal('modelBlockType' in blocks[0], false);
+	});
+});
+
+describe('collapsePaintScenes', () => {
+	const pageRect = [0, 0, 100, 100];
+
+	function formFixture(rect = [20, 20, 80, 80], fragmentCount = 33) {
+		const lines = [line(0, 'before', [5, 90, 45, 98], 0)];
+		for (let index = 0; index < fragmentCount; index++) {
+			const x = 20 + (index % 6) * 8;
+			const y = 20 + Math.floor(index / 6) * 8;
+			lines.push({
+				...line(index + 1, String(index), [x, y, x + 4, y + 6], index + 1),
+				formXObjectSeqs: [10],
+				chars: [{
+					fontName: 'marker-font',
+					paintGlyph: 17,
+				}],
+			});
+		}
+		lines.push(line(lines.length, 'after', [5, 5, 45, 13], lines.length));
+		return {
+			lines,
+			blocks: [{
+				type: 'body',
+				flowClass: 'body',
+				bbox: [5, 5, 80, 98],
+				lines: lines.map(item => item.id),
+				startOffset: 0,
+				endOffset: lines.length - 1,
+			}],
+			scenes: [{
+				seq: 10,
+				rect,
+				paintObjectCount: 100,
+				textCharCount: fragmentCount,
+				formXObjectSeqs: [10],
+			}],
+		};
+	}
+
+	function fragmentFixture({
+		rect,
+		chars = null,
+	}) {
+		const lines = Array.from({ length: 33 }, (_, index) => ({
+			...line(index, `text ${index}`, rect(index), index),
+			...(chars ? { chars: chars(index) } : {}),
+		}));
+		const blocks = lines.map(item => ({
+			type: 'body',
+			flowClass: 'auxiliary',
+			bbox: item.rect,
+			lines: [item.id],
+			startOffset: item.startOffset,
+			endOffset: item.endOffset,
+		}));
+		return { lines, blocks, scenes: [] };
+	}
+
+	function collapse(fixture, validObjects = []) {
+		return collapsePaintScenes(
+			fixture.blocks,
+			fixture.lines,
+			fixture.scenes,
+			pageRect,
+			{ validObjects },
+		);
+	}
+
+	it('uses actual painted Form bounds and preserves surrounding text', () => {
+		const fixture = formFixture();
+		fixture.blocks.push({
+			type: 'image',
+			flowClass: 'auxiliary',
+			bbox: [82, 20, 98, 80],
+			lines: [],
+			startOffset: 0,
+			endOffset: -1,
+		});
+
+		const collapsed = collapse(fixture, [{ bbox: [20, 20, 80, 80] }]);
+
+		assert.deepEqual(collapsed.map(block => block.type), ['body', 'image', 'image', 'body']);
+		assert.deepEqual(collapsed[2].bbox, [20, 20, 80, 80]);
+		assert.deepEqual(collapsed[2].lines, []);
+		assert.deepEqual(collapsed[2]._charRanges, []);
+		assert.deepEqual(collapsed[0].lines, [0]);
+		assert.deepEqual(collapsed[3].lines, [34]);
+	});
+
+	it('does not treat a declared full-page Form as a scene', () => {
+		const fixture = formFixture(pageRect);
+		assert.equal(
+			collapse(fixture, [{ bbox: [20, 20, 80, 80] }]),
+			fixture.blocks,
+		);
+	});
+
+	it('requires fragmented paint evidence in addition to Form complexity', () => {
+		const fixture = formFixture([20, 20, 80, 80], 32);
+		assert.equal(
+			collapse(fixture, [{ bbox: [20, 20, 80, 80] }]),
+			fixture.blocks,
+		);
+	});
+
+	it('preserves text-dominant Forms', () => {
+		const fixture = formFixture();
+		fixture.scenes[0].textCharCount = fixture.scenes[0].paintObjectCount * 3 + 1;
+		assert.equal(
+			collapse(fixture, [{ bbox: [20, 20, 80, 80] }]),
+			fixture.blocks,
+		);
+	});
+
+	it('does not infer Form text density when extraction metadata is missing', () => {
+		const fixture = formFixture();
+		delete fixture.scenes[0].textCharCount;
+		assert.equal(
+			collapse(fixture, [{ bbox: [20, 20, 80, 80] }]),
+			fixture.blocks,
+		);
+	});
+
+	it('does not subdivide an existing image with a contained Form scene', () => {
+		const fixture = formFixture();
+		fixture.blocks.push({
+			type: 'image',
+			flowClass: 'auxiliary',
+			bbox: [10, 10, 90, 90],
+			lines: [],
+			startOffset: 0,
+			endOffset: -1,
+		});
+
+		assert.equal(collapse(fixture, [{ bbox: [10, 10, 90, 90] }]), fixture.blocks);
+	});
+
+	it('keeps a graphic-only Form scene free of unrelated text ranges', () => {
+		const fixture = {
+			lines: [],
+			blocks: Array.from({ length: 33 }, (_, index) => ({
+				type: 'image',
+				flowClass: 'auxiliary',
+				bbox: [20 + index % 6, 20 + Math.floor(index / 6), 21 + index % 6, 21 + Math.floor(index / 6)],
+				lines: [],
+				startOffset: 0,
+				endOffset: -1,
+			})),
+			scenes: [{
+				seq: 10,
+				rect: [20, 20, 80, 80],
+				paintObjectCount: 100,
+				textCharCount: 0,
+				formXObjectSeqs: [10],
+			}],
+		};
+		const collapsed = collapse(fixture, [{ bbox: [20, 20, 80, 80] }]);
+
+		assert.equal(collapsed.length, 1);
+		assert.deepEqual(collapsed[0]._charRanges, []);
+	});
+
+	it('does not group dense atomic text from geometry without graphic provenance', () => {
+		const fixture = fragmentFixture({
+			rect: (index) => {
+				const x = 10 + (index % 11) * 7;
+				const y = 30 + Math.floor(index / 11) * 7;
+				return [x, y, x + 4, y + 5];
+			},
+		});
+		const collapsed = collapse(fixture, [{ bbox: [8, 28, 86, 50] }]);
+
+		assert.equal(collapsed, fixture.blocks);
+	});
+
+	it('groups repeated source glyph programs without interpreting extracted text', () => {
+		const fixture = fragmentFixture({
+			rect: () => [20, 20, 80, 70],
+			chars: () => Array.from({ length: 20 }, () => ({
+				fontName: 'marker-font',
+				paintGlyph: 17,
+			})),
+		});
+		const collapsed = collapse(fixture, [{ bbox: [20, 20, 80, 70] }]);
+
+		assert.equal(collapsed.length, 1);
+		assert.equal(collapsed[0].type, 'image');
+		assert.deepEqual(collapsed[0].bbox, [20, 20, 80, 70]);
+		assert.deepEqual(collapsed[0].lines, []);
+		assert.deepEqual(collapsed[0]._charRanges, []);
+	});
+
+	it('keeps real image text while dropping repeated graphical glyphs', () => {
+		const fixture = fragmentFixture({
+			rect: (index) => [20, 20 + index, 80, 21 + index],
+			chars: () => [{
+				fontName: 'marker-font',
+				paintGlyph: 17,
+			}],
+		});
+		fixture.lines.unshift({
+			...line(0, 'real label', [20, 18, 40, 19], 0),
+			chars: [{
+				fontName: 'label-font',
+				paintGlyph: 1,
+			}],
+		});
+		for (let index = 1; index < fixture.lines.length; index++) {
+			fixture.lines[index].id = index;
+			fixture.lines[index].startOffset = index;
+			fixture.lines[index].endOffset = index;
+			fixture.blocks[index - 1].lines = [index];
+			fixture.blocks[index - 1].startOffset = index;
+			fixture.blocks[index - 1].endOffset = index;
+		}
+		fixture.blocks.unshift({
+			type: 'image',
+			flowClass: 'auxiliary',
+			bbox: [20, 18, 80, 54],
+			lines: [0],
+			startOffset: 0,
+			endOffset: 0,
+		});
+
+		const collapsed = collapse(fixture, [{ bbox: [20, 18, 80, 54] }]);
+
+		assert.equal(collapsed.length, 1);
+		assert.deepEqual(collapsed[0].lines, [0]);
+		assert.deepEqual(collapsed[0]._charRanges, [[0, 0]]);
+	});
+
+	it('preserves non-fragment text inside a qualifying Form', () => {
+		const fixture = formFixture();
+		const textLine = {
+			...line(35, 'legitimate explanatory text', [22, 50, 75, 56], 35),
+			formXObjectSeqs: [10],
+		};
+		fixture.lines.push(textLine);
+		fixture.blocks[0].lines.push(textLine.id);
+		fixture.blocks[0].endOffset = textLine.endOffset;
+		const collapsed = collapse(fixture, [{ bbox: [20, 20, 80, 80] }]);
+
+		assert.equal(collapsed.some(block => block.lines?.includes(textLine.id)), true);
+		assert.equal(
+			collapsed.find(block => block.type === 'image').lines.includes(textLine.id),
+			false,
+		);
+	});
+
+	it('counts each Form fragment once when it is also in a graphic block', () => {
+		const fixture = formFixture();
+		for (const item of fixture.lines.filter(item => item.id > 17 && item.formXObjectSeqs)) {
+			delete item.formXObjectSeqs;
+		}
+		fixture.blocks = fixture.lines
+			.filter(item => item.formXObjectSeqs)
+			.map(item => ({
+				type: 'image',
+				flowClass: 'auxiliary',
+				bbox: item.rect,
+				lines: [item.id],
+				startOffset: item.startOffset,
+				endOffset: item.endOffset,
+			}));
+
+		assert.equal(
+			collapse(fixture, [{ bbox: [20, 20, 80, 80] }]),
+			fixture.blocks,
+		);
+	});
+
+	it('collapses excessive non-table block fragmentation inside a complex Form', () => {
+		const fixture = formFixture();
+		for (const item of fixture.lines) {
+			delete item.chars;
+		}
+		fixture.blocks = fixture.lines
+			.filter(item => item.formXObjectSeqs)
+			.map(item => ({
+				type: 'body',
+				flowClass: 'body',
+				bbox: item.rect,
+				lines: [item.id],
+				startOffset: item.startOffset,
+				endOffset: item.endOffset,
+			}));
+
+		const collapsed = collapse(fixture, [{ bbox: [20, 20, 80, 80] }]);
+
+		assert.equal(collapsed.length, 1);
+		assert.equal(collapsed[0].type, 'image');
+		assert.deepEqual(collapsed[0]._charRanges, [[1, 33]]);
+	});
+
+	it('preserves excessive table fragmentation inside a complex Form', () => {
+		const fixture = formFixture();
+		for (const item of fixture.lines) {
+			delete item.chars;
+		}
+		fixture.blocks = fixture.lines
+			.filter(item => item.formXObjectSeqs)
+			.map(item => ({
+				type: 'table',
+				flowClass: 'body',
+				bbox: item.rect,
+				lines: [item.id],
+				startOffset: item.startOffset,
+				endOffset: item.endOffset,
+			}));
+
+		assert.equal(
+			collapse(fixture, [{ bbox: [20, 20, 80, 80] }]),
+			fixture.blocks,
+		);
+	});
+});
+
+describe('compactExcessiveImageBlocks', () => {
+	function imageFragment(index) {
+		const x = (index % 8) * 10;
+		const y = Math.floor(index / 8) * 10;
+		return {
+			type: 'image',
+			flowClass: 'auxiliary',
+			bbox: [x, y, x + 8, y + 8],
+			lines: [index],
+			startOffset: index,
+			endOffset: index,
+		};
+	}
+
+	it('returns pages within the image budget untouched', () => {
+		const lines = Array.from({ length: 5 }, (_, index) => line(index, `label ${index}`, [index * 10, 0, index * 10 + 8, 8], index));
+		const blocks = Array.from({ length: 5 }, (_, index) => imageFragment(index));
+
+		assert.equal(compactExcessiveImageBlocks(blocks, lines, [0, 0, 100, 100]), blocks);
+	});
+
+	it('collapses an excessive adjacent image run without absorbing a table', () => {
+		const lines = Array.from({ length: 40 }, (_, index) => (
+			line(index, `label ${index}`, [(index % 8) * 10, Math.floor(index / 8) * 10, (index % 8) * 10 + 8, Math.floor(index / 8) * 10 + 8], index)
+		));
+		const blocks = [
+			{ type: 'table', flowClass: 'auxiliary', bbox: [-5, 0, -1, 48], lines: [], startOffset: 0, endOffset: -1 },
+			...Array.from({ length: 40 }, (_, index) => imageFragment(index)),
+		];
+
+		const compacted = compactExcessiveImageBlocks(blocks, lines, [0, 0, 100, 100]);
+
+		assert.equal(compacted.length, 2);
+		assert.deepEqual(compacted.map(block => block.type), ['table', 'image']);
+		assert.deepEqual(compacted[1].bbox, [0, 0, 78, 48]);
+		assert.equal(compacted[1].lines.length, 40);
+		assert.equal(compacted[1].flowClass, 'auxiliary');
+	});
+
+	it('enforces the hard limit when images are separated by arbitrary body blocks', () => {
+		const lines = Array.from({ length: 80 }, (_, index) => line(index, `text ${index}`, [index % 10 * 10, Math.floor(index / 10) * 10, index % 10 * 10 + 8, Math.floor(index / 10) * 10 + 8], index));
+		const bodyBlocks = [];
+		const blocks = [];
+		for (let index = 0; index < 40; index++) {
+			blocks.push(imageFragment(index));
+			const body = { type: 'body', flowClass: 'body', bbox: [0, index, 5, index + 1], lines: [40 + index], startOffset: 40 + index, endOffset: 40 + index };
+			bodyBlocks.push(body);
+			blocks.push(body);
+		}
+
+		const compacted = compactExcessiveImageBlocks(blocks, lines, [0, 0, 100, 100]);
+
+		assert.ok(compacted.filter(block => block.type === 'image').length <= MAX_IMAGE_BLOCKS_PER_PAGE);
+		assert.deepEqual(compacted.filter(block => block.type === 'body'), bodyBlocks);
+	});
+
+	it('maintains the image bound across adversarial generated layouts', () => {
+		for (let seed = 1; seed <= 100; seed++) {
+			const imageCount = MAX_IMAGE_BLOCKS_PER_PAGE + seed;
+			const lines = Array.from({ length: imageCount }, (_, index) => line(index, `label ${index}`, [index % 17, index % 23, index % 17 + 1, index % 23 + 1], index));
+			const blocks = [];
+			for (let index = 0; index < imageCount; index++) {
+				blocks.push({
+					...imageFragment(index),
+					flowClass: index % 3 ? 'auxiliary' : 'body',
+					bbox: index % 19 ? [index % 17, index % 23, index % 17 + 1, index % 23 + 1] : null,
+				});
+				if ((index + seed) % 4 === 0) {
+					blocks.push({ type: 'caption', flowClass: 'auxiliary', bbox: [0, 0, 1, 1], lines: [] });
+				}
+			}
+
+			const compacted = compactExcessiveImageBlocks(blocks, lines, seed % 2 ? [0, 0, 100, 100] : null);
+			const outputImageRects = compacted
+				.filter(block => block.type === 'image' && block.bbox)
+				.map(block => block.bbox);
+			assert.ok(countImages(compacted) <= MAX_IMAGE_BLOCKS_PER_PAGE, `seed ${seed}`);
+			for (const block of blocks.filter(block => block.type === 'image' && block.bbox)) {
+				assert.ok(outputImageRects.some(rect => rectContains(rect, block.bbox)), `image coverage for seed ${seed}`);
+			}
+		}
+	});
+
+	it('enforces the bound for thousands of unrelated images', () => {
+		const imageCount = 4096;
+		const lines = Array.from({ length: imageCount }, (_, index) => line(index, '', [index % 64, Math.floor(index / 64), index % 64 + 1, Math.floor(index / 64) + 1], index));
+		const blocks = Array.from({ length: imageCount }, (_, index) => ({
+			...imageFragment(index),
+			flowClass: 'body',
+			bbox: [index % 64, Math.floor(index / 64), index % 64 + 1, Math.floor(index / 64) + 1],
+		}));
+
+		const compacted = compactExcessiveImageBlocks(blocks, lines, [0, 0, 64, 64]);
+
+		assert.ok(countImages(compacted) <= MAX_IMAGE_BLOCKS_PER_PAGE);
+	});
+});
+
+describe('enforceStandaloneGraphicQuality', () => {
+	it('consolidates adjacent sub-figure images into one figure-scale image', () => {
+		const lines = [
+			line(0, 'left', [0, 0, 10, 10], 0),
+			line(1, 'right', [10, 0, 20, 10], 1),
+		];
+		const blocks = [
+			{ type: 'image', flowClass: 'auxiliary', bbox: [0, 0, 10, 10], lines: [0], startOffset: 0, endOffset: 0 },
+			{ type: 'image', flowClass: 'auxiliary', bbox: [10, 0, 20, 10], lines: [1], startOffset: 1, endOffset: 1 },
+		];
+
+		const objectLines = [
+			{ type: 'object', subtype: 'image', rect: [0, 0, 10, 10] },
+			{ type: 'object', subtype: 'image', rect: [10, 0, 20, 10] },
+		];
+		const result = enforceStandaloneGraphicQuality(blocks, lines, [0, 0, 100, 100], objectLines);
+
+		assert.equal(result.length, 1);
+		assert.equal(result[0].type, 'image');
+		assert.deepEqual(result[0].bbox, [0, 0, 20, 10]);
+		assert.deepEqual(result[0].lines, [0, 1]);
+	});
+
+	it('demotes text-bearing tiny images and drops empty tiny images', () => {
+		const lines = [line(0, 'axis tick', [1, 1, 5, 5], 0)];
+		const textImage = { type: 'image', flowClass: 'auxiliary', bbox: [1, 1, 5, 5], lines: [0], startOffset: 0, endOffset: 0 };
+		const emptyImage = { type: 'image', flowClass: 'auxiliary', bbox: [90, 90, 92, 92], lines: [], startOffset: 0, endOffset: -1 };
+
+		const textResult = enforceStandaloneGraphicQuality([textImage], lines, [0, 0, 100, 100]);
+		const emptyResult = enforceStandaloneGraphicQuality([emptyImage], lines, [0, 0, 100, 100]);
+
+		assert.equal(textResult.length, 1);
+		assert.equal(textResult[0].type, 'body');
+		assert.deepEqual(emptyResult, []);
+	});
+
+	it('drops images with invalid geometry', () => {
+		const blocks = [
+			{ type: 'image', flowClass: 'auxiliary', bbox: null, lines: [], startOffset: 0, endOffset: -1 },
+			{ type: 'image', flowClass: 'auxiliary', bbox: [1, 1, Number.NaN, 5], lines: [], startOffset: 0, endOffset: -1 },
+		];
+
+		assert.deepEqual(enforceStandaloneGraphicQuality(blocks, [], [0, 0, 100, 100]), []);
+	});
+
+	it('keeps figure-scale images and compact equations with generic mathematical evidence', () => {
+		const lines = [line(0, 'x ⊗ y', [1, 1, 8, 5], 0)];
+		const blocks = [
+			{ type: 'image', flowClass: 'auxiliary', bbox: [10, 10, 50, 30], lines: [], startOffset: 0, endOffset: -1 },
+			{ type: 'equation', flowClass: 'auxiliary', bbox: [1, 1, 8, 5], lines: [0], startOffset: 0, endOffset: 0 },
+		];
+
+		const objectLines = [
+			{ type: 'object', subtype: 'image', rect: [10, 10, 50, 30] },
+		];
+		const result = enforceStandaloneGraphicQuality(blocks, lines, [0, 0, 100, 100], objectLines);
+
+		assert.deepEqual(result.map(block => block.type), ['image', 'equation']);
+	});
+
+	it('rejects a model image backed only by a page substrate', () => {
+		const lines = [line(0, 'OCR fragment', [20, 20, 80, 80], 0)];
+		const blocks = [
+			{ type: 'image', flowClass: 'auxiliary', bbox: [20, 20, 80, 80], lines: [0], startOffset: 0, endOffset: 0 },
+		];
+		const objectLines = [
+			{ type: 'object', subtype: 'image', rect: [0, 0, 100, 100] },
+		];
+
+		const result = enforceStandaloneGraphicQuality(blocks, lines, [0, 0, 100, 100], objectLines);
+
+		assert.equal(result.length, 1);
+		assert.equal(result[0].type, 'body');
+	});
+
+	it('keeps an independently embedded figure over a page substrate', () => {
+		const blocks = [
+			{ type: 'image', flowClass: 'auxiliary', bbox: [20, 20, 60, 50], lines: [], startOffset: 0, endOffset: -1 },
+		];
+		const objectLines = [
+			{ type: 'object', subtype: 'image', rect: [0, 0, 100, 100] },
+			{ type: 'object', subtype: 'xobject', rect: [20, 20, 60, 50] },
+		];
+
+		const result = enforceStandaloneGraphicQuality(blocks, [], [0, 0, 100, 100], objectLines);
+
+		assert.deepEqual(result, blocks);
+	});
+
+	it('keeps a figure with independent vector-component provenance', () => {
+		const blocks = [
+			{ type: 'image', flowClass: 'auxiliary', bbox: [20, 20, 60, 50], lines: [], startOffset: 0, endOffset: -1 },
+		];
+		const objectLines = [
+			{ type: 'object', subtype: 'path', rect: [20, 20, 60, 50] },
+		];
+
+		const result = enforceStandaloneGraphicQuality(blocks, [], [0, 0, 100, 100], objectLines);
+
+		assert.deepEqual(result, blocks);
+	});
+
+	it('demotes isolated low-information equation fragments across writing systems', () => {
+		const lines = [
+			line(0, '（٢٤）', [90, 40, 98, 46], 0),
+			line(1, '(', [50, 20, 52, 26], 1),
+		];
+		const blocks = [
+			{ type: 'equation', flowClass: 'auxiliary', bbox: [90, 40, 98, 46], lines: [0], startOffset: 0, endOffset: 0 },
+			{ type: 'equation', flowClass: 'auxiliary', bbox: [50, 20, 52, 26], lines: [1], startOffset: 1, endOffset: 1 },
+		];
+
+		const result = enforceStandaloneGraphicQuality(blocks, lines, [0, 0, 100, 100]);
+
+		assert.deepEqual(result.map(block => block.type), ['body', 'body']);
+	});
+
+	it('attaches an undersized aligned satellite without interpreting its text', () => {
+		const lines = [
+			line(0, 'x = y + z', [20, 40, 50, 60], 0),
+			line(1, 'ref', [90, 48, 98, 55], 1),
+		];
+		const blocks = [
+			{ type: 'equation', flowClass: 'auxiliary', bbox: [20, 40, 50, 60], lines: [0], startOffset: 0, endOffset: 0 },
+			{ type: 'equation', flowClass: 'auxiliary', bbox: [90, 48, 98, 55], lines: [1], startOffset: 1, endOffset: 1 },
+		];
+
+		const result = enforceStandaloneGraphicQuality(blocks, lines, [0, 0, 100, 100]);
+
+		assert.equal(result.length, 1);
+		assert.equal(result[0].type, 'equation');
+		assert.deepEqual(result[0].bbox, [20, 40, 98, 60]);
+		assert.deepEqual(result[0].lines, [0, 1]);
 	});
 });
 
@@ -182,6 +747,67 @@ describe('refineGraphicBlocks', () => {
 		assert.deepEqual(refined.map(block => block.lines), [[0], [1], [2]]);
 	});
 
+	it('merges asymmetric stacked extraction shards from structural evidence', () => {
+		const lines = [
+			line(0, '12345678', [20, 90, 60, 100], 0),
+			line(1, '90123456', [20, 80, 60, 90], 1),
+			line(2, '123', [25, 72, 100, 82], 2),
+			line(3, '456', [25, 69, 100, 72], 3),
+			line(4, '789', [25, 66, 100, 69], 4),
+			line(5, '012', [25, 63, 100, 66], 5),
+			line(6, '345', [25, 60, 100, 63], 6),
+			line(7, '678', [25, 58, 100, 60], 7),
+		];
+		const blocks = [
+			{ type: 'body', bbox: [70, 95, 70, 95], lines: [], startOffset: 8, endOffset: 8 },
+			{ type: 'equation', bbox: [20, 80, 60, 100], lines: [0, 1], startOffset: 0, endOffset: 1 },
+			{ type: 'equation', bbox: [25, 58, 100, 82], lines: [2, 3, 4, 5, 6, 7], startOffset: 2, endOffset: 7 },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, []);
+
+		assert.equal(refined.length, 2);
+		assert.deepEqual(refined[1].lines, [0, 1, 2, 3, 4, 5, 6, 7]);
+	});
+
+	it('keeps similarly complete stacked equations separate', () => {
+		const lines = [
+			line(0, '1234567890123456', [20, 80, 60, 100], 0),
+			line(1, '1234567890123456', [25, 58, 100, 82], 1),
+		];
+		const blocks = [
+			{ type: 'body', bbox: [70, 95, 70, 95], lines: [], startOffset: 2, endOffset: 2 },
+			{ type: 'equation', bbox: [20, 80, 60, 100], lines: [0], startOffset: 0, endOffset: 0 },
+			{ type: 'equation', bbox: [25, 58, 100, 82], lines: [1], startOffset: 1, endOffset: 1 },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, []);
+
+		assert.equal(refined.length, 3);
+		assert.deepEqual(refined.slice(1).map(block => block.lines), [[0], [1]]);
+	});
+
+	it('keeps vertically aligned equation blocks in separate columns', () => {
+		const lines = [
+			line(0, '12', [20, 80, 40, 90], 0),
+			line(1, '34', [20, 70, 40, 80], 1),
+			line(2, '56', [120, 90, 150, 100], 2),
+			line(3, '78', [120, 84, 150, 90], 3),
+			line(4, '90', [120, 78, 150, 84], 4),
+			line(5, '12', [120, 72, 150, 78], 5),
+			line(6, '34', [120, 66, 150, 72], 6),
+			line(7, '56', [120, 60, 150, 66], 7),
+		];
+		const blocks = [
+			{ type: 'equation', bbox: [20, 70, 40, 90], lines: [0, 1], startOffset: 0, endOffset: 1 },
+			{ type: 'equation', bbox: [120, 60, 150, 100], lines: [2, 3, 4, 5, 6, 7], startOffset: 2, endOffset: 7 },
+		];
+
+		const refined = refineGraphicBlocks(blocks, lines, []);
+
+		assert.equal(refined.length, 2);
+	});
+
 	it('merges stacked display equation fragments with small gaps', () => {
 		const lines = [
 			line(0, 'λ := min', [80, 80, 125, 90], 0),
@@ -259,10 +885,10 @@ describe('refineGraphicBlocks', () => {
 		assert.deepEqual(refined[0].bbox, [20, 38, 170, 84]);
 	});
 
-	it('does not merge prose-like math blocks into the previous equation', () => {
+	it('does not merge prose-dominant math blocks in another language', () => {
 		const lines = [
 			line(0, '|ψ(y, z)| > (1 + δ)l−1 − δ/2', [40, 80, 220, 110], 0),
-			line(1, 'If y is not in the set, then ψ(y, z) = 0.', [42, 50, 218, 78], 1),
+			line(1, 'Cuando el valor no pertenece al conjunto, entonces ψ(y, z) = 0.', [42, 50, 218, 78], 1),
 		];
 		const blocks = lines.map(item => ({
 			type: 'equation',
@@ -357,6 +983,29 @@ describe('refineGraphicBlocks', () => {
 		];
 
 		const refined = refineGraphicBlocks([], [], objectLines, [0, 0, 612, 792]);
+
+		assert.deepEqual(refined, []);
+	});
+
+	it('does not insert a full-page raster substrate as an image', () => {
+		const objectLines = [
+			{ type: 'object', subtype: 'image', rect: [0, 0, 100, 100] },
+		];
+
+		const refined = refineGraphicBlocks([], [], objectLines, [0, 0, 100, 100]);
+
+		assert.deepEqual(refined, []);
+	});
+
+	it('does not insert collectively page-covering raster tiles', () => {
+		const objectLines = [
+			{ type: 'object', subtype: 'image', rect: [0, 0, 50, 50] },
+			{ type: 'object', subtype: 'image', rect: [50, 0, 100, 50] },
+			{ type: 'object', subtype: 'image', rect: [0, 50, 50, 100] },
+			{ type: 'object', subtype: 'image', rect: [50, 50, 100, 100] },
+		];
+
+		const refined = refineGraphicBlocks([], [], objectLines, [0, 0, 100, 100]);
 
 		assert.deepEqual(refined, []);
 	});

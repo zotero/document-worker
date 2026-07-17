@@ -17,11 +17,16 @@ const OBJECT_COMPONENT_GAP = 1.5;
 const BLOCKER_INFLATE = 1.5;
 const MIN_SIGHT_OVERLAP = 0.5;
 const DISTANCE_EPSILON = 1e-6;
-const OBJECT_IMAGE_SUBTYPES = new Set(['image', 'xobject']);
+const OBJECT_IMAGE_SUBTYPES = new Set(['image', 'inline-image', 'xobject']);
 const STANDALONE_IMAGE_MIN_WIDTH_RATIO = 0.15;
 const STANDALONE_IMAGE_MIN_HEIGHT_RATIO = 0.08;
 const STANDALONE_IMAGE_MIN_AREA_RATIO = 0.015;
 const STANDALONE_IMAGE_MIN_SIZE_MATCHES = 2;
+const PAGE_SUBSTRATE_MIN_COVERAGE = 0.8;
+const PAGE_SUBSTRATE_MAX_TILE_OVERLAP_RATIO = 0.1;
+const PAGE_SUBSTRATE_MAX_TILE_GAP_RATIO = 0.005;
+const IMAGE_PROVENANCE_MIN_BLOCK_COVERAGE = 0.2;
+const IMAGE_PROVENANCE_MIN_COMPONENT_SPAN_RATIO = 0.25;
 const RULED_TABLE_ORIENTATION_RATIO = 8;
 const RULED_TABLE_MIN_RULE_LENGTH_RATIO = 0.04;
 const RULED_TABLE_MAX_RULE_THICKNESS = 2.5;
@@ -46,10 +51,19 @@ const SCANNED_TABLE_JUNK_MAX_WIDTH_RATIO = 0.08;
 const SCANNED_TABLE_MAX_FRAGMENT_GAP_RATIO = 4;
 const DISPLAY_EQUATION_MAX_FRAGMENT_GAP_RATIO = 2.5;
 const DISPLAY_EQUATION_MAX_HORIZONTAL_GAP_RATIO = 1.5;
-const DISPLAY_EQUATION_FRAGMENT_MAX_TEXT_LENGTH = 32;
 const DISPLAY_EQUATION_SHORT_TEXT_LENGTH = 12;
 const DISPLAY_EQUATION_VISUAL_JOIN_MIN_VERTICAL_OVERLAP_RATIO = 0.5;
 const DISPLAY_EQUATION_VISUAL_JOIN_MAX_HORIZONTAL_GAP_RATIO = 0.25;
+const DISPLAY_EQUATION_STACKED_MIN_VERTICAL_OVERLAP_RATIO = 0.1;
+const DISPLAY_EQUATION_STACKED_MIN_HORIZONTAL_OVERLAP_RATIO = 0.8;
+const DISPLAY_EQUATION_STACKED_MAX_LINE_COUNT_RATIO = 0.5;
+const DISPLAY_EQUATION_PROSE_MIN_LETTER_RATIO = 0.6;
+const DISPLAY_EQUATION_PROSE_MIN_AVERAGE_WORD_LENGTH = 3;
+const EQUATION_SATELLITE_MAX_AREA_RATIO = 0.35;
+const TRIVIAL_EQUATION_MAX_CHARACTER_COUNT = 3;
+const FORM_SCENE_MAX_TEXT_CHARS_PER_PAINT_OBJECT = 3;
+export const MAX_IMAGE_BLOCKS_PER_PAGE = 32;
+const equationTextProfileCache = new WeakMap();
 
 function getPageNumber(pageDataItem) {
 	return Number.isInteger(pageDataItem?.pageIndex) ? pageDataItem.pageIndex + 1 : '?';
@@ -399,6 +413,187 @@ function buildObjectRefinementContext(objectLines) {
 		});
 	}
 	return { validObjects };
+}
+
+function createDisjointSet(size) {
+	const parents = Array.from({ length: size }, (_, index) => index);
+	const find = (index) => {
+		let root = index;
+		while (parents[root] !== root) root = parents[root];
+		while (parents[index] !== index) {
+			const next = parents[index];
+			parents[index] = root;
+			index = next;
+		}
+		return root;
+	};
+	const union = (first, second) => {
+		const firstRoot = find(first);
+		const secondRoot = find(second);
+		if (firstRoot !== secondRoot) parents[secondRoot] = firstRoot;
+	};
+	return { find, union };
+}
+
+function clipRectToPage(rect, pageRect) {
+	if (!isValidRect(rect) || !isValidRect(pageRect)) {
+		return null;
+	}
+	const clipped = [
+		Math.max(rect[0], pageRect[0]),
+		Math.max(rect[1], pageRect[1]),
+		Math.min(rect[2], pageRect[2]),
+		Math.min(rect[3], pageRect[3]),
+	];
+	return validRectArea(clipped) > 0 ? clipped : null;
+}
+
+function getRectUnionArea(rects, pageRect) {
+	const clippedRects = rects
+		.map(rect => clipRectToPage(rect, pageRect))
+		.filter(Boolean);
+	if (!clippedRects.length) {
+		return 0;
+	}
+	const events = [];
+	for (let id = 0; id < clippedRects.length; id++) {
+		events.push({ x: clippedRects[id][0], id, entering: true });
+		events.push({ x: clippedRects[id][2], id, entering: false });
+	}
+	events.sort((a, b) => a.x - b.x || Number(a.entering) - Number(b.entering));
+
+	const active = new Set();
+	let area = 0;
+	let previousX = events[0].x;
+	for (let i = 0; i < events.length;) {
+		const x = events[i].x;
+		if (x > previousX && active.size) {
+			const intervals = [...active]
+				.map(id => [clippedRects[id][1], clippedRects[id][3]])
+				.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+			let coveredY = 0;
+			let [start, end] = intervals[0];
+			for (const interval of intervals.slice(1)) {
+				if (interval[0] <= end) {
+					end = Math.max(end, interval[1]);
+				}
+				else {
+					coveredY += end - start;
+					[start, end] = interval;
+				}
+			}
+			coveredY += end - start;
+			area += (x - previousX) * coveredY;
+		}
+		while (i < events.length && events[i].x === x) {
+			if (events[i].entering) {
+				active.add(events[i].id);
+			}
+			else {
+				active.delete(events[i].id);
+			}
+			i++;
+		}
+		previousX = x;
+	}
+	return area;
+}
+
+function rasterObjectsCanShareSubstrate(first, second, maxGap) {
+	if (rectDistance(first.bbox, second.bbox) > maxGap) {
+		return false;
+	}
+	const smallerArea = Math.min(validRectArea(first.bbox), validRectArea(second.bbox));
+	if (smallerArea <= 0) {
+		return false;
+	}
+	return intersectionArea(first.bbox, second.bbox) / smallerArea
+		<= PAGE_SUBSTRATE_MAX_TILE_OVERLAP_RATIO;
+}
+
+function getPageSubstrateObjectIndexes(objectContext, pageRect) {
+	if (!isValidRect(pageRect)) {
+		return new Set();
+	}
+	const pageArea = validRectArea(pageRect);
+	if (pageArea <= 0) {
+		return new Set();
+	}
+
+	const rasterObjects = objectContext.validObjects
+		.filter(object => OBJECT_IMAGE_SUBTYPES.has(object.subtype))
+		.sort((a, b) => a.bbox[0] - b.bbox[0] || a.index - b.index);
+	const { find, union } = createDisjointSet(rasterObjects.length);
+	const pageWidth = pageRect[2] - pageRect[0];
+	const pageHeight = pageRect[3] - pageRect[1];
+	const maxGap = Math.max(OBJECT_COMPONENT_GAP, Math.min(pageWidth, pageHeight) * PAGE_SUBSTRATE_MAX_TILE_GAP_RATIO);
+	for (let i = 0; i < rasterObjects.length; i++) {
+		for (let j = i + 1; j < rasterObjects.length; j++) {
+			if (rasterObjects[j].bbox[0] > rasterObjects[i].bbox[2] + maxGap) {
+				break;
+			}
+			if (rasterObjectsCanShareSubstrate(rasterObjects[i], rasterObjects[j], maxGap)) {
+				union(i, j);
+			}
+		}
+	}
+
+	const groups = new Map();
+	for (let i = 0; i < rasterObjects.length; i++) {
+		const root = find(i);
+		if (!groups.has(root)) {
+			groups.set(root, []);
+		}
+		groups.get(root).push(rasterObjects[i]);
+	}
+
+	const objectIndexes = new Set();
+	for (const objects of groups.values()) {
+		const coverage = getRectUnionArea(objects.map(object => object.bbox), pageRect) / pageArea;
+		if (coverage < PAGE_SUBSTRATE_MIN_COVERAGE) {
+			continue;
+		}
+		for (const object of objects) {
+			objectIndexes.add(object.index);
+		}
+	}
+
+	// Page-sized non-raster objects are backgrounds rather than independent
+	// figure provenance. Keep them out of graphic expansion as well.
+	for (const object of objectContext.validObjects) {
+		if (objectIndexes.has(object.index)) {
+			continue;
+		}
+		const clipped = clipRectToPage(object.bbox, pageRect);
+		const coverage = clipped ? validRectArea(clipped) / pageArea : 0;
+		if (coverage < PAGE_SUBSTRATE_MIN_COVERAGE) {
+			continue;
+		}
+		objectIndexes.add(object.index);
+	}
+
+	return objectIndexes;
+}
+
+function excludeSubstrateObjects(objectContext, substrateObjectIndexes) {
+	if (!substrateObjectIndexes.size) {
+		return objectContext;
+	}
+	return {
+		validObjects: objectContext.validObjects.filter(object => !substrateObjectIndexes.has(object.index)),
+	};
+}
+
+function buildGraphicObjectContexts(objectLines, pageRect) {
+	const sourceObjectContext = buildObjectRefinementContext(objectLines);
+	const substrateObjectIndexes = getPageSubstrateObjectIndexes(sourceObjectContext, pageRect);
+	return {
+		sourceObjectContext,
+		independentObjectContext: excludeSubstrateObjects(
+			sourceObjectContext,
+			substrateObjectIndexes,
+		),
+	};
 }
 
 function getHorizontalRuleCandidate(object, pageRect) {
@@ -769,10 +964,7 @@ function isTinyScannedTableJunk(block, lines, pageRect) {
 	return (block.bbox[2] - block.bbox[0]) / pageWidth <= SCANNED_TABLE_JUNK_MAX_WIDTH_RATIO;
 }
 
-function cleanupScannedTableJunkFragments(blocks, lines, objectContext, pageRect) {
-	if (!hasFullPageImageObject(objectContext, pageRect)) {
-		return blocks;
-	}
+function cleanupScannedTableJunkFragments(blocks, lines, pageRect) {
 	let changed = false;
 	const result = blocks.map(block => {
 		if (!isTinyScannedTableJunk(block, lines, pageRect)) {
@@ -834,11 +1026,7 @@ function getScannedTableMergeSegment(blockIndexes, blocks, lines, textBbox) {
 	return blockIndexes.slice(captionOffset);
 }
 
-function mergeDenseScannedTableFragments(blocks, lines, objectContext, pageRect) {
-	if (!hasFullPageImageObject(objectContext, pageRect)) {
-		return blocks;
-	}
-
+function mergeDenseScannedTableFragments(blocks, lines, pageRect) {
 	const pageWidth = isValidRect(pageRect) ? Math.max(1, pageRect[2] - pageRect[0]) : 1;
 	const mergeByFirstIndex = new Map();
 	const replaceByIndex = new Map();
@@ -937,7 +1125,6 @@ function buildObjectComponents(objectContext, blockers = []) {
 		version: 1,
 		active: true,
 		bbox: object.bbox,
-		objectIndexes: [object.index],
 	}));
 	const objectCount = components.length;
 	const mergeablePairs = [];
@@ -1045,21 +1232,23 @@ function buildObjectComponents(objectContext, blockers = []) {
 		}
 	};
 	const addInitialMergeablePairs = () => {
-		const byX = components
-			.slice()
-			.sort((a, b) => a.bbox[0] - b.bbox[0] || a.id - b.id);
-		const byY = components
-			.slice()
-			.sort((a, b) => a.bbox[1] - b.bbox[1] || a.id - b.id);
-		const countLimit = 1000000;
-		const xPairCount = getIntervalPairCount(byX, 0, 2, countLimit);
-		const yPairCount = getIntervalPairCount(byY, 1, 3, countLimit);
-		if (yPairCount < xPairCount) {
-			addInitialPairsForAxis(byY, 1, 3);
+		if (!objectContext.componentOrder) {
+			const byX = components
+				.slice()
+				.sort((a, b) => a.bbox[0] - b.bbox[0] || a.id - b.id);
+			const byY = components
+				.slice()
+				.sort((a, b) => a.bbox[1] - b.bbox[1] || a.id - b.id);
+			const countLimit = 1000000;
+			const xPairCount = getIntervalPairCount(byX, 0, 2, countLimit);
+			const yPairCount = getIntervalPairCount(byY, 1, 3, countLimit);
+			objectContext.componentAxis = yPairCount < xPairCount ? 1 : 0;
+			objectContext.componentOrder = (objectContext.componentAxis ? byY : byX)
+				.map(component => component.id);
 		}
-		else {
-			addInitialPairsForAxis(byX, 0, 2);
-		}
+		const sortedComponents = objectContext.componentOrder.map(id => components[id]);
+		const minIndex = objectContext.componentAxis;
+		addInitialPairsForAxis(sortedComponents, minIndex, minIndex + 2);
 	};
 
 	addInitialMergeablePairs();
@@ -1079,7 +1268,6 @@ function buildObjectComponents(objectContext, blockers = []) {
 
 		first.bbox = pair.bbox;
 		first.version++;
-		first.objectIndexes.push(...second.objectIndexes);
 		second.active = false;
 
 		for (const component of components) {
@@ -1092,13 +1280,54 @@ function buildObjectComponents(objectContext, blockers = []) {
 	const result = [];
 	for (const component of components) {
 		if (component.active) {
-			result.push({
-				bbox: component.bbox,
-				objectIndexes: component.objectIndexes,
-			});
+			result.push(component.bbox);
 		}
 	}
 	return result;
+}
+
+function componentSupportsImageBlock(componentBbox, block, pageRect) {
+	if (!isValidRect(componentBbox) || !isValidRect(block?.bbox)) {
+		return false;
+	}
+	const componentArea = validRectArea(componentBbox);
+	const blockArea = validRectArea(block.bbox);
+	if (componentArea <= 0 || blockArea <= 0) {
+		return false;
+	}
+	const pageArea = isValidRect(pageRect) ? validRectArea(pageRect) : 0;
+	if (pageArea > 0 && componentArea / pageArea >= PAGE_SUBSTRATE_MIN_COVERAGE) {
+		return false;
+	}
+	const overlapArea = intersectionArea(componentBbox, block.bbox);
+	if (overlapArea / blockArea >= IMAGE_PROVENANCE_MIN_BLOCK_COVERAGE) {
+		return true;
+	}
+	const componentWidth = componentBbox[2] - componentBbox[0];
+	const componentHeight = componentBbox[3] - componentBbox[1];
+	const blockWidth = block.bbox[2] - block.bbox[0];
+	const blockHeight = block.bbox[3] - block.bbox[1];
+	return overlapArea / componentArea >= 0.8
+		&& componentWidth / blockWidth >= IMAGE_PROVENANCE_MIN_COMPONENT_SPAN_RATIO
+		&& componentHeight / blockHeight >= IMAGE_PROVENANCE_MIN_COMPONENT_SPAN_RATIO;
+}
+
+function buildImageEligibilityPredicate(blocks, lines, pageRect, independentObjectContext) {
+	const objects = independentObjectContext.validObjects;
+	if (!objects.length) {
+		return () => false;
+	}
+	if (objects.length === 1) {
+		return block => componentSupportsImageBlock(objects[0].bbox, block, pageRect);
+	}
+
+	let blockContext = null;
+	return (block) => {
+		blockContext ||= buildBlockRefinementContext(blocks, lines);
+		const blockers = blockContext.getBlockers(new Set([block]));
+		const components = buildObjectComponents(independentObjectContext, blockers);
+		return components.some(componentBbox => componentSupportsImageBlock(componentBbox, block, pageRect));
+	};
 }
 
 function shouldJoinValidObjectImageCandidate(candidateBbox, objectBbox) {
@@ -1139,7 +1368,6 @@ function buildObjectImageCandidates(objectContext) {
 
 		candidates.push({
 			bbox,
-			objectIndexes,
 			hasXObject: object.subtype === 'xobject',
 		});
 	}
@@ -1154,7 +1382,6 @@ function buildObjectImageCandidates(objectContext) {
 				}
 				candidates[i] = {
 					bbox: unionValidRects(candidates[i].bbox, candidates[j].bbox),
-					objectIndexes: new Set([...candidates[i].objectIndexes, ...candidates[j].objectIndexes]),
 					hasXObject: candidates[i].hasXObject || candidates[j].hasXObject,
 				};
 				candidates.splice(j, 1);
@@ -1168,47 +1395,25 @@ function buildObjectImageCandidates(objectContext) {
 }
 
 function getGraphicComponentIds(lineIds, lines, objectComponents, blockers) {
-	const nodes = [];
-	const lineNodeIndexes = new Map();
+	const rects = [];
+	const lineRectIndexes = new Map();
 
 	for (const lineId of lineIds) {
 		const rect = getLineRect(lines, lineId);
 		if (!rect) {
 			continue;
 		}
-		lineNodeIndexes.set(lineId, nodes.length);
-		nodes.push({ kind: 'line', lineId, rect });
+		lineRectIndexes.set(lineId, rects.length);
+		rects.push(rect);
 	}
 	for (let i = 0; i < objectComponents.length; i++) {
-		nodes.push({ kind: 'object', objectIndex: i, rect: objectComponents[i].bbox });
+		rects.push(objectComponents[i]);
 	}
 
-	const parents = new Array(nodes.length);
-	for (let i = 0; i < parents.length; i++) {
-		parents[i] = i;
-	}
-	const find = index => {
-		let root = index;
-		while (parents[root] !== root) {
-			root = parents[root];
-		}
-		while (parents[index] !== index) {
-			const next = parents[index];
-			parents[index] = root;
-			index = next;
-		}
-		return root;
-	};
-	const union = (a, b) => {
-		const rootA = find(a);
-		const rootB = find(b);
-		if (rootA !== rootB) {
-			parents[rootB] = rootA;
-		}
-	};
-	for (let i = 0; i < nodes.length; i++) {
-		for (let j = i + 1; j < nodes.length; j++) {
-			if (!hasDirectSightValid(nodes[i].rect, nodes[j].rect, blockers)) {
+	const { find, union } = createDisjointSet(rects.length);
+	for (let i = 0; i < rects.length; i++) {
+		for (let j = i + 1; j < rects.length; j++) {
+			if (!hasDirectSightValid(rects[i], rects[j], blockers)) {
 				continue;
 			}
 			union(i, j);
@@ -1216,8 +1421,8 @@ function getGraphicComponentIds(lineIds, lines, objectComponents, blockers) {
 	}
 
 	const componentByLine = new Map();
-	for (const [lineId, nodeIndex] of lineNodeIndexes) {
-		componentByLine.set(lineId, find(nodeIndex));
+	for (const [lineId, rectIndex] of lineRectIndexes) {
+		componentByLine.set(lineId, find(rectIndex));
 	}
 	return componentByLine;
 }
@@ -1287,14 +1492,14 @@ function expandGraphicBlock(block, blockContext, lines, objectContext) {
 			if (includedObjects.has(i)) {
 				continue;
 			}
-			if (!isValidRect(bbox) || !hasDirectSightValid(bbox, objectComponents[i].bbox, blockers)) {
+			if (!isValidRect(bbox) || !hasDirectSightValid(bbox, objectComponents[i], blockers)) {
 				continue;
 			}
-			if (objectBelongsCloserToAnotherBlock(objectComponents[i].bbox, bbox, block, blockContext)) {
+			if (objectBelongsCloserToAnotherBlock(objectComponents[i], bbox, block, blockContext)) {
 				continue;
 			}
 			includedObjects.add(i);
-			bbox = unionValidRects(bbox, objectComponents[i].bbox);
+			bbox = unionValidRects(bbox, objectComponents[i]);
 			changed = true;
 		}
 	}
@@ -1376,6 +1581,412 @@ function mergeGraphicBlocks(first, second, lines) {
 	};
 }
 
+function getBlockLineGroupsExcluding(block, excludedLineIds) {
+	const groups = [];
+	let group = [];
+	for (const lineId of block.lines || []) {
+		if (excludedLineIds.has(lineId)) {
+			if (group.length) groups.push(group);
+			group = [];
+			continue;
+		}
+		group.push(lineId);
+	}
+	if (group.length) groups.push(group);
+	return groups;
+}
+
+function getLineCharRanges(lineIds, lines) {
+	const merged = [];
+	for (const lineId of lineIds) {
+		const line = lines[lineId];
+		if (!Number.isInteger(line?.startOffset) || !Number.isInteger(line?.endOffset)) {
+			continue;
+		}
+		const previous = merged[merged.length - 1];
+		if (previous && line.startOffset <= previous[1] + 1) {
+			previous[1] = Math.max(previous[1], line.endOffset);
+		}
+		else {
+			merged.push([line.startOffset, line.endOffset]);
+		}
+	}
+	return merged;
+}
+
+function getPaintGlyphKey(line) {
+	if (!Array.isArray(line?.chars) || !line.chars.length) {
+		return null;
+	}
+	const { fontName, paintGlyph } = line.chars[0] || {};
+	if (
+		(typeof paintGlyph !== 'string' && !Number.isFinite(paintGlyph))
+		|| typeof fontName !== 'string'
+	) {
+		return null;
+	}
+	const paintKey = `${fontName}\0${paintGlyph}`;
+	return line.chars.every(char => (
+		(typeof char?.paintGlyph === 'string' || Number.isFinite(char?.paintGlyph))
+		&& typeof char?.fontName === 'string'
+		&& `${char.fontName}\0${char.paintGlyph}` === paintKey
+	)) ? paintKey : null;
+}
+
+function getRepeatedPaintGlyphLineIds(lines) {
+	const linesByPaintKey = new Map();
+	for (const line of lines) {
+		const paintKey = getPaintGlyphKey(line);
+		if (!paintKey) continue;
+		if (!linesByPaintKey.has(paintKey)) linesByPaintKey.set(paintKey, []);
+		linesByPaintKey.get(paintKey).push(line.id);
+	}
+	return new Set(
+		[...linesByPaintKey.values()]
+			.filter(lineIds => lineIds.length > MAX_IMAGE_BLOCKS_PER_PAGE)
+			.flat(),
+	);
+}
+
+function isPaintFragmentBlock(block, paintFragmentLineIds) {
+	return isValidRect(block?.bbox)
+		&& block?.lines?.length
+		&& block.lines.every(lineId => paintFragmentLineIds.has(lineId));
+}
+
+function createPaintSceneImage(blocks, sceneLineIds, retainedLineIds, bbox, context) {
+	const metrics = getLineBlockMetrics(sceneLineIds, context.lines, bbox);
+	const flowClasses = new Set(blocks.map(block => block.flowClass).filter(Boolean));
+	return {
+		type: 'image',
+		flowClass: flowClasses.size === 1 ? [...flowClasses][0] : 'auxiliary',
+		bbox: bbox.slice(0, 4),
+		lines: retainedLineIds,
+		startOffset: metrics.startOffset,
+		endOffset: metrics.endOffset,
+		_charRanges: getLineCharRanges(retainedLineIds, context.lines),
+	};
+}
+
+function replaceSceneBlocks(
+	blocks,
+	sceneBlocks,
+	bbox,
+	context,
+	includedLineIds = null,
+	retainedLineIds = null,
+) {
+	const { lines, validateReplacement } = context;
+	const sceneBlockSet = new Set(sceneBlocks);
+	const sceneLineIds = includedLineIds || new Set(sceneBlocks.flatMap(block => block.lines || []));
+	const remaining = [];
+	for (const block of blocks) {
+		const blockLineIds = block.lines || [];
+		const hasSceneLine = blockLineIds.some(lineId => sceneLineIds.has(lineId));
+		if (!sceneBlockSet.has(block) && !hasSceneLine) {
+			remaining.push(block);
+			continue;
+		}
+		if (
+			sceneBlockSet.has(block)
+			&& blockLineIds.every(lineId => sceneLineIds.has(lineId))
+		) {
+			continue;
+		}
+		const groups = getBlockLineGroupsExcluding(block, sceneLineIds);
+		for (const group of groups) {
+			remaining.push(createBlockFromLines(block, group, lines));
+		}
+	}
+	const lineIds = [...sceneLineIds]
+		.filter(lineId => lines[lineId])
+		.sort((a, b) => (lines[a]?.startOffset ?? a) - (lines[b]?.startOffset ?? b));
+	const imageLineIds = retainedLineIds === null
+		? lineIds
+		: lineIds.filter(lineId => retainedLineIds.has(lineId));
+	const sceneImage = createPaintSceneImage(
+		sceneBlocks,
+		lineIds,
+		imageLineIds,
+		bbox,
+		context,
+	);
+	remaining.push(sceneImage);
+	const replacement = remaining.sort((a, b) => a.startOffset - b.startOffset);
+	return validateReplacement(replacement, sceneImage)
+		? replacement
+		: null;
+}
+
+function formSceneContainsLine(scene, line) {
+	return Number.isFinite(scene?.seq)
+		&& Array.isArray(line?.formXObjectSeqs)
+		&& line.formXObjectSeqs.includes(scene.seq);
+}
+
+function collapseFormPaintScenes(blocks, formScenes, context) {
+	const { lines, pageRect, paintFragmentLineIds } = context;
+	const pageArea = isValidRect(pageRect) ? validRectArea(pageRect) : 0;
+	const candidates = (formScenes || [])
+		.filter(scene => (
+			isValidRect(scene?.rect)
+			&& Number.isInteger(scene.paintObjectCount)
+			&& scene.paintObjectCount > MAX_IMAGE_BLOCKS_PER_PAGE
+			&& (
+				Number.isInteger(scene.textCharCount)
+				&& scene.textCharCount
+					<= scene.paintObjectCount * FORM_SCENE_MAX_TEXT_CHARS_PER_PAINT_OBJECT
+			)
+			&& passesStandaloneImageSize({ bbox: scene.rect }, pageRect)
+			&& (
+				pageArea <= 0
+				|| validRectArea(scene.rect) / pageArea < PAGE_SUBSTRATE_MIN_COVERAGE
+			)
+		))
+		.sort((a, b) => (
+			(b.formXObjectSeqs?.length || 0) - (a.formXObjectSeqs?.length || 0)
+			|| validRectArea(a.rect) - validRectArea(b.rect)
+		));
+	if (!candidates.length) {
+		return blocks;
+	}
+
+	let result = blocks;
+	const coveredFormSeqs = new Set();
+	for (const scene of candidates) {
+		if (coveredFormSeqs.has(scene.seq)) {
+			continue;
+		}
+		if (result.some(block => (
+			block?.type === 'image'
+			&& isValidRect(block.bbox)
+			&& validRectContains(block.bbox, scene.rect, OBJECT_COMPONENT_GAP)
+		))) {
+			continue;
+		}
+		const formLineIds = new Set(
+			lines.filter(line => formSceneContainsLine(scene, line)).map(line => line.id),
+		);
+		const fragmentLineIds = new Set(
+			[...formLineIds].filter(lineId => paintFragmentLineIds.has(lineId)),
+		);
+		const fragmentBlocks = result.filter(block => (
+			(block.lines || []).some(lineId => fragmentLineIds.has(lineId))
+		));
+		const lineFreeGraphicBlocks = result.filter(block => (
+			GRAPHIC_BLOCK_TYPES.has(block?.type)
+			&& !(block.lines || []).length
+			&& isValidRect(block.bbox)
+			&& validRectContains(scene.rect, block.bbox, OBJECT_COMPONENT_GAP)
+		));
+		let sceneBlocks = [...fragmentBlocks, ...lineFreeGraphicBlocks];
+		let sceneLineIds = fragmentLineIds;
+		const fragmentCount = fragmentLineIds.size + lineFreeGraphicBlocks.length;
+		if (fragmentCount <= MAX_IMAGE_BLOCKS_PER_PAGE) {
+			const formBlocks = result.filter(block => (
+				(block.lines || []).some(lineId => formLineIds.has(lineId))
+			));
+			if (
+				fragmentLineIds.size
+				|| formBlocks.length <= MAX_IMAGE_BLOCKS_PER_PAGE
+				|| formBlocks.some(block => block.type === 'table')
+			) {
+				continue;
+			}
+			sceneBlocks = [...formBlocks, ...lineFreeGraphicBlocks];
+			sceneLineIds = formLineIds;
+		}
+		const replacement = replaceSceneBlocks(
+			result,
+			sceneBlocks,
+			scene.rect,
+			context,
+			sceneLineIds,
+			fragmentLineIds.size ? new Set() : null,
+		);
+		if (!replacement) {
+			continue;
+		}
+		result = replacement;
+		for (const seq of scene.formXObjectSeqs || [scene.seq]) {
+			coveredFormSeqs.add(seq);
+		}
+	}
+	return result;
+}
+
+function buildPaintFragmentComponents(blocks, paintFragmentLineIds) {
+	const fragments = blocks
+		.filter(block => isPaintFragmentBlock(block, paintFragmentLineIds))
+		.map((block, id) => ({ id, block, bbox: block.bbox }));
+	if (fragments.length <= MAX_IMAGE_BLOCKS_PER_PAGE) {
+		return [];
+	}
+	const heights = fragments
+		.map(fragment => fragment.bbox[3] - fragment.bbox[1])
+		.filter(height => height > 0)
+		.sort((a, b) => a - b);
+	const gap = Math.max(OBJECT_COMPONENT_GAP, heights[Math.floor(heights.length / 2)] || 0);
+	const { find, union } = createDisjointSet(fragments.length);
+	const byX = fragments.slice().sort((a, b) => a.bbox[0] - b.bbox[0] || a.id - b.id);
+	for (let i = 0; i < byX.length; i++) {
+		const first = byX[i];
+		for (let j = i + 1; j < byX.length; j++) {
+			const second = byX[j];
+			if (second.bbox[0] > first.bbox[2] + gap) {
+				break;
+			}
+			if (
+				second.bbox[1] <= first.bbox[3] + gap
+				&& second.bbox[3] >= first.bbox[1] - gap
+			) {
+				union(first.id, second.id);
+			}
+		}
+	}
+	const groups = new Map();
+	for (const fragment of fragments) {
+		const root = find(fragment.id);
+		if (!groups.has(root)) groups.set(root, []);
+		groups.get(root).push(fragment.block);
+	}
+	return [...groups.values()].filter(group => group.length > MAX_IMAGE_BLOCKS_PER_PAGE);
+}
+
+function collapseFragmentsIntoImageScenes(blocks, context) {
+	const { pageRect, paintFragmentLineIds } = context;
+	const images = blocks.filter(block => (
+		block?.type === 'image'
+		&& isValidRect(block.bbox)
+		&& passesStandaloneImageSize(block, pageRect)
+	));
+	if (!images.length) {
+		return blocks;
+	}
+	const fragmentsByImage = new Map(images.map(image => [image, []]));
+	for (const block of blocks) {
+		if (!isPaintFragmentBlock(block, paintFragmentLineIds)) {
+			continue;
+		}
+		let containingImage = null;
+		for (const image of images) {
+			if (
+				validRectCenterInside(block.bbox, image.bbox)
+				&& (
+					!containingImage
+					|| validRectArea(image.bbox) < validRectArea(containingImage.bbox)
+				)
+			) {
+				containingImage = image;
+			}
+		}
+		if (containingImage) {
+			fragmentsByImage.get(containingImage).push(block);
+		}
+	}
+
+	let result = blocks;
+	for (const image of images) {
+		const fragments = fragmentsByImage.get(image);
+		if (fragments.length <= MAX_IMAGE_BLOCKS_PER_PAGE || !result.includes(image)) {
+			continue;
+		}
+		const sceneBlocks = [image, ...fragments.filter(fragment => result.includes(fragment))];
+		const bbox = unionRects(sceneBlocks.map(block => block.bbox));
+		const retainedLineIds = new Set(
+			(image.lines || []).filter(lineId => !paintFragmentLineIds.has(lineId)),
+		);
+		result = replaceSceneBlocks(
+			result,
+			sceneBlocks,
+			bbox,
+			context,
+			null,
+			retainedLineIds,
+		) || result;
+	}
+	return result;
+}
+
+function expandSceneBboxWithObjects(bbox, objectContext) {
+	let expanded = bbox.slice();
+	const includedObjects = new Set();
+	let changed = true;
+	while (changed) {
+		changed = false;
+		for (const object of objectContext.validObjects) {
+			if (
+				includedObjects.has(object)
+				|| rectDistance(expanded, object.bbox) > OBJECT_COMPONENT_GAP
+			) {
+				continue;
+			}
+			includedObjects.add(object);
+			const next = unionValidRects(expanded, object.bbox);
+			if (!rectsEqual(next, expanded)) {
+				expanded = next;
+				changed = true;
+			}
+		}
+	}
+	return expanded;
+}
+
+function collapseFragmentPaintScenes(blocks, context) {
+	const { pageRect, objectContext, paintFragmentLineIds } = context;
+	let result = blocks;
+	for (const component of buildPaintFragmentComponents(blocks, paintFragmentLineIds)) {
+		const liveBlocks = component.filter(block => result.includes(block));
+		if (liveBlocks.length <= MAX_IMAGE_BLOCKS_PER_PAGE) {
+			continue;
+		}
+		let bbox = unionRects(liveBlocks.map(block => block.bbox));
+		bbox = expandSceneBboxWithObjects(bbox, objectContext);
+		if (!passesStandaloneImageSize({ bbox }, pageRect)) {
+			continue;
+		}
+		result = replaceSceneBlocks(
+			result,
+			liveBlocks,
+			bbox,
+			context,
+			null,
+			new Set(),
+		) || result;
+	}
+	return result;
+}
+
+export function collapsePaintScenes(
+	blocks,
+	lines,
+	formScenes,
+	pageRect,
+	objectContext,
+) {
+	if (!Array.isArray(blocks) || !Array.isArray(lines)) {
+		return blocks || [];
+	}
+	const context = {
+		lines,
+		pageRect,
+		objectContext,
+		paintFragmentLineIds: getRepeatedPaintGlyphLineIds(lines),
+		validateReplacement: (replacement, sceneImage) => (
+			buildImageEligibilityPredicate(
+				replacement,
+				lines,
+				pageRect,
+				objectContext,
+			)(sceneImage)
+		),
+	};
+	let result = collapseFormPaintScenes(blocks, formScenes, context);
+	result = collapseFragmentsIntoImageScenes(result, context);
+	result = collapseFragmentPaintScenes(result, context);
+	return result;
+}
+
 function canMergeEquationBlocks(first, second, blockContext) {
 	if (first?.type !== 'equation' || second?.type !== 'equation') {
 		return false;
@@ -1387,59 +1998,73 @@ function canMergeEquationBlocks(first, second, blockContext) {
 	return clearSightRect(unionRects([first.bbox, second.bbox]), blockers);
 }
 
-function getEquationFragmentText(block, lines) {
-	return getBlockLineText(block, lines).replace(/\s+/g, ' ').trim();
+function getEquationTextProfile(block, lines) {
+	const cached = equationTextProfileCache.get(block);
+	if (cached?.lines === lines) return cached.profile;
+
+	const text = getBlockLineText(block, lines).replace(/\s+/g, ' ').trim();
+	const characters = Array.from(text).filter(character => !/\s/u.test(character));
+	const words = text.match(/\p{L}{2,}/gu) || [];
+	let letterCount = 0;
+	let mathSymbolCount = 0;
+	for (const character of characters) {
+		if (/\p{L}/u.test(character)) letterCount++;
+		else if (/\p{Sm}/u.test(character)) mathSymbolCount++;
+	}
+	const profile = {
+		textLength: text.length,
+		firstCharacter: characters[0] || '',
+		lastCharacter: characters.at(-1) || '',
+		characterCount: characters.length,
+		letterCount,
+		mathSymbolCount,
+		wordCount: words.length,
+		averageWordLength: words.reduce((sum, word) => sum + Array.from(word).length, 0)
+			/ Math.max(words.length, 1),
+	};
+	equationTextProfileCache.set(block, { lines, profile });
+	return profile;
 }
 
-function hasEquationFragmentSignal(block, lines) {
-	const text = getEquationFragmentText(block, lines);
-	if (!text) {
-		return false;
-	}
-	if (text.length <= DISPLAY_EQUATION_SHORT_TEXT_LENGTH) {
+function isProseDominantEquationFragment(block, lines) {
+	const profile = getEquationTextProfile(block, lines);
+	return profile.wordCount > 1
+		&& profile.mathSymbolCount <= 1
+		&& profile.averageWordLength >= DISPLAY_EQUATION_PROSE_MIN_AVERAGE_WORD_LENGTH
+		&& profile.letterCount / Math.max(profile.characterCount, 1)
+			>= DISPLAY_EQUATION_PROSE_MIN_LETTER_RATIO;
+}
+
+function hasEquationContinuationBoundary(profile, allowOpeningStart = false) {
+	return /\p{S}/u.test(profile.firstCharacter)
+		|| (allowOpeningStart && /\p{Ps}/u.test(profile.firstCharacter))
+		|| /\p{Pe}/u.test(profile.firstCharacter)
+		|| /\p{S}/u.test(profile.lastCharacter)
+		|| /\p{Ps}/u.test(profile.lastCharacter);
+}
+
+function hasEquationFragmentSignal(block, lines, allowOpeningStart = false) {
+	const profile = getEquationTextProfile(block, lines);
+	if (!profile.characterCount) return false;
+	if (profile.textLength <= DISPLAY_EQUATION_SHORT_TEXT_LENGTH) {
 		return true;
 	}
-	if (/^[()[\]{}⎛⎝⎞⎠|∣∥√∑∏,.;:]+$/u.test(text)) {
-		return true;
-	}
-	if (text.length <= DISPLAY_EQUATION_FRAGMENT_MAX_TEXT_LENGTH) {
-		if (/^(?:[()[\]{}⎛⎝⎞⎠]|[=≤≥<>+\-−*/]|√|∑|∏|max\b|min\b|sup\b|inf\b)/u.test(text)) {
-			return true;
-		}
-		if (/(?:[=≤≥<>+\-−*/]|\bmax\b|\bmin\b|\bsup\b|\binf\b|[([{⎛⎝√∑∏])$/u.test(text)) {
-			return true;
-		}
-	}
-	return false;
-}
-
-function startsDisplayEquationContinuation(block, lines) {
-	const text = getEquationFragmentText(block, lines);
-	return /^(?:[=≤≥<>+\-−*/|]|\)|\]|\}|⎞|⎠|∣|∥|√|∑|∏|max\b|min\b|sup\b|inf\b)/u.test(text);
-}
-
-function endsDisplayEquationContinuation(block, lines) {
-	const text = getEquationFragmentText(block, lines);
-	return /(?:[=≤≥<>+\-−*/]|\bmax\b|\bmin\b|\bsup\b|\binf\b|[([{⎛⎝√∑∏])$/u.test(text);
-}
-
-function isProseLikeMathBlock(block, lines) {
-	const text = getEquationFragmentText(block, lines);
-	if (!/^(?:If|Then|For|Since|Thus|Hence|Therefore)\b/.test(text)) {
-		return false;
-	}
-	const words = text.match(/[A-Za-z]{2,}/g) || [];
-	return words.length >= 3;
+	return hasEquationContinuationBoundary(profile, allowOpeningStart);
 }
 
 function hasDisplayEquationContinuationSignal(first, second, lines) {
-	if (isProseLikeMathBlock(second, lines)) {
+	if (
+		isProseDominantEquationFragment(first, lines)
+		|| isProseDominantEquationFragment(second, lines)
+	) {
 		return false;
 	}
-	return hasEquationFragmentSignal(first, lines)
-		|| hasEquationFragmentSignal(second, lines)
-		|| endsDisplayEquationContinuation(first, lines)
-		|| startsDisplayEquationContinuation(second, lines);
+	return hasEquationFragmentSignal(first, lines, true)
+		|| hasEquationFragmentSignal(
+			second,
+			lines,
+			verticalOverlapRatio(first.bbox, second.bbox) > 0,
+		);
 }
 
 function horizontalGap(a, b) {
@@ -1477,6 +2102,18 @@ function visuallyJoinedEquationFragments(first, second, lineHeight) {
 		&& horizontalGap(first.bbox, second.bbox) <= lineHeight * DISPLAY_EQUATION_VISUAL_JOIN_MAX_HORIZONTAL_GAP_RATIO;
 }
 
+function stackedEquationFragmentsOverlap(first, second) {
+	const firstLineCount = first.lines?.length || 0;
+	const secondLineCount = second.lines?.length || 0;
+	return verticalOverlapRatio(first.bbox, second.bbox)
+		>= DISPLAY_EQUATION_STACKED_MIN_VERTICAL_OVERLAP_RATIO
+		&& horizontalOverlapRatio(first.bbox, second.bbox)
+			>= DISPLAY_EQUATION_STACKED_MIN_HORIZONTAL_OVERLAP_RATIO
+		&& Math.min(firstLineCount, secondLineCount)
+			/ Math.max(firstLineCount, secondLineCount, 1)
+			<= DISPLAY_EQUATION_STACKED_MAX_LINE_COUNT_RATIO;
+}
+
 function canContinueDisplayEquationRun(first, second, lines) {
 	if (first?.type !== 'equation' || second?.type !== 'equation') {
 		return false;
@@ -1490,6 +2127,9 @@ function canContinueDisplayEquationRun(first, second, lines) {
 		1
 	);
 	if (visuallyJoinedEquationFragments(first, second, lineHeight)) {
+		return true;
+	}
+	if (stackedEquationFragmentsOverlap(first, second)) {
 		return true;
 	}
 	if (verticalGap(first.bbox, second.bbox) > lineHeight * DISPLAY_EQUATION_MAX_FRAGMENT_GAP_RATIO) {
@@ -1691,7 +2331,10 @@ function createObjectImageBlock(candidate) {
 }
 
 function passesStandaloneImageSize(candidate, pageRect) {
-	if (!isValidRect(candidate?.bbox) || !isValidRect(pageRect)) {
+	if (!isValidRect(candidate?.bbox)) {
+		return false;
+	}
+	if (!isValidRect(pageRect)) {
 		return true;
 	}
 
@@ -1749,9 +2392,16 @@ function insertObjectImageBlocks(blocks, objectContext, pageRect = null) {
 	return result;
 }
 
-export function refineGraphicBlocks(blocks, lines, objectLines = [], pageRect = null) {
+export function refineGraphicBlocks(
+	blocks,
+	lines,
+	objectLines = [],
+	pageRect = null,
+	objectContexts = null,
+) {
 	const sourceBlocks = Array.isArray(blocks) ? blocks : [];
-	const objectContext = buildObjectRefinementContext(objectLines);
+	objectContexts ||= buildGraphicObjectContexts(objectLines, pageRect);
+	const { sourceObjectContext, independentObjectContext: objectContext } = objectContexts;
 	if (!sourceBlocks.length) {
 		return insertObjectImageBlocks(sourceBlocks, objectContext, pageRect);
 	}
@@ -1779,8 +2429,10 @@ export function refineGraphicBlocks(blocks, lines, objectLines = [], pageRect = 
 		refined = expandGraphicBlocks(refined, refinedBlockContext, lines, objectContext).blocks;
 	}
 	refined = mergeRuledTableFragments(refined, lines, objectContext, pageRect);
-	refined = mergeDenseScannedTableFragments(refined, lines, objectContext, pageRect);
-	refined = cleanupScannedTableJunkFragments(refined, lines, objectContext, pageRect);
+	if (hasFullPageImageObject(sourceObjectContext, pageRect)) {
+		refined = mergeDenseScannedTableFragments(refined, lines, pageRect);
+		refined = cleanupScannedTableJunkFragments(refined, lines, pageRect);
+	}
 	refined = insertObjectImageBlocks(refined, objectContext, pageRect);
 	return refined;
 }
@@ -1876,8 +2528,316 @@ function attachBlockText(blocks, lines) {
 	return blocks;
 }
 
-function finalizePageBlocks(blocks, textLines, objectLines, pageRect) {
-	blocks = refineGraphicBlocks(blocks, textLines, objectLines, pageRect);
+function isAuxiliaryImageFragment(block) {
+	return block?.flowClass === 'auxiliary'
+		&& block.type === 'image';
+}
+
+function mergeImageFragments(fragments, lines) {
+	const lineIds = [...new Set(fragments.flatMap(block => block.lines || []))]
+		.filter(lineId => lines[lineId])
+		.sort((a, b) => (lines[a]?.startOffset ?? a) - (lines[b]?.startOffset ?? b));
+	const bbox = unionRects(fragments.map(block => block.bbox));
+	const metrics = lineIds.length ? getLineBlockMetrics(lineIds, lines, bbox) : null;
+	const flowClasses = new Set(fragments.map(block => block.flowClass));
+	return {
+		type: 'image',
+		flowClass: flowClasses.size === 1 ? fragments[0].flowClass : 'body',
+		bbox,
+		lines: lineIds,
+		startOffset: metrics?.startOffset ?? 0,
+		endOffset: metrics?.endOffset ?? -1,
+	};
+}
+
+function countImageBlocks(blocks) {
+	return blocks.reduce((count, block) => count + (block?.type === 'image' ? 1 : 0), 0);
+}
+
+function mergeAuxiliaryGraphicRuns(blocks, lines, shouldMerge) {
+	const firstFragmentIndex = blocks.findIndex(isAuxiliaryImageFragment);
+	if (firstFragmentIndex < 0) return blocks;
+	const result = blocks.slice(0, firstFragmentIndex);
+	for (let i = firstFragmentIndex; i < blocks.length;) {
+		if (!isAuxiliaryImageFragment(blocks[i])) {
+			result.push(blocks[i]);
+			i++;
+			continue;
+	}
+
+		let end = i + 1;
+		while (end < blocks.length && isAuxiliaryImageFragment(blocks[end])) {
+			end++;
+		}
+		const fragments = blocks.slice(i, end);
+		if (fragments.length > 1 && shouldMerge(fragments)) {
+			result.push(mergeImageFragments(fragments, lines));
+		}
+		else {
+			for (const fragment of fragments) {
+				result.push(fragment);
+			}
+		}
+		i = end;
+	}
+	return result;
+}
+
+function getImageLayoutRect(imageEntries, pageRect) {
+	let rect = isValidRect(pageRect) ? pageRect.slice(0, 4) : null;
+	if (!rect || rect[2] === rect[0] || rect[3] === rect[1]) {
+		rect = unionRects(imageEntries.map(entry => entry.block.bbox));
+	}
+	if (rect[2] === rect[0]) {
+		rect[2] = rect[0] + 1;
+	}
+	if (rect[3] === rect[1]) {
+		rect[3] = rect[1] + 1;
+	}
+	return rect;
+}
+
+function getSpatialGridDimensions(limit, rect) {
+	const width = Math.max(1, rect[2] - rect[0]);
+	const height = Math.max(1, rect[3] - rect[1]);
+	const columns = Math.max(1, Math.min(limit, Math.round(Math.sqrt(limit * width / height))));
+	const rows = Math.max(1, Math.floor(limit / columns));
+	return { columns, rows };
+}
+
+function compactImagesBySpatialRegion(blocks, lines, pageRect, limit) {
+	const imageEntries = [];
+	for (let index = 0; index < blocks.length; index++) {
+		if (blocks[index]?.type === 'image') {
+			imageEntries.push({ block: blocks[index], index });
+		}
+	}
+	const layoutRect = getImageLayoutRect(imageEntries, pageRect);
+	const { columns, rows } = getSpatialGridDimensions(limit, layoutRect);
+	const width = layoutRect[2] - layoutRect[0];
+	const height = layoutRect[3] - layoutRect[1];
+	const clusters = new Map();
+
+	for (const entry of imageEntries) {
+		const bbox = entry.block.bbox;
+		let column = 0;
+		let row = 0;
+		if (isValidRect(bbox)) {
+			const centerX = (bbox[0] + bbox[2]) / 2;
+			const centerY = (bbox[1] + bbox[3]) / 2;
+			column = Math.max(0, Math.min(columns - 1, Math.floor((centerX - layoutRect[0]) / width * columns)));
+			row = Math.max(0, Math.min(rows - 1, Math.floor((centerY - layoutRect[1]) / height * rows)));
+		}
+		const key = row * columns + column;
+		if (!clusters.has(key)) {
+			clusters.set(key, []);
+		}
+		clusters.get(key).push(entry);
+	}
+
+	const replacements = new Map();
+	const skipped = new Set();
+	for (const entries of clusters.values()) {
+		if (entries.length === 1) continue;
+		const firstIndex = entries[0].index;
+		replacements.set(firstIndex, mergeImageFragments(entries.map(entry => entry.block), lines));
+		for (let i = 1; i < entries.length; i++) {
+			skipped.add(entries[i].index);
+		}
+	}
+
+	const result = [];
+	for (let i = 0; i < blocks.length; i++) {
+		if (skipped.has(i)) {
+			continue;
+		}
+		result.push(replacements.get(i) || blocks[i]);
+	}
+	return result;
+}
+
+/**
+ * Enforce a content-independent upper bound on renderable image blocks for a
+ * page. Pages within the budget are returned untouched. Over-budget pages first
+ * collapse adjacent auxiliary graphics, then use bounded spatial regions as a
+ * fallback so arbitrary block ordering cannot evade the limit.
+ */
+export function compactExcessiveImageBlocks(
+	blocks,
+	lines,
+	pageRect,
+	maxImageBlocks = MAX_IMAGE_BLOCKS_PER_PAGE,
+) {
+	if (!Array.isArray(blocks) || !blocks.length) {
+		return blocks || [];
+	}
+	const limit = Math.max(1, Math.floor(maxImageBlocks));
+	if (countImageBlocks(blocks) <= limit) {
+		return blocks;
+	}
+
+	const runCompacted = mergeAuxiliaryGraphicRuns(blocks, lines, () => true);
+	if (countImageBlocks(runCompacted) <= limit) {
+		return runCompacted;
+	}
+	return compactImagesBySpatialRegion(runCompacted, lines, pageRect, limit);
+}
+
+function mergeSmallAuxiliaryGraphicRuns(blocks, lines, pageRect) {
+	return mergeAuxiliaryGraphicRuns(
+		blocks,
+		lines,
+		fragments => fragments.some(block => !passesStandaloneImageSize(block, pageRect)),
+	);
+}
+
+function isTrivialEquationFragment(block, lines, pageRect) {
+	const profile = getEquationTextProfile(block, lines);
+	if (!profile.characterCount) {
+		return !passesStandaloneImageSize(block, pageRect);
+	}
+	const isLowInformation = (
+		profile.letterCount === 0
+		&& profile.mathSymbolCount === 0
+	) || (
+		profile.characterCount <= TRIVIAL_EQUATION_MAX_CHARACTER_COUNT
+		&& profile.mathSymbolCount === 0
+	);
+	return isLowInformation && !passesStandaloneImageSize(block, pageRect);
+}
+
+function hasEquationSatellite(first, second) {
+	const firstArea = rectArea(first?.bbox);
+	const secondArea = rectArea(second?.bbox);
+	if (firstArea <= 0 || secondArea <= 0) return false;
+	return Math.min(firstArea, secondArea) / Math.max(firstArea, secondArea)
+		<= EQUATION_SATELLITE_MAX_AREA_RATIO;
+}
+
+function canMergeAlignedEquationFragments(first, second, blockContext, lines) {
+	if (first?.type !== 'equation' || second?.type !== 'equation') return false;
+	if (!hasEquationSatellite(first, second)) return false;
+	if (
+		isProseDominantEquationFragment(first, lines)
+		|| isProseDominantEquationFragment(second, lines)
+	) {
+		return false;
+	}
+	if (
+		verticalOverlapRatio(first.bbox, second.bbox)
+		< DISPLAY_EQUATION_VISUAL_JOIN_MIN_VERTICAL_OVERLAP_RATIO
+	) {
+		return false;
+	}
+	const blockers = blockContext.getBlockers(new Set([first, second]));
+	return clearSightRect(unionRects([first.bbox, second.bbox]), blockers);
+}
+
+function mergeAlignedEquationFragments(blocks, lines) {
+	const hasCandidatePair = blocks.some((block, index) => {
+		const next = blocks[index + 1];
+		return block?.type === 'equation'
+			&& next?.type === 'equation'
+			&& hasEquationSatellite(block, next);
+	});
+	if (!hasCandidatePair) return blocks;
+
+	let result = blocks;
+	let changed = true;
+	while (changed) {
+		changed = false;
+		const blockContext = buildBlockRefinementContext(result, lines);
+		const next = [];
+		for (let i = 0; i < result.length; i++) {
+			const first = result[i];
+			const second = result[i + 1];
+			if (canMergeAlignedEquationFragments(first, second, blockContext, lines)) {
+				next.push(mergeGraphicBlocks(first, second, lines));
+				i++;
+				changed = true;
+				continue;
+			}
+			next.push(first);
+		}
+		result = next;
+	}
+	return result;
+}
+
+function demoteOrDropGraphicFragment(block) {
+	if (block.lines?.length) {
+		return { ...block, type: 'body' };
+	}
+	return null;
+}
+
+/**
+ * Ensure image and equation nodes are useful standalone render targets. Small
+ * adjacent image fragments are consolidated; remaining sub-figure images and
+ * trivial equation fragments become text blocks or are dropped when empty.
+ */
+export function enforceStandaloneGraphicQuality(
+	blocks,
+	lines,
+	pageRect,
+	objectLines = [],
+	objectContexts = null,
+) {
+	let consolidated = mergeSmallAuxiliaryGraphicRuns(blocks, lines, pageRect);
+	consolidated = mergeAlignedEquationFragments(consolidated, lines);
+	const hasImageBlocks = consolidated.some(block => block?.type === 'image');
+	let hasIndependentImageProvenance = null;
+	if (hasImageBlocks) {
+		objectContexts ||= buildGraphicObjectContexts(objectLines, pageRect);
+		hasIndependentImageProvenance = buildImageEligibilityPredicate(
+			consolidated,
+			lines,
+			pageRect,
+			objectContexts.independentObjectContext,
+		);
+	}
+	const result = [];
+	for (const block of consolidated) {
+		let replacement = block;
+		if (
+			block?.type === 'image'
+			&& (
+				!passesStandaloneImageSize(block, pageRect)
+				|| !hasIndependentImageProvenance(block)
+			)
+		) {
+			replacement = demoteOrDropGraphicFragment(block);
+		}
+		else if (block?.type === 'equation' && isTrivialEquationFragment(block, lines, pageRect)) {
+			replacement = demoteOrDropGraphicFragment(block);
+		}
+		if (replacement) {
+			result.push(replacement);
+		}
+	}
+	return result;
+}
+
+function finalizePageBlocks(blocks, prepared, pageRect) {
+	const { textLines, objectLines, formScenes } = prepared;
+	const objectContexts = buildGraphicObjectContexts(objectLines, pageRect);
+	blocks = refineGraphicBlocks(blocks, textLines, objectLines, pageRect, objectContexts);
+	blocks = compactExcessiveImageBlocks(blocks, textLines, pageRect);
+	blocks = enforceStandaloneGraphicQuality(
+		blocks,
+		textLines,
+		pageRect,
+		objectLines,
+		objectContexts,
+	);
+	blocks = collapsePaintScenes(
+		blocks,
+		textLines,
+		formScenes,
+		pageRect,
+		objectContexts.independentObjectContext,
+	);
+	blocks = compactExcessiveImageBlocks(blocks, textLines, pageRect);
 	blocks = detectPreformattedBlocks(blocks, textLines);
 	return attachBlockText(blocks, textLines);
 }
@@ -1902,7 +2862,7 @@ async function inferPage(pageDataItem, onnxRuntimeProvider, modelProvider, val =
 	const prepared = prepareBlockSegPageInput(pageDataItem);
 	const { textLines, objectLines, lineFeatures, objectFeatures } = prepared;
 	if (!lineFeatures.length) {
-		return finalizePageBlocks([], textLines, objectLines, pageDataItem?.viewBox);
+		return finalizePageBlocks([], prepared, pageDataItem?.viewBox);
 	}
 	if (lineFeatures.length > MAX_INFERENCE_LINES_PER_PAGE) {
 		const fallbackBlocks = buildRecordedParagraphFallback(pageDataItem, val, 'too_many_lines', {
@@ -1910,7 +2870,7 @@ async function inferPage(pageDataItem, onnxRuntimeProvider, modelProvider, val =
 			objectCount: objectFeatures.length,
 			limit: MAX_INFERENCE_LINES_PER_PAGE,
 		});
-		return finalizePageBlocks(fallbackBlocks, textLines, objectLines, pageDataItem?.viewBox);
+		return finalizePageBlocks(fallbackBlocks, prepared, pageDataItem?.viewBox);
 	}
 
 	const clusterRuntime = await getCachedClusterRuntime(runtimeCache, onnxRuntimeProvider, modelProvider);
@@ -1926,7 +2886,7 @@ async function inferPage(pageDataItem, onnxRuntimeProvider, modelProvider, val =
 	});
 	const predictions = await classifierRuntime.run(features);
 	blocks = applyBlockClassifierPredictions(blocks, predictions);
-	return finalizePageBlocks(blocks, textLines, objectLines, pageDataItem?.viewBox);
+	return finalizePageBlocks(blocks, prepared, pageDataItem?.viewBox);
 }
 
 export async function inference(pageDataList, onnxRuntimeProvider, modelProvider, val) {

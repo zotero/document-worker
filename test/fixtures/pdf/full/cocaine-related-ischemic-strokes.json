@@ -20,15 +20,15 @@
 		"pages": [
 			{"viewRect": [0, 0, 595.276, 793.701], "contentRange": [[0], [18]], "label": "253"},
 			{"viewRect": [0, 0, 595.276, 793.701], "contentRange": [[18], [33]], "label": "254"},
-			{"viewRect": [0, 0, 595.276, 793.701], "contentRange": [[33], [46]], "label": "255"},
-			{"viewRect": [0, 0, 595.276, 793.701], "contentRange": [[46], [65]], "label": "256"}
+			{"viewRect": [0, 0, 595.276, 793.701], "contentRange": [[33], [47]], "label": "255"},
+			{"viewRect": [0, 0, 595.276, 793.701], "contentRange": [[47], [66]], "label": "256"}
 		],
 		"outline": [
-			{"title": "Funding statement", "ref": [36]},
-			{"title": "Conflicts of interest", "ref": [38]},
-			{"title": "Author contribution", "ref": [49]},
-			{"title": "Acknowledgments", "ref": [51]},
-			{"title": "References", "ref": [53]}
+			{"title": "Funding statement", "ref": [37]},
+			{"title": "Conflicts of interest", "ref": [39]},
+			{"title": "Author contribution", "ref": [50]},
+			{"title": "Acknowledgments", "ref": [52]},
+			{"title": "References", "ref": [54]}
 		]
 	},
 	"content": [
@@ -124,7 +124,7 @@
 					"text": "1",
 					"style": {"sup": true},
 					"anchor": {"textMap": "[[0,0,208,462.5,211,468]]"},
-					"refs": [[54, 0]]
+					"refs": [[55, 0]]
 				},
 				{"text": " "},
 				{
@@ -137,7 +137,7 @@
 					"text": "2",
 					"style": {"sup": true},
 					"anchor": {"textMap": "[[0,0,177,420.5,180,426]]"},
-					"refs": [[54, 1]]
+					"refs": [[55, 1]]
 				},
 				{"text": " "},
 				{
@@ -150,7 +150,7 @@
 					"text": "3",
 					"style": {"sup": true},
 					"anchor": {"textMap": "[[0,0,259.3,392.5,262,398]]"},
-					"refs": [[54, 2]]
+					"refs": [[55, 2]]
 				},
 				{"text": " "},
 				{
@@ -163,7 +163,7 @@
 					"text": "4",
 					"style": {"sup": true},
 					"anchor": {"textMap": "[[0,0,118.5,350.5,121.4,356]]"},
-					"refs": [[54, 3]]
+					"refs": [[55, 3]]
 				}
 			]
 		},
@@ -205,7 +205,7 @@
 					"text": "5",
 					"style": {"sup": true},
 					"anchor": {"textMap": "[[0,0,218.4,154.5,221.3,160]]"},
-					"refs": [[54, 4]]
+					"refs": [[55, 4]]
 				},
 				{"text": " "},
 				{
@@ -280,7 +280,7 @@
 					"anchor": {
 						"textMap": "[[1,0,317.5,163,544,172,[214.5,4],[-0.3,4.7],4],[0,0,309,149,544,158,5,[-0.5,2.4],3,[3.5,5],[-0.3,1.4]]]"
 					},
-					"refs": [[40]]
+					"refs": [[41]]
 				},
 				{
 					"text": " Patients with small vessel disease had the highest median hemoglobin A1c of 5.9% (IQR 5.7–6.2), while those within the other determined cause category had the highest median LDL cholesterol of 107 mg/dL (IQR 92–113). Additionally, patients with strokes attributed to large vessel atherosclerosis had the high-",
@@ -563,7 +563,7 @@
 					"text": "2",
 					"style": {"sup": true},
 					"anchor": {"textMap": "[[0,1,357,704,360,709]]"},
-					"refs": [[54, 1]]
+					"refs": [[55, 1]]
 				},
 				{"text": " "},
 				{
@@ -589,7 +589,7 @@
 					"text": "6",
 					"style": {"sup": true},
 					"anchor": {"textMap": "[[0,1,489.3,606,492,611]]"},
-					"refs": [[54, 6]]
+					"refs": [[55, 6]]
 				},
 				{"text": " "},
 				{
@@ -602,7 +602,7 @@
 					"text": "7",
 					"style": {"sup": true},
 					"anchor": {"textMap": "[[0,1,510.4,536,513.3,541]]"},
-					"refs": [[54, 7]]
+					"refs": [[55, 7]]
 				},
 				{"text": " "},
 				{
@@ -615,7 +615,7 @@
 					"text": "8",
 					"style": {"sup": true},
 					"anchor": {"textMap": "[[0,1,464.5,480,467.5,485]]"},
-					"refs": [[54, 8]]
+					"refs": [[55, 8]]
 				},
 				{"text": " "},
 				{
@@ -623,7 +623,7 @@
 					"anchor": {
 						"textMap": "[[0,1,469.7,474,544,483.3,4,2.3,[-0.3,5],[-0.5,5],[-0.3,3],3,[3.4,3.3]]]"
 					},
-					"refs": [[45]]
+					"refs": [[46]]
 				},
 				{
 					"text": " displays the known mechanisms of cocaine-mediated inflammation causing atherosclerosis in the brain.",
@@ -647,7 +647,7 @@
 					"text": "9",
 					"style": {"sup": true},
 					"anchor": {"textMap": "[[0,1,452.4,396,455.3,401]]"},
-					"refs": [[54, 9]]
+					"refs": [[55, 9]]
 				},
 				{"text": " "},
 				{
@@ -660,7 +660,7 @@
 					"text": "10",
 					"style": {"sup": true},
 					"anchor": {"textMap": "[[0,1,385.7,284,391,289,3,[-0.4,2]]]"},
-					"refs": [[54, 10]]
+					"refs": [[55, 10]]
 				},
 				{"text": " "},
 				{
@@ -694,7 +694,7 @@
 					}
 				}
 			],
-			"nextPart": [35]
+			"nextPart": [36]
 		},
 		{
 			"type": "caption",
@@ -768,6 +768,12 @@
 					}
 				}
 			],
+			"flowClass": "auxiliary"
+		},
+		{
+			"type": "image",
+			"anchor": {"pageRects": [[2, 49.9934759, 200.4106259, 545.3919726, 521.3730322]]},
+			"content": [],
 			"flowClass": "auxiliary"
 		},
 		{
@@ -1233,7 +1239,7 @@
 							}
 						}
 					],
-					"nextPart": [54, 5],
+					"nextPart": [55, 5],
 					"reference": true,
 					"backRefs": [[7, 1]]
 				},
@@ -1263,7 +1269,7 @@
 							}
 						}
 					],
-					"previousPart": [54, 4],
+					"previousPart": [55, 4],
 					"reference": true
 				},
 				{

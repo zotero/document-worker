@@ -511,6 +511,14 @@ export function getLines(chars) {
       return;
     }
 
+    const formXObjectSeqs = lineChars[0]?.formXObjectSeqs;
+    const hasCommonFormPath = Array.isArray(formXObjectSeqs)
+      && formXObjectSeqs.length
+      && lineChars.every(char => (
+        Array.isArray(char?.formXObjectSeqs)
+        && char.formXObjectSeqs.length === formXObjectSeqs.length
+        && char.formXObjectSeqs.every((seq, index) => seq === formXObjectSeqs[index])
+      ));
     const line = {
       id: lines.length,
       text: words.map(w => w.text).join(' '),
@@ -520,6 +528,7 @@ export function getLines(chars) {
       startOffset: lineStartOffset,
       endOffset: lastCharOffset,
       ...(lineSeqMin !== null ? { seq: lineSeqMin, seqStart: lineSeqMin, seqEnd: lineSeqMax ?? lineSeqMin } : {}),
+      ...(hasCommonFormPath ? { formXObjectSeqs } : {}),
     };
 
     lines.push(line);
@@ -733,6 +742,13 @@ export function prepareBlockSegPageInput(pageDataItem) {
 	const adjacentTextGaps = getAdjacentTextGaps(textLines);
 	let objectLines = [];
 	const rawObjects = filterLayoutObjects(pageDataItem?.objects, pageDataItem?.viewBox, adjacentTextGaps);
+	const formScenes = (pageDataItem?.forms || []).map(form => ({
+		seq: form.seq,
+		rect: form.paintRect,
+		paintObjectCount: form.paintObjectCount,
+		textCharCount: form.textCharCount,
+		formXObjectSeqs: form.formXObjectSeqs,
+	}));
 
 	if (rawObjects.length) {
 		objectLines = rawObjects.map(object => ({
@@ -753,7 +769,7 @@ export function prepareBlockSegPageInput(pageDataItem) {
 		lines: clustererObjectLines,
 	}).lines;
 
-	return { textLines, objectLines, clustererObjectLines, lineFeatures, objectFeatures };
+	return { textLines, objectLines, formScenes, clustererObjectLines, lineFeatures, objectFeatures };
 }
 
 // ─────────────────── Preformatted (monospace code) detection ───────────────────

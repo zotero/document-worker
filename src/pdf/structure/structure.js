@@ -156,7 +156,11 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 		for (let bi = 0; bi < blocks.length; bi++) {
 			let block = blocks[bi];
 
-			let charsRange = chars.slice(block.startOffset, block.endOffset + 1);
+			let charsRange = Array.isArray(block._charRanges)
+				? block._charRanges.flatMap(([startOffset, endOffset]) => (
+					chars.slice(startOffset, endOffset + 1)
+				))
+				: chars.slice(block.startOffset, block.endOffset + 1);
 
 			let node;
 			let anchor = createBlockAnchor(i, block.bbox);
@@ -293,7 +297,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 		let batchEnd = Math.min(pageCount, batchStart + inferenceBatchSize);
 
 		for (let i = batchStart; i < batchEnd; i++) {
-			let { chars, objects } = await pdfDocument.module.getPageCharsObjects(i);
+			let { chars, objects, forms } = await pdfDocument.module.getPageCharsObjects(i);
 
 			updateRegularWordsSet(chars, regularWordsSet);
 
@@ -317,7 +321,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 			};
 			if (chars.length || objects?.length) {
 				let val = {};
-				inferenceInputs.push({ chars, objects, viewBox: viewRect, pageIndex: i });
+				inferenceInputs.push({ chars, objects, forms, viewBox: viewRect, pageIndex: i });
 				inferenceVals.push(val);
 				inferenceContextIndexes.push(contexts.length);
 			}
