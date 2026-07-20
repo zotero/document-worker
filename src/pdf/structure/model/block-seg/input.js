@@ -738,7 +738,7 @@ function orderLayoutObjectsForClusterer(objectLines, adjacentTextGaps, pageRect)
 }
 
 export function prepareBlockSegPageInput(pageDataItem) {
-	const textLines = getLines(pageDataItem?.chars || []);
+	const textLines = pageDataItem?.lines || getLines(pageDataItem?.chars || []);
 	const adjacentTextGaps = getAdjacentTextGaps(textLines);
 	let objectLines = [];
 	const rawObjects = filterLayoutObjects(pageDataItem?.objects, pageDataItem?.viewBox, adjacentTextGaps);

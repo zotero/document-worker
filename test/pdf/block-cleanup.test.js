@@ -486,6 +486,36 @@ describe('wrapListItems page ranges', () => {
 		assert.equal(structure.content[0].flowClass, 'auxiliary');
 	});
 
+	it('wraps detected contents items without marker heuristics', () => {
+		let structure = {
+			catalog: { pages: [{ contentRange: [[0], [2]] }] },
+			content: [
+				{
+					type: 'listitem',
+					flowClass: 'auxiliary',
+					_contentsList: true,
+					_metrics: { pageIndex: 0 },
+					content: [{ text: 'Introduction 1' }],
+				},
+				{
+					type: 'listitem',
+					flowClass: 'auxiliary',
+					_contentsList: true,
+					_metrics: { pageIndex: 0 },
+					content: [{ text: 'Methods 7' }],
+				},
+			],
+		};
+
+		wrapListItems(structure);
+
+		assert.equal(structure.content.length, 1);
+		assert.equal(structure.content[0].type, 'list');
+		assert.equal(structure.content[0].flowClass, 'auxiliary');
+		assert.equal(structure.content[0].content.length, 2);
+		assert.ok(structure.content[0].content.every(item => item._contentsList === undefined));
+	});
+
 	it('does not wrap a marked item with incompatible unmarked footnote-like text', () => {
 		let structure = {
 			content: [

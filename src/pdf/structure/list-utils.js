@@ -73,14 +73,16 @@ export function wrapListItems(structure) {
 			const oldStart = i;
 			const items = [];
 			const pageIndex = block._metrics?.pageIndex;
+			const contentsList = block._contentsList === true;
 			let lastSiblingItem = hasListItemMarker(block) ? block : null;
 
 			while (
 				i < originalContent.length
 				&& originalContent[i]?.type === 'listitem'
 				&& originalContent[i]?._metrics?.pageIndex === pageIndex
+				&& (originalContent[i]?._contentsList === true) === contentsList
 			) {
-				if (items.length > 0) {
+				if (items.length > 0 && !contentsList) {
 					const join = getJoinRelation(structure, items, lastSiblingItem, originalContent[i]);
 					if (!join) {
 						break;
@@ -89,6 +91,7 @@ export function wrapListItems(structure) {
 				}
 				listItemMap.set(i, { listIndex, itemIndex: items.length });
 				items.push(originalContent[i]);
+				delete originalContent[i]._contentsList;
 				i++;
 			}
 			listGroups.push({

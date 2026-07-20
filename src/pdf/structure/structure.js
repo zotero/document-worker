@@ -1,5 +1,12 @@
 import { buildInferenceErrorFallbackBlocks, inferenceBatch } from './model/block-seg/inference.js';
-import { getOutline } from './outline/outline.js';
+import { getNativeOutline, getOutline } from './outline/outline.js';
+import { getLines } from './model/block-seg/input.js';
+import {
+	createContentsHeadingIndex,
+	detectContentsRegion,
+	getContentsEvidence,
+	normalizeContentsBlocks,
+} from './contents.js';
 import { getReferenceLists } from './reference/reference.js';
 import { getFigureAndMathCandidates } from './citations.js';
 import { getFigures } from './figure.js';
@@ -139,12 +146,24 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 	let regularWordsSet = new Set();
 	let catalogPageLabels = await pdfDocument.pdfManager.ensureCatalog("pageLabels");
+	let nativeOutline = await getNativeOutline(pdfDocument);
+	let pageContentLengths = new Array(pageCount).fill(0);
+	let inferredHeadings = [];
+	let contentsContexts = [];
+	const contentsNavigationRegions = [];
 	let pagesProcessed = 0;
 	reportPageProgress(onProgress, 0, pageCount);
+	function getPageContentOffset(pageIndex) {
+		let offset = 0;
+		for (let index = 0; index < pageIndex; index++) {
+			offset += pageContentLengths[index];
+		}
+		return offset;
+	}
 
-	async function appendPageContext(context) {
+	async function appendPageContext(context, replace = false) {
 		let { i, chars, page, viewRect, blocks, extractionDegraded } = context;
-		let prevContentLength = structure.content.length;
+		let content = [];
 
 		for (let j = 0; j < blocks.length; j++) {
 			let block = blocks[j];
@@ -169,7 +188,8 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 					type: 'heading',
 					...(anchor && { anchor }),
 					content: charsToTextNodes(i, charsRange),
-					_metrics: getHeadingMetrics(block, charsRange)
+					_metrics: getHeadingMetrics(block, charsRange),
+					...(block._contentsNavigationHeading && { _contentsNavigationHeading: true }),
 				}
 			}
 			else if (block.type === 'body') {
@@ -213,7 +233,8 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 					type: 'listitem',
 					...(anchor && { anchor }),
 					content: charsToTextNodes(i, charsRange),
-					_metrics: getParagraphMetrics(block, charsRange)
+					_metrics: getParagraphMetrics(block, charsRange),
+					...(block._contentsList && { _contentsList: true }),
 				}
 			}
 			else if (block.type === 'equation') {
@@ -236,7 +257,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 			if (node) {
 				applyFlowClassMetadata(node, block);
-				structure.content.push(node);
+				content.push(node);
 			}
 
 			if (block.type === 'title') {
@@ -249,17 +270,41 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 		let rotation = VALID_PAGE_ROTATIONS.has(page.rotate) ? page.rotate : 0;
 		let userUnit = Number.isFinite(page.userUnit) && page.userUnit > 0 ? page.userUnit : 1;
-		let newPage = {
+		if (replace) {
+			structure.content.splice(
+				getPageContentOffset(i),
+				pageContentLengths[i],
+				...content,
+			);
+			pageContentLengths[i] = content.length;
+			return;
+		}
+		pageContentLengths[i] = content.length;
+		structure.content.push(...content);
+		structure.catalog.pages.push({
 			viewRect,
 			...(rotation !== 0 ? { rotation } : {}),
 			...(userUnit !== 1 ? { userUnit } : {}),
 			...(extractionDegraded ? { extractionDegraded: true } : {}),
-			contentRange: [[prevContentLength], [structure.content.length]]
-		};
-
-		structure.catalog.pages.push(newPage);
+		});
 		pagesProcessed++;
 		reportPageProgress(onProgress, pagesProcessed, pageCount);
+	}
+
+	function collectInferredHeadings(context) {
+		for (const block of context.blocks || []) {
+			if (block.type !== 'title') continue;
+			const title = Array.isArray(block.lines)
+				? block.lines.map(lineId => context.lines[lineId]?.text || '').join(' ').trim()
+				: context.chars
+					.slice(block.startOffset, block.endOffset + 1)
+					.map(char => char?.c || '')
+					.join('')
+					.trim();
+			if (title) {
+				inferredHeadings.push({ title, _pageIndex: context.i });
+			}
+		}
 	}
 
 	async function inferBlockListsWithFallback(inferenceInputs, inferenceVals) {
@@ -298,6 +343,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 		for (let i = batchStart; i < batchEnd; i++) {
 			let { chars, objects, forms } = await pdfDocument.module.getPageCharsObjects(i);
+			let lines = getLines(chars);
 
 			updateRegularWordsSet(chars, regularWordsSet);
 
@@ -313,15 +359,17 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 			let context = {
 				i,
 				chars,
+				lines,
 				objects,
 				page,
 				viewRect,
+				links,
 				blocks: [],
 				extractionDegraded: viewRect !== pageView,
 			};
 			if (chars.length || objects?.length) {
 				let val = {};
-				inferenceInputs.push({ chars, objects, forms, viewBox: viewRect, pageIndex: i });
+				inferenceInputs.push({ chars, lines, objects, forms, viewBox: viewRect, pageIndex: i });
 				inferenceVals.push(val);
 				inferenceContextIndexes.push(contexts.length);
 			}
@@ -344,8 +392,63 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 		}
 
 		for (let context of contexts) {
+			collectInferredHeadings(context);
+			contentsContexts.push({
+				i: context.i,
+				lines: context.lines.map(line => ({
+					id: line.id,
+					text: line.text,
+					rect: line.rect,
+					startOffset: line.startOffset,
+					endOffset: line.endOffset,
+				})),
+				blocks: context.blocks,
+				viewRect: context.viewRect,
+				links: context.links,
+			});
 			await appendPageContext(context);
 		}
+	}
+
+	// Confirm printed navigation only after inference has seen the whole PDF.
+	const headingIndex = createContentsHeadingIndex(inferredHeadings);
+	for (const context of contentsContexts) {
+		const evidence = getContentsEvidence(
+			context.lines,
+			context.links,
+			headingIndex,
+			context.i,
+		);
+		const contentsRegion = detectContentsRegion(context.lines, context.viewRect, {
+			evidence,
+			links: context.links,
+		});
+		if (!contentsRegion) continue;
+		contentsNavigationRegions.push({
+			pageIndex: context.i,
+			source: contentsRegion.source,
+			rows: contentsRegion.rows,
+		});
+		const { chars } = await pdfDocument.module.getPageCharsObjects(context.i);
+		const page = await pdfDocument.getPage(context.i);
+		context.blocks = normalizeContentsBlocks(
+			context.blocks,
+			context.lines,
+			context.viewRect,
+			{ region: contentsRegion },
+		);
+		await appendPageContext({ ...context, chars, page }, true);
+	}
+	contentsContexts = null;
+
+	let contentOffset = 0;
+	for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+		const contentLength = pageContentLengths[pageIndex];
+		structure.catalog.pages[pageIndex].contentRange = [
+			[contentOffset],
+			[contentOffset + contentLength],
+		];
+		contentOffset += contentLength;
 	}
 
 	// Block transformations
@@ -406,9 +509,20 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	let referenceTitleRefs = referenceLists
 		.map(referenceList => referenceList.titleRef)
 		.filter(Array.isArray);
-	let outline = await getOutline(structure.content, referenceTitleRefs, pdfDocument);
+	let outline = await getOutline(
+		structure.content,
+		referenceTitleRefs,
+		pdfDocument,
+		nativeOutline,
+		{
+			navigationRegions: contentsNavigationRegions,
+		},
+	);
 	if (outline.length) {
 		structure.catalog.outline = outline;
+	}
+	for (const block of structure.content) {
+		delete block._contentsNavigationHeading;
 	}
 
 	cleanupBlockMetrics(structure);

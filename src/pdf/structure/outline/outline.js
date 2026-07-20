@@ -1,6 +1,6 @@
 import { getBlockPlainText } from '../../../../structured-document-text/src/pdf/index.js';
 import { titles as REFERENCE_TITLES } from '../reference/titles.js';
-import { resolveDestination } from '../util.js';
+import { getClosestDistance, resolveDestination } from '../util.js';
 
 const ACKNOWLEDGMENT_TOP_TITLES = [
 	'acknowledgment',
@@ -178,6 +178,7 @@ function buildAllBlocksByPage(blocks) {
 			_fontSize: metrics.fontSize || metrics.firstCharFontSize || 0,
 			_firstCharFontName: metrics.firstCharFontName || '',
 			_firstCharFontSize: metrics.firstCharFontSize || 0,
+			_contentsNavigationHeading: block._contentsNavigationHeading === true,
 		};
 
 		let list = allBlocksByPage.get(pageIndex);
@@ -194,7 +195,7 @@ function extractHeadingItems(blocks) {
 	const headingItems = [];
 	for (let i = 0; i < blocks.length; i++) {
 		const block = blocks[i];
-		if (block.flowClass === 'excluded') continue;
+		if (block.flowClass === 'excluded' || block._contentsNavigationHeading) continue;
 		if (block.type !== 'heading') continue;
 		const metrics = block._metrics || {};
 		const anchorRect = block?.anchor?.pageRects?.[0];
@@ -251,7 +252,7 @@ function truncateToNativeTitle(blockTitle, nativeTitle) {
 	return blockTitle.slice(0, cutPoint).trim();
 }
 
-async function getNativeOutline(pdfDocument) {
+export async function getNativeOutline(pdfDocument) {
 	if (!pdfDocument) return [];
 	let items;
 	try {
@@ -291,7 +292,7 @@ async function getNativeOutline(pdfDocument) {
 	return outline;
 }
 
-function flattenNativeOutline(items, depth = 0, parent = null, out = [], orderRef = { value: 0 }) {
+export function flattenNativeOutline(items, depth = 0, parent = null, out = [], orderRef = { value: 0 }) {
 	for (const item of items || []) {
 		const orderIndex = orderRef.value++;
 		const pageIndex = item?.location?.position?.pageIndex;
@@ -371,6 +372,7 @@ function recoverInlineHeadings(allBlocksByPage, confirmedStyles, usedBlockIndice
 	for (const pageBlocks of allBlocksByPage.values()) {
 		for (const block of pageBlocks) {
 			if (usedBlockIndices.has(block._blockIndex)) continue;
+			if (block._contentsNavigationHeading) continue;
 			if (skipTypes.has(block.type)) continue;
 			if (!block.title || block.title.length > 150) continue;
 
@@ -406,6 +408,201 @@ function recoverInlineHeadings(allBlocksByPage, confirmedStyles, usedBlockIndice
 		}
 	}
 
+	return recoveredItems;
+}
+
+function getComparableTitleKey(title) {
+	return normalizeLooseTitle(title).replace(/\s/gu, '');
+}
+
+function getBlockStyles(block) {
+	const upper = getUppercaseRatio(block.title) >= 0.9;
+	const styles = [];
+	for (const [fontName, fontSize] of [
+		[block._fontName, block._fontSize],
+		[block._firstCharFontName, block._firstCharFontSize],
+	]) {
+		const normalizedFontName = normalizeFontName(fontName || '');
+		const sizeBucket = Math.round((fontSize || 0) * 2) / 2;
+		if (normalizedFontName || sizeBucket) {
+			styles.push({
+				key: `${normalizedFontName}|${sizeBucket}|${upper}`,
+				fontName,
+				fontSize,
+			});
+		}
+	}
+	return styles.filter((style, index) => (
+		styles.findIndex(candidate => candidate.key === style.key) === index
+	));
+}
+
+function getRowDestinations(row) {
+	return row.linkDestinations || [];
+}
+
+function selectDestinationMatch(candidates, destination) {
+	if (candidates.length === 1) return candidates[0];
+	if (!destination?.rect || candidates.some(candidate => !candidate._rect)) return null;
+	const ranked = candidates
+		.map(candidate => ({
+			candidate,
+			distance: getClosestDistance(candidate._rect, destination.rect),
+		}))
+		.sort((a, b) => a.distance - b.distance);
+	return ranked.length > 1 && ranked[0].distance === ranked[1].distance
+		? null
+		: ranked[0]?.candidate || null;
+}
+
+function findLinkedTitleMatch(row, candidatesByPage) {
+	const titleKey = row.titleKey || getComparableTitleKey(row.title);
+	if (!titleKey) return null;
+	const matches = [];
+	for (const destination of getRowDestinations(row)) {
+		if (!Number.isInteger(destination.pageIndex)) continue;
+		const candidates = (candidatesByPage.get(destination.pageIndex) || [])
+			.filter(candidate => getComparableTitleKey(candidate.title) === titleKey);
+		const match = selectDestinationMatch(candidates, destination);
+		if (match) matches.push({ match, destination });
+	}
+	const unique = matches.filter(({ match }, index) => (
+		matches.findIndex(candidate => candidate.match._blockIndex === match._blockIndex) === index
+	));
+	return unique.length === 1
+		? { ...unique[0].match, _matchedDestination: unique[0].destination }
+		: null;
+}
+
+function groupItemsByPage(items) {
+	const result = new Map();
+	for (const item of items) {
+		if (!Number.isInteger(item._pageIndex)) continue;
+		if (!result.has(item._pageIndex)) result.set(item._pageIndex, []);
+		result.get(item._pageIndex).push(item);
+	}
+	return result;
+}
+
+function markAlignedContentsHeadings(headingItems, navigationRegions) {
+	const alignedBlockIndices = new Set();
+	if (!navigationRegions?.length) return alignedBlockIndices;
+	const navigationPages = new Set(navigationRegions.map(region => region.pageIndex));
+	const headingsByTitle = new Map();
+	for (const item of headingItems) {
+		if (navigationPages.has(item._pageIndex)) continue;
+		const key = getComparableTitleKey(item.title);
+		if (!key) continue;
+		if (!headingsByTitle.has(key)) headingsByTitle.set(key, []);
+		headingsByTitle.get(key).push(item);
+	}
+
+	for (const region of navigationRegions) {
+		const matches = [];
+		const usedBlockIndices = new Set();
+		for (const row of region.rows || []) {
+			const candidates = (headingsByTitle.get(row.titleKey || getComparableTitleKey(row.title)) || [])
+				.filter(item => item._pageIndex > region.pageIndex);
+			if (candidates.length !== 1 || usedBlockIndices.has(candidates[0]._blockIndex)) continue;
+			matches.push(candidates[0]);
+			usedBlockIndices.add(candidates[0]._blockIndex);
+		}
+		if (
+			matches.length
+			&& matches.every((item, index) => (
+				index === 0 || matches[index - 1]._blockIndex < item._blockIndex
+			))
+		) {
+			for (const item of matches) {
+				item._contentsAnchor = true;
+				alignedBlockIndices.add(item._blockIndex);
+			}
+		}
+	}
+	return alignedBlockIndices;
+}
+
+// Two independently recognized linked headings establish that a navigation
+// region follows the body outline. Only exact linked block matches that
+// preserve that sequence and reuse an anchored heading style are recovered.
+function recoverContentsHeadings(
+	allBlocksByPage,
+	headingItems,
+	usedBlockIndices,
+	navigationRegions,
+) {
+	if (!navigationRegions?.length) return [];
+	const navigationPages = new Set(navigationRegions.map(region => region.pageIndex));
+	const headingsByPage = groupItemsByPage(headingItems.filter(item => (
+		!navigationPages.has(item._pageIndex)
+	)));
+	const candidatesByPage = new Map();
+	for (const pageBlocks of allBlocksByPage.values()) {
+		for (const block of pageBlocks) {
+			if (
+				(block.type !== 'paragraph' && block.type !== 'heading')
+				|| usedBlockIndices.has(block._blockIndex)
+				|| block._contentsNavigationHeading
+				|| navigationPages.has(block._pageIndex)
+			) {
+				continue;
+			}
+			if (!candidatesByPage.has(block._pageIndex)) candidatesByPage.set(block._pageIndex, []);
+			candidatesByPage.get(block._pageIndex).push(block);
+		}
+	}
+
+	const recoveredItems = [];
+	for (const region of navigationRegions) {
+		const rows = (region.rows || []).map((row, rowIndex) => ({
+			row,
+			rowIndex,
+			anchor: findLinkedTitleMatch(row, headingsByPage),
+		}));
+		const anchors = rows.filter(item => item.anchor);
+		const orderedAnchors = region.source === 'destination-link'
+			&& anchors.length >= 2 && anchors.every((item, index) => (
+			index === 0 || anchors[index - 1].anchor._blockIndex < item.anchor._blockIndex
+		));
+		const anchorStyles = new Set(anchors.map(item => item.anchor._styleKey).filter(Boolean));
+		if (orderedAnchors) for (const rowMatch of rows) {
+			if (rowMatch.anchor) continue;
+			const candidate = findLinkedTitleMatch(rowMatch.row, candidatesByPage);
+			if (!candidate || usedBlockIndices.has(candidate._blockIndex)) continue;
+			const destinationRect = candidate._matchedDestination?.rect;
+			if (destinationRect && candidate._rect) {
+				const candidateDistance = getClosestDistance(candidate._rect, destinationRect);
+				const closerHeading = (headingsByPage.get(candidate._pageIndex) || []).some(heading => (
+					heading._rect
+					&& getClosestDistance(heading._rect, destinationRect) <= candidateDistance
+				));
+				if (closerHeading) continue;
+			}
+			const matchingStyle = getBlockStyles(candidate)
+				.find(style => anchorStyles.has(style.key));
+			if (!matchingStyle) continue;
+			const preservesOrder = anchors.every(anchor => (
+				anchor.rowIndex < rowMatch.rowIndex
+					? anchor.anchor._blockIndex < candidate._blockIndex
+					: anchor.anchor._blockIndex > candidate._blockIndex
+			));
+			if (!preservesOrder) continue;
+			const outlineItem = {
+				title: candidate.title,
+				ref: [candidate._blockIndex],
+				_blockIndex: candidate._blockIndex,
+				_pageIndex: candidate._pageIndex,
+				_rect: candidate._rect,
+				_fontName: matchingStyle.fontName || '',
+				_fontSize: matchingStyle.fontSize || 0,
+				_orderIndex: candidate._blockIndex,
+				_recovered: true,
+			};
+			computeItemStyle(outlineItem);
+			recoveredItems.push(outlineItem);
+			usedBlockIndices.add(candidate._blockIndex);
+		}
+	}
 	return recoveredItems;
 }
 
@@ -656,7 +853,7 @@ function unwrapUniqueStyleParents(items, styleCounts) {
 
 		const styleKey = item._styleKey;
 		const isUnique = styleKey && styleCounts.get(styleKey) === 1;
-		if (children.length && isUnique && !item._forceTop) {
+		if (children.length && isUnique && !item._forceTop && !item._contentsAnchor) {
 			result.push(...children);
 		} else {
 			result.push(item);
@@ -1013,12 +1210,97 @@ function filterOutlineItem(item) {
 	return result;
 }
 
-export async function getOutline(blocks, titleRef, pdfDocument) {
+function buildGeneratedOutline(items, titleRef, nativeMatchedItems, nativeMatches) {
+	const combined = items.map(item => ({ ...item, children: [] }));
+	for (const item of combined) {
+		item._orderKey = getNodeOrderKey(item);
+	}
+	combined.sort((a, b) => compareOrderKey(a._orderKey, b._orderKey));
+
+	const styleStats = computeStyleStats(combined);
+	markForceTop(combined, titleRef);
+	const styleDepthMap = buildStyleDepthMap(nativeMatchedItems, combined);
+	const numDistinctStyles = styleStats.size || 1;
+	const maxDepth = Math.min(6, Math.max(1, numDistinctStyles));
+	const outline = buildOutline(combined, styleDepthMap, maxDepth);
+	const styleCounts = new Map();
+	for (const [key, stat] of styleStats) {
+		styleCounts.set(key, stat.count);
+	}
+	const unwrapped = unwrapUniqueStyleParents(outline, styleCounts);
+	markKeywordTitleTerminals(unwrapped);
+	repairNativeParentHierarchy(unwrapped, nativeMatches);
+	repairNumericHierarchy(unwrapped);
+	const markerRepaired = repairMixedMarkerHierarchy(unwrapped);
+	const terminalLifted = liftTerminalChildren(markerRepaired);
+	normalizeLevels(terminalLifted, 1);
+	return terminalLifted.map(filterOutlineItem).filter(Boolean);
+}
+
+function getRefKey(item) {
+	return Array.isArray(item?.ref) ? item.ref.join('.') : null;
+}
+
+function cloneOutlineItems(items, index) {
+	return (items || []).map(item => {
+		const children = cloneOutlineItems(item.children, index);
+		const clone = {
+			title: item.title,
+			...(Array.isArray(item.ref) && { ref: item.ref.slice() }),
+			...(item.target && { target: { ...item.target } }),
+			...(children.length && { children }),
+		};
+		const key = getRefKey(clone);
+		if (key) index.set(key, clone);
+		return clone;
+	});
+}
+
+function insertOutlineItem(items, item) {
+	const blockIndex = item.ref?.[0] ?? Number.POSITIVE_INFINITY;
+	const index = items.findIndex(candidate => (
+		(candidate.ref?.[0] ?? Number.POSITIVE_INFINITY) > blockIndex
+	));
+	items.splice(index === -1 ? items.length : index, 0, item);
+}
+
+function mergeOutlineAdditions(baseline, enriched, allowedBlockIndices) {
+	const index = new Map();
+	const result = cloneOutlineItems(baseline, index);
+	function visit(items, ancestors = []) {
+		for (const item of items || []) {
+			const key = getRefKey(item);
+			let target = key ? index.get(key) : null;
+			if (key && !target && allowedBlockIndices.has(item.ref?.[0])) {
+				target = {
+					title: item.title,
+					ref: item.ref.slice(),
+					...(item.target && { target: { ...item.target } }),
+				};
+				const parent = ancestors
+					.slice()
+					.reverse()
+					.map(ancestor => index.get(ancestor))
+					.find(Boolean);
+				const siblings = parent
+					? (parent.children ||= [])
+					: result;
+				insertOutlineItem(siblings, target);
+				index.set(key, target);
+			}
+			visit(item.children, key ? [...ancestors, key] : ancestors);
+		}
+	}
+	visit(enriched);
+	return result;
+}
+
+export async function getOutline(blocks, titleRef, pdfDocument, nativeOutline = null, options = {}) {
 	// Phase 1: Build allBlocksByPage
 	const allBlocksByPage = buildAllBlocksByPage(blocks);
 
 	// Phase 2: Native outline -> match to blocks
-	const nativeOutline = await getNativeOutline(pdfDocument);
+	nativeOutline ||= await getNativeOutline(pdfDocument);
 	const nativeNodes = flattenNativeOutline(nativeOutline);
 	const nativeMatches = matchNativeToBlocks(nativeNodes, allBlocksByPage);
 	const nativeMatchedItems = buildNativeMatchedItems(nativeMatches);
@@ -1035,36 +1317,39 @@ export async function getOutline(blocks, titleRef, pdfDocument) {
 	const confirmedStyles = new Set(combined.map(item => item._styleKey).filter(Boolean));
 	const recoveredItems = recoverInlineHeadings(allBlocksByPage, confirmedStyles, usedBlockIndices);
 	combined.push(...recoveredItems);
-
-	// Sort by SDT block order; visual y-order breaks multi-column outlines.
-	for (const item of combined) {
-		item._orderKey = getNodeOrderKey(item);
+	const navigationRegions = options.navigationRegions || [];
+	if (!navigationRegions.length) {
+		return buildGeneratedOutline(combined, titleRef, nativeMatchedItems, nativeMatches);
 	}
-	combined.sort((a, b) => compareOrderKey(a._orderKey, b._orderKey));
-
-	// Phase 5: Compute style stats + _forceTop
-	const styleStats = computeStyleStats(combined);
-	markForceTop(combined, titleRef);
-
-	// Phase 6: Build style-depth map
-	const styleDepthMap = buildStyleDepthMap(nativeMatchedItems, combined);
-	const numDistinctStyles = styleStats.size || 1;
-	const maxDepth = Math.min(6, Math.max(1, numDistinctStyles));
-
-	// Phase 7: Stack-based depth assignment + tree building
-	const outline = buildOutline(combined, styleDepthMap, maxDepth);
-
-	// Phase 8: Post-processing
-	const styleCounts = new Map();
-	for (const [key, stat] of styleStats) {
-		styleCounts.set(key, stat.count);
+	const baselineItems = combined.map(item => ({ ...item }));
+	const baselineNativeMatchedItems = nativeMatchedItems.filter(item => (
+		!blocks[item._blockIndex]?._contentsNavigationHeading
+	));
+	const baselineNativeMatches = nativeMatches.filter(match => (
+		!blocks[match.block._blockIndex]?._contentsNavigationHeading
+	));
+	const enrichmentBlockIndices = markAlignedContentsHeadings(
+		headingItems,
+		navigationRegions,
+	);
+	const contentsRecoveryItems = recoverContentsHeadings(
+		allBlocksByPage,
+		headingItems,
+		usedBlockIndices,
+		navigationRegions,
+	);
+	combined.push(...contentsRecoveryItems);
+	for (const item of contentsRecoveryItems) {
+		enrichmentBlockIndices.add(item._blockIndex);
 	}
-	const unwrapped = unwrapUniqueStyleParents(outline, styleCounts);
-	markKeywordTitleTerminals(unwrapped);
-	repairNativeParentHierarchy(unwrapped, nativeMatches);
-	repairNumericHierarchy(unwrapped);
-	const markerRepaired = repairMixedMarkerHierarchy(unwrapped);
-	const terminalLifted = liftTerminalChildren(markerRepaired);
-	normalizeLevels(terminalLifted, 1);
-	return terminalLifted.map(filterOutlineItem).filter(Boolean);
+
+	const baseline = buildGeneratedOutline(
+		baselineItems,
+		titleRef,
+		baselineNativeMatchedItems,
+		baselineNativeMatches,
+	);
+	if (!enrichmentBlockIndices.size) return baseline;
+	const enriched = buildGeneratedOutline(combined, titleRef, nativeMatchedItems, nativeMatches);
+	return mergeOutlineAdditions(baseline, enriched, enrichmentBlockIndices);
 }
