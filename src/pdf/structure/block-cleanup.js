@@ -331,10 +331,14 @@ export function markParagraphParts(structure) {
 		if (width1 === null || width2 === null) {
 			return false;
 		}
-		if (Math.abs(width1 - width2) <= 1) {
+		const crossPage = m2.pageIndex === m1.pageIndex + 1;
+		const widthTolerance = crossPage
+			? Math.max(1, Math.min(width1, width2) * 0.01)
+			: 1;
+		if (Math.abs(width1 - width2) <= widthTolerance) {
 			return true;
 		}
-		return m2.pageIndex === m1.pageIndex + 1
+		return crossPage
 			&& m2.lineCount === 1
 			&& width2 <= width1 + 1;
 	};
@@ -366,7 +370,12 @@ export function markParagraphParts(structure) {
 		}
 
 		// First paragraph lastLineRag must be <= threshold
-		if (m1.lastLineRag > RAG_THRESHOLD) {
+		const crossPage = m2.pageIndex === m1.pageIndex + 1;
+		const width1 = getBlockWidth(m1);
+		const ragTolerance = crossPage && width1 !== null
+			? Math.max(RAG_THRESHOLD, width1 * 0.01)
+			: RAG_THRESHOLD;
+		if (m1.lastLineRag > ragTolerance) {
 			return false;
 		}
 

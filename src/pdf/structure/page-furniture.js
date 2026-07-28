@@ -6,6 +6,10 @@ const EDGE_BAND_RATIO = 0.12;
 const LOCATION_BUCKET_RATIO = 0.05;
 const MIN_REPEATED_TEXT_LENGTH = 8;
 const MAX_REPEATED_TEXT_LENGTH = 160;
+const EXACT_BBOX_TYPES = new Set(['paragraph', 'heading']);
+// Ignore insignificant extraction noise while keeping the bbox match much
+// tighter than the general location buckets.
+const BBOX_COORDINATE_SCALE = 10;
 
 function getPrimaryPageRect(block) {
 	const rect = block?.anchor?.pageRects?.[0];
@@ -17,6 +21,17 @@ function getPrimaryPageRect(block) {
 
 function getBlockPageIndex(block) {
 	return getPrimaryPageRect(block)?.[0] ?? null;
+}
+
+function getExactBboxKey(block) {
+	const rect = getPrimaryPageRect(block);
+	const coordinates = rect?.slice(1, 5);
+	if (!coordinates || coordinates.some(value => !Number.isFinite(value))) {
+		return null;
+	}
+	return coordinates
+		.map(value => Math.round(value * BBOX_COORDINATE_SCALE))
+		.join(':');
 }
 
 function getPageRegionKeys(block, page) {
@@ -92,6 +107,24 @@ function getRepeatedFurnitureCandidate(block, page) {
 	return { textKeys: getTextGroupKeys(text), regionKeys };
 }
 
+function getExactRepeatedFurnitureCandidate(block, page) {
+	if (!block || !EXACT_BBOX_TYPES.has(block.type)) {
+		return null;
+	}
+	const regionKeys = getPageRegionKeys(block, page);
+	if (!regionKeys.some(key => key.startsWith('top:') || key.startsWith('bottom:'))) {
+		return null;
+	}
+
+	const text = normalizeRepeatedText(getNestedBlockPlainText(block));
+	if (!text || text.length > MAX_REPEATED_TEXT_LENGTH) {
+		return null;
+	}
+
+	const bboxKey = getExactBboxKey(block);
+	return bboxKey ? `${text}\0${bboxKey}` : null;
+}
+
 export function excludeRepeatedPageFurniture(structure) {
 	if (!structure || !Array.isArray(structure.content) || !Array.isArray(structure.catalog?.pages)) {
 		return structure;
@@ -103,6 +136,7 @@ export function excludeRepeatedPageFurniture(structure) {
 	}
 
 	const groups = new Map();
+	const exactGroups = new Map();
 	for (let i = 0; i < structure.content.length; i++) {
 		const block = structure.content[i];
 		const pageIndex = getBlockPageIndex(block);
@@ -110,7 +144,18 @@ export function excludeRepeatedPageFurniture(structure) {
 			continue;
 		}
 
-		const candidate = getRepeatedFurnitureCandidate(block, structure.catalog.pages[pageIndex]);
+		const page = structure.catalog.pages[pageIndex];
+		const exactKey = getExactRepeatedFurnitureCandidate(block, page);
+		if (exactKey) {
+			const group = exactGroups.get(exactKey) || { refs: new Set(), pages: new Set() };
+			if (!block.flowClass) {
+				group.refs.add(i);
+			}
+			group.pages.add(pageIndex);
+			exactGroups.set(exactKey, group);
+		}
+
+		const candidate = getRepeatedFurnitureCandidate(block, page);
 		if (!candidate) {
 			continue;
 		}
@@ -129,6 +174,15 @@ export function excludeRepeatedPageFurniture(structure) {
 	}
 
 	const minPages = Math.max(MIN_REPEATED_PAGES, Math.ceil(pageCount * MIN_REPEATED_PAGE_RATIO));
+	for (const group of exactGroups.values()) {
+		if (group.pages.size < minPages) {
+			continue;
+		}
+		for (const ref of group.refs) {
+			structure.content[ref].flowClass = 'excluded';
+		}
+	}
+
 	for (const group of groups.values()) {
 		if (group.pages.size < minPages) {
 			continue;

@@ -455,8 +455,8 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	wrapListItems(structure);
 	markListItemParts(structure);
 	postProcessStructure(structure);
-	markParagraphParts(structure);
 	excludeRepeatedPageFurniture(structure);
+	markParagraphParts(structure);
 	normalizeTopLevelFlowClasses(structure);
 
 	// After this only text node transformations are allowed

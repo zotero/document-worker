@@ -121,7 +121,7 @@ describe('excludeRepeatedPageFurniture', () => {
 		]);
 	});
 
-	it('keeps repeated headings as structural content', () => {
+	it('excludes repeated headings at the same page-edge bbox', () => {
 		const structure = repeatedPageStructure(pageIndex => ({
 			type: 'heading',
 			anchor: { pageRects: [[pageIndex, 100, 20, 260, 32]] },
@@ -131,7 +131,80 @@ describe('excludeRepeatedPageFurniture', () => {
 		excludeRepeatedPageFurniture(structure);
 
 		assert.deepEqual(structure.content.map(block => block.flowClass), [
+			'excluded',
+			'excluded',
+			'excluded',
+			'excluded',
+		]);
+	});
+
+	it('excludes short exact-bbox page furniture across paragraph and heading predictions', () => {
+		const structure = repeatedPageStructure(pageIndex => ({
+			type: pageIndex % 2 ? 'heading' : 'paragraph',
+			anchor: { pageRects: [[pageIndex, 100, 20, 160, 32]] },
+			content: [{ text: 'Article' }],
+		}));
+
+		excludeRepeatedPageFurniture(structure);
+
+		assert.deepEqual(structure.content.map(block => block.flowClass), [
+			'excluded',
+			'excluded',
+			'excluded',
+			'excluded',
+		]);
+	});
+
+	it('uses classified exact-bbox furniture as evidence without overriding it', () => {
+		const structure = repeatedPageStructure(pageIndex => ({
+			type: pageIndex % 2 ? 'heading' : 'paragraph',
+			...(pageIndex === 1 && { flowClass: 'auxiliary' }),
+			anchor: { pageRects: [[pageIndex, 100, 20, 160, 32]] },
+			content: [{ text: 'Article' }],
+		}));
+
+		excludeRepeatedPageFurniture(structure);
+
+		assert.deepEqual(structure.content.map(block => block.flowClass), [
+			'excluded',
+			'auxiliary',
+			'excluded',
+			'excluded',
+		]);
+	});
+
+	it('keeps repeated headings when their page-edge bboxes differ', () => {
+		const structure = repeatedPageStructure(pageIndex => ({
+			type: 'heading',
+			anchor: { pageRects: [[pageIndex, 100 + pageIndex * 10, 20, 260 + pageIndex * 10, 32]] },
+			content: [{ text: 'References' }],
+		}));
+
+		excludeRepeatedPageFurniture(structure);
+
+		assert.deepEqual(structure.content.map(block => block.flowClass), [
 			undefined,
+			undefined,
+			undefined,
+			undefined,
+		]);
+	});
+
+	it('keeps sparse structural headings even when their page-edge bboxes are identical', () => {
+		const structure = {
+			catalog: {
+				pages: Array.from({ length: 20 }, () => ({ viewRect: [0, 0, 600, 800] })),
+			},
+			content: [1, 8, 17].map(pageIndex => ({
+				type: 'heading',
+				anchor: { pageRects: [[pageIndex, 100, 20, 260, 32]] },
+				content: [{ text: 'Running section title' }],
+			})),
+		};
+
+		excludeRepeatedPageFurniture(structure);
+
+		assert.deepEqual(structure.content.map(block => block.flowClass), [
 			undefined,
 			undefined,
 			undefined,
