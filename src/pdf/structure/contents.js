@@ -2,6 +2,7 @@ const MIN_MATCHED_HEADINGS = 4;
 const MIN_MATCH_DENSITY = 0.5;
 const MIN_ORDERED_FRACTION = 0.75;
 const MIN_TITLE_LENGTH = 5;
+const MAX_WRAPPED_ENTRY_LINES = 4;
 
 function isValidRect(rect) {
 	return Array.isArray(rect)
@@ -104,19 +105,25 @@ function orderedFraction(values) {
 
 export function createContentsHeadingIndex(nodes) {
 	const entries = [];
+	const entriesByPrefix = new Map();
 	for (let index = 0; index < (nodes || []).length; index++) {
 		const node = nodes[index];
 		if (!Number.isInteger(node?._pageIndex)) continue;
 		const key = getTitleKey(node.title);
 		if (!key) continue;
-		entries.push({
+		const entry = {
 			index,
 			key,
 			title: node.title,
 			targetPage: node._pageIndex,
-		});
+		};
+		entries.push(entry);
+		const prefix = key.slice(0, MIN_TITLE_LENGTH);
+		const prefixEntries = entriesByPrefix.get(prefix) || [];
+		prefixEntries.push(entry);
+		entriesByPrefix.set(prefix, prefixEntries);
 	}
-	return { entries };
+	return { entries, entriesByPrefix };
 }
 
 function getLinkedDestinations(line, links) {
@@ -134,10 +141,29 @@ function getLinkedDestinations(line, links) {
 	return [...destinations.values()];
 }
 
-function matchHeading(line, headingIndex, pageIndex) {
-	const lineKey = getTitleKey(line.text);
+function getLinesLinkedDestinations(lines, links) {
+	const destinations = new Map();
+	for (const line of lines) {
+		for (const destination of getLinkedDestinations(line, links)) {
+			const key = `${destination.pageIndex}|${destination.rect?.join(',') || ''}`;
+			destinations.set(key, destination);
+		}
+	}
+	return [...destinations.values()];
+}
+
+function getHeadingCandidates(headingIndex, lineKey) {
+	if (headingIndex?.entriesByPrefix instanceof Map) {
+		return headingIndex.entriesByPrefix.get(
+			lineKey.slice(0, MIN_TITLE_LENGTH),
+		) || [];
+	}
+	return headingIndex?.entries || [];
+}
+
+function matchHeadingKey(lineKey, headingIndex, pageIndex) {
 	if (!lineKey) return null;
-	const matches = (headingIndex?.entries || [])
+	const matches = getHeadingCandidates(headingIndex, lineKey)
 		.filter(entry => (
 			entry.targetPage > pageIndex
 			&& lineKey.startsWith(entry.key)
@@ -154,6 +180,43 @@ function matchHeading(line, headingIndex, pageIndex) {
 	return best[0];
 }
 
+function matchHeading(line, headingIndex, pageIndex) {
+	return matchHeadingKey(getTitleKey(line.text), headingIndex, pageIndex);
+}
+
+function couldExtendToHeading(text, headingIndex, pageIndex) {
+	const lineKey = getTitleKey(text);
+	if (!lineKey) return true;
+	return getHeadingCandidates(headingIndex, lineKey)
+		.some(entry => entry.targetPage > pageIndex && entry.key.startsWith(lineKey));
+}
+
+function areWrappedEntryLines(previousLine, nextLine) {
+	if (!isValidRect(previousLine?.rect) || !isValidRect(nextLine?.rect)) {
+		return false;
+	}
+
+	const previousWidth = previousLine.rect[2] - previousLine.rect[0];
+	const nextWidth = nextLine.rect[2] - nextLine.rect[0];
+	const horizontalOverlap = Math.min(previousLine.rect[2], nextLine.rect[2])
+		- Math.max(previousLine.rect[0], nextLine.rect[0]);
+	if (horizontalOverlap <= 0 || previousWidth <= 0 || nextWidth <= 0) {
+		return false;
+	}
+
+	const verticalGap = Math.max(
+		0,
+		Math.max(previousLine.rect[1], nextLine.rect[1])
+			- Math.min(previousLine.rect[3], nextLine.rect[3]),
+	);
+	const lineHeight = Math.max(
+		1,
+		getLineHeight(previousLine),
+		getLineHeight(nextLine),
+	);
+	return verticalGap <= lineHeight * 1.5;
+}
+
 /**
  * Match physical page lines against headings inferred elsewhere in the PDF.
  * Detection deliberately has no vocabulary, locator, numbering, or link rules.
@@ -161,21 +224,55 @@ function matchHeading(line, headingIndex, pageIndex) {
 export function getContentsEvidence(lines, links, headingIndex, pageIndex) {
 	const matches = [];
 	const usedEntries = new Set();
+	const directMatches = (lines || []).map(line => (
+		isValidRect(line?.rect) ? matchHeading(line, headingIndex, pageIndex) : null
+	));
 	for (let index = 0; index < (lines || []).length; index++) {
 		const line = lines[index];
 		if (!isValidRect(line?.rect)) continue;
-		const heading = matchHeading(line, headingIndex, pageIndex);
+		let matchedLines = [line];
+		let heading = directMatches[index];
+		let combinedText = String(line.text || '');
+		if (!heading && couldExtendToHeading(combinedText, headingIndex, pageIndex)) {
+			for (
+				let nextIndex = index + 1;
+				nextIndex < lines.length
+					&& nextIndex < index + MAX_WRAPPED_ENTRY_LINES;
+				nextIndex++
+			) {
+				const nextLine = lines[nextIndex];
+				if (
+					directMatches[nextIndex]
+					|| !areWrappedEntryLines(matchedLines.at(-1), nextLine)
+				) {
+					break;
+				}
+				matchedLines.push(nextLine);
+				combinedText += ` ${nextLine.text || ''}`;
+				const combinedKey = getTitleKey(combinedText);
+				heading = matchHeadingKey(combinedKey, headingIndex, pageIndex);
+				if (heading) {
+					break;
+				}
+				if (!couldExtendToHeading(combinedText, headingIndex, pageIndex)) {
+					break;
+				}
+			}
+		}
 		if (!heading || usedEntries.has(heading.index)) continue;
 		usedEntries.add(heading.index);
 		matches.push({
-			lineIds: [getLineId(line, index)],
+			lineIds: matchedLines.map((matchedLine, matchedIndex) => (
+				getLineId(matchedLine, index + matchedIndex)
+			)),
 			startOffset: getLineStartOffset(line, index),
-			endOffset: getLineEndOffset(line, index),
+			endOffset: getLineEndOffset(matchedLines.at(-1), index + matchedLines.length - 1),
 			title: heading.title,
 			titleKey: heading.key,
 			targetPage: heading.targetPage,
-			linkDestinations: getLinkedDestinations(line, links),
+			linkDestinations: getLinesLinkedDestinations(matchedLines, links),
 		});
+		index += matchedLines.length - 1;
 	}
 	return { pageIndex, matches };
 }
@@ -227,25 +324,29 @@ export function detectContentsRegion(lines, pageRect, options = {}) {
 		&& getLineStartOffset(line, index) >= firstOffset
 		&& getLineEndOffset(line, index) <= lastOffset
 	));
-	if (matches.length / Math.max(1, spanLines.length) < MIN_MATCH_DENSITY) return null;
+	const matchedLineIds = new Set(matches.flatMap(match => match.lineIds));
+	if (matchedLineIds.size / Math.max(1, spanLines.length) < MIN_MATCH_DENSITY) return null;
 
 	const matchesByLine = new Map(matches.map(match => [match.lineIds[0], match]));
-	const rows = spanLines.map((line, index) => {
+	const rows = spanLines.flatMap((line) => {
 		const lineId = getLineId(line, lines.indexOf(line));
+		if (matchedLineIds.has(lineId) && !matchesByLine.has(lineId)) return [];
 		const match = matchesByLine.get(lineId);
-		return {
-			lineIds: [lineId],
+		return [{
+			lineIds: match?.lineIds || [lineId],
 			title: match?.title || String(line.text || '').trim(),
 			titleKey: match?.titleKey || getTitleKey(line.text),
-			linkDestinations: match?.linkDestinations || getLinkedDestinations(line, options.links),
-		};
+			linkDestinations: match?.linkDestinations
+				|| getLinkedDestinations(line, options.links),
+		}];
 	});
 	const heading = findVisualHeading(rows.map(row => {
-		const line = lines[row.lineIds[0]];
+		const firstLine = lines[row.lineIds[0]];
+		const lastLine = lines[row.lineIds.at(-1)];
 		return {
 			...row,
-			startOffset: getLineStartOffset(line),
-			endOffset: getLineEndOffset(line),
+			startOffset: getLineStartOffset(firstLine),
+			endOffset: getLineEndOffset(lastLine),
 		};
 	}), lines, pageRect);
 	return {
@@ -323,6 +424,7 @@ export function normalizeContentsBlocks(blocks, lines, pageRect, options = {}) {
 			block.type === 'title'
 			&& block.lines?.some(lineId => region.headingLineIds.includes(lineId))
 		) {
+			block.flowClass = 'auxiliary';
 			block._contentsNavigationHeading = true;
 		}
 	}

@@ -114,6 +114,96 @@ describe('PDF printed contents detection', () => {
 		assert.equal(region?.rows.length, 6);
 	});
 
+	it('matches wrapped contents entries as single navigation rows', () => {
+		const titles = Array.from({ length: 4 }, (_, index) => (
+			`${index + 1}. A sufficiently descriptive chapter title with continuation`
+		));
+		const lines = [makeLine(0, 'Contents', [60, 750, 140, 765], 0)];
+		for (let index = 0; index < titles.length; index++) {
+			lines.push(makeLine(
+				lines.length,
+				`${index + 1}. A sufficiently descriptive chapter title`,
+				[60, 710 - index * 45, 430, 724 - index * 45],
+			));
+			lines.push(makeNavigationLine(
+				lines.length,
+				'with continuation',
+				String(index + 10),
+				[80, 690 - index * 45, 520, 704 - index * 45],
+			));
+		}
+		const evidence = getEvidence(lines, titles);
+		const region = detectContentsRegion(lines, PAGE_RECT, { evidence });
+
+		assert.deepEqual(
+			evidence.matches.map(match => match.lineIds),
+			[[1, 2], [3, 4], [5, 6], [7, 8]],
+		);
+		assert.deepEqual(
+			region?.rows.map(row => row.lineIds),
+			[[1, 2], [3, 4], [5, 6], [7, 8]],
+		);
+	});
+
+	it('matches contents entries spanning more than two physical lines', () => {
+		const titles = Array.from({ length: 4 }, (_, index) => (
+			`${index + 1}. A sufficiently descriptive chapter title with middle and final continuation`
+		));
+		const lines = [makeLine(0, 'Contents', [60, 750, 140, 765], 0)];
+		for (let index = 0; index < titles.length; index++) {
+			const top = 710 - index * 60;
+			lines.push(makeLine(
+				lines.length,
+				`${index + 1}. A sufficiently descriptive chapter title`,
+				[60, top, 430, top + 14],
+			));
+			lines.push(makeLine(
+				lines.length,
+				'with middle',
+				[80, top - 18, 300, top - 4],
+			));
+			lines.push(makeNavigationLine(
+				lines.length,
+				'and final continuation',
+				String(index + 10),
+				[80, top - 36, 520, top - 22],
+			));
+		}
+		const evidence = getEvidence(lines, titles);
+		const region = detectContentsRegion(lines, PAGE_RECT, { evidence });
+
+		assert.deepEqual(
+			evidence.matches.map(match => match.lineIds),
+			[[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]],
+		);
+		assert.deepEqual(
+			region?.rows.map(row => row.lineIds),
+			[[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]],
+		);
+	});
+
+	it('does not combine adjacent lines from separate columns', () => {
+		const titles = Array.from({ length: 4 }, (_, index) => (
+			`${index + 1}. Left-column title fragment with right-column continuation`
+		));
+		const lines = [];
+		for (let index = 0; index < titles.length; index++) {
+			const bottom = 700 - index * 24;
+			lines.push(makeLine(
+				lines.length,
+				`${index + 1}. Left-column title fragment`,
+				[60, bottom, 260, bottom + 14],
+			));
+			lines.push(makeLine(
+				lines.length,
+				'with right-column continuation',
+				[340, bottom, 540, bottom + 14],
+			));
+		}
+
+		assert.equal(getEvidence(lines, titles).matches.length, 0);
+	});
+
 	it('does not detect navigation without independent inferred headings', () => {
 		assert.equal(detectContentsRegion(makeInlineContents(), PAGE_RECT), null);
 	});
@@ -264,6 +354,38 @@ describe('PDF printed contents detection', () => {
 		)));
 		assert.deepEqual(normalized[0].lines, [0, 1]);
 		assert.deepEqual(normalized.at(-1).lines, [8]);
+	});
+
+	it('marks the detected contents heading as auxiliary navigation', () => {
+		const lines = makeInlineContents();
+		const titles = lines.slice(1).map(line => (
+			line.words.slice(0, -1).map(word => word.text).join(' ')
+		));
+		const blocks = [
+			{
+				type: 'title',
+				flowClass: 'body',
+				lines: [0],
+				bbox: lines[0].rect,
+				startOffset: lines[0].startOffset,
+				endOffset: lines[0].endOffset,
+			},
+			{
+				type: 'body',
+				flowClass: 'body',
+				lines: lines.slice(1).map(line => line.id),
+				bbox: [60, 600, 520, 724],
+				startOffset: lines[1].startOffset,
+				endOffset: lines.at(-1).endOffset,
+			},
+		];
+		const evidence = getEvidence(lines, titles);
+		const region = detectContentsRegion(lines, PAGE_RECT, { evidence });
+		const normalized = normalizeContentsBlocks(blocks, lines, PAGE_RECT, { region });
+		const heading = normalized.find(block => block.type === 'title');
+
+		assert.equal(heading?.flowClass, 'auxiliary');
+		assert.equal(heading?._contentsNavigationHeading, true);
 	});
 
 	it('keeps printed contents entries from shadowing real outline targets', async () => {
