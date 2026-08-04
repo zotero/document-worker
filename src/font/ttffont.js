@@ -1885,6 +1885,7 @@ var Subset = (function() {
       _ref;
     cmap = CmapTable.encode(this.generateCmap(), "unicode");
     glyphs = this.glyphsFor(glyID);
+    glyphs[0] = this.font.glyf.glyphFor(0);
     old2new = {
       0: 0
     };

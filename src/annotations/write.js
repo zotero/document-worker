@@ -69,25 +69,35 @@ function calculateLines(chars, fontSize, maxWidth) {
 	let lines = [];
 	let currentLine = [];
 	let currentLineWidth = 0;
+	let pushLine = () => {
+		lines.push(currentLine);
+		currentLine = [];
+		currentLineWidth = 0;
+	};
 
 	for (let i = 0; i < chars.length; i++) {
 		let char = chars[i];
+		if (char.lineBreak) {
+			pushLine();
+			continue;
+		}
 		let charWidth = char.width / 1000 * fontSize;
 
 		if (char.char === ' ') {
 			// Calculate the width of the next word
-			let nextSpaceIndex = chars.findIndex((c, idx) => idx > i && c.char === ' ');
+			let nextSpaceIndex = chars.findIndex((c, idx) => idx > i && (c.char === ' ' || c.lineBreak));
 			if (nextSpaceIndex === -1) nextSpaceIndex = chars.length;
 
 			let nextWordWidth = chars.slice(i + 1, nextSpaceIndex).reduce((acc, c) => acc + c.width / 1000 * fontSize, 0);
 
 			// Check if adding the next word (excluding the space) will exceed maxWidth
 			if (currentLineWidth + nextWordWidth > maxWidth && currentLine.length > 0) {
-				lines.push(currentLine);
-				currentLine = [];
-				currentLineWidth = 0;
+				pushLine();
 				continue; // Skip adding the space character to the new line
 			}
+		}
+		else if (currentLineWidth + charWidth > maxWidth && currentLine.length > 0) {
+			pushLine();
 		}
 
 		// Add the character to the current line and update the line width
@@ -212,7 +222,7 @@ async function annotationToRaw(annotation, fontEmbedder) {
 		}
 
 		let fontResource = {};
-		let chars = await fontEmbedder.embedChars(annotation.comment, fontResource);
+		let chars = await fontEmbedder.embedChars(annotation.comment.replace(/\r\n?/g, '\n'), fontResource);
 		if (chars) {
 			let fontSize = roundedFontSize;
 			let lineHeightMultiplier = 1.2;
@@ -281,8 +291,15 @@ async function annotationToRaw(annotation, fontEmbedder) {
 			let bbox = getBoundingBox(points);
 			bbox = bbox.map(n => Math.round(n * 1000) / 1000);
 			res['/Rect'] = bbox;
+			let appearanceWidth = Math.round((bbox[2] - bbox[0]) * 1000) / 1000;
+			let appearanceHeight = Math.round((bbox[3] - bbox[1]) * 1000) / 1000;
 
-			let stream = ['q'];
+			let stream = [
+				'q',
+				`0 0 ${appearanceWidth} ${appearanceHeight} re`,
+				'W',
+				'n'
+			];
 
 			// // Set stroke color to green (0 Red, 1 Green, 0 Blue)
 			// stream.push('0 1 0 RG');
@@ -310,8 +327,8 @@ async function annotationToRaw(annotation, fontEmbedder) {
 				let transformedY = refY + (lineY - refY) * cosTheta - deltaY;
 
 				let matrix = rotationMatrix.slice();
-				matrix[4] = transformedX.toFixed(3);
-				matrix[5] = transformedY.toFixed(3);
+				matrix[4] = (transformedX - bbox[0]).toFixed(3);
+				matrix[5] = (transformedY - bbox[1]).toFixed(3);
 
 				stream.push(`${matrix.join(' ')} Tm`);
 
@@ -327,7 +344,7 @@ async function annotationToRaw(annotation, fontEmbedder) {
 							textBuffer = '';
 						}
 						currentFont = char.resKey;
-						stream.push(`/${currentFont} ${fontSize} Tf`);
+						stream.push(`${currentFont} ${fontSize} Tf`);
 					}
 					textBuffer += char.utf16;
 				}
@@ -343,7 +360,7 @@ async function annotationToRaw(annotation, fontEmbedder) {
 
 			res['/AP'] = {
 				'/N': {
-					'/BBox': bbox,
+					'/BBox': [0, 0, appearanceWidth, appearanceHeight],
 					'/FormType': 1,
 					'/Subtype': '/Form',
 					'/Type': '/XObject',

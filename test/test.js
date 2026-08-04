@@ -32,6 +32,8 @@ import { expect } from 'chai';
 import fs from 'fs';
 import crypto from 'crypto';
 import * as pdfWorker from '../src/index.js';
+import { PDFAssembler } from '../src/pdfassembler.js';
+import { TTFFont } from '../src/font/ttffont.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -255,6 +257,49 @@ describe('PDF Worker', function () {
 		let md5 = crypto.createHash('md5').update(buffer).digest('hex');
 		// console.log(md5);
 		// fs.writeFileSync(__dirname + '/1-out.pdf', buffer);
+	});
+
+	it('should write a visible appearance for multiline Chinese text annotations', async function () {
+		let annotations = [{
+			id: 'CHINESE-TEXT',
+			type: 'text',
+			color: '#000000',
+			position: {
+				pageIndex: 0,
+				rects: [[54, 300, 254, 360]],
+				rotation: 0,
+				fontSize: 12
+			},
+			authorName: 'Wentian',
+			comment: '第一行中文批注\n第二行中文批注',
+			dateModified: '2026-08-04T08:00:00.000Z',
+			tags: []
+		}];
+		let standardFontProvider = async filename => fs.readFileSync(
+			path.join(__dirname, '../assets/standard_fonts', filename)
+		);
+
+		let buf = fs.readFileSync(__dirname + '/pdfs/1.pdf');
+		buf = await pdfWorker.writeAnnotations(buf, annotations, '', undefined, standardFontProvider);
+
+		let pdf = new PDFAssembler();
+		await pdf.init(buf, '');
+		let structure = await pdf.getPDFStructure();
+		let rawAnnotation = structure['/Root']['/Pages']['/Kids'][0]['/Annots']
+			.find(annotation => annotation['/NM'] === '(Zotero-CHINESE-TEXT)');
+
+		let appearanceStream = Buffer.from(rawAnnotation['/AP']['/N'].stream).toString('latin1');
+		expect(appearanceStream).to.match(/\/F\d+ \d+ Tf/);
+		expect(appearanceStream).not.to.include('//F');
+		expect(appearanceStream).to.include('1 0 0 1 0.000 45.600 Tm');
+		expect(rawAnnotation['/AP']['/N']['/BBox']).to.deep.equal([0, 0, 200, 60]);
+		expect(rawAnnotation['/AP']['/N']).not.to.have.property('/Matrix');
+		expect(rawAnnotation['/AP']['/N']['/Resources']['/Font']).not.to.be.empty;
+
+		let embeddedFont = Object.values(rawAnnotation['/AP']['/N']['/Resources']['/Font'])[0];
+		let fontFile = embeddedFont['/DescendantFonts'][0]['/FontDescriptor']['/FontFile2'].stream;
+		let ttfFont = TTFFont.open(fontFile);
+		expect(ttfFont.loca.offsets.at(-1)).to.equal(ttfFont.glyf.length);
 	});
 
 	it('should import Mendeley annotations', async function () {

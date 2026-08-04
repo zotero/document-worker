@@ -131,6 +131,10 @@ export class FontEmbedder {
 		let chars2 = [];
 		let resultChars = [];
 		for (let char of chars) {
+			if (char === '\n') {
+				chars2.push({ char, lineBreak: true });
+				continue;
+			}
 			let font = this.getFontByCharacter(char);
 			if (!font) {
 				return;
@@ -138,7 +142,11 @@ export class FontEmbedder {
 			chars2.push({ char, font });
 		}
 		for (let char2 of chars2) {
-			let { font, char } = char2;
+			let { font, char, lineBreak } = char2;
+			if (lineBreak) {
+				resultChars.push({ char, lineBreak: true, width: 0 });
+				continue;
+			}
 			if (!this._fonts.includes(font)) {
 				this._fonts.push(font);
 				font.charsUsed = [];
@@ -176,7 +184,7 @@ export class FontEmbedder {
 			resultChars.push(resultChar);
 		}
 
-		let fonts = Array.from(new Set(chars2.map(x => x.font)));
+		let fonts = Array.from(new Set(chars2.map(x => x.font).filter(Boolean)));
 		for (let font of fonts) {
 			this._embedFontData(font);
 		}
@@ -190,16 +198,15 @@ export class FontEmbedder {
 		var widths = [];
 		let toUnicode = {};
 		let glyphIDsUsed = [];
-		let unicodeCmap = ttfFont.cmap.unicode.codeMap;
 
-		for (let key in unicodeCmap) {
-			key = parseInt(key);
-			let t = ttfFont.characterToGlyph(key);
-			glyphIDsUsed.push(t);
-			toUnicode[t] = key;
-			if (widths.indexOf(t) == -1) {
-				widths.push(t);
-				widths.push([parseInt(ttfFont.widthOfGlyph(t), 10)]);
+		for (let char of font.charsUsed) {
+			let key = char.charCodeAt(0);
+			let glyphID = ttfFont.characterToGlyph(key);
+			toUnicode[glyphID] = key;
+			if (!glyphIDsUsed.includes(glyphID)) {
+				glyphIDsUsed.push(glyphID);
+				widths.push(glyphID);
+				widths.push([parseInt(ttfFont.widthOfGlyph(glyphID), 10)]);
 			}
 		}
 
