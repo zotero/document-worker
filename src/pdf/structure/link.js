@@ -1,19 +1,39 @@
 import {
   resolveDestination, getRectCenter, getRangeRects, getClosestDistance
 } from './util.js';
+import { quadPointsToRects } from '../utils.js';
 import { getBlockText, getTextNodesAtRange } from '../../../structured-document-text/src/pdf/index.js';
 import { createStructureIndex, rectsIntersect } from './structure-index.js';
+
+const MIN_GLYPH_OVERLAP_RATIO = 0.15;
+
+function getAnnotationSourceRects(rect, quadPoints) {
+	if (quadPoints?.length && quadPoints.length % 8 === 0) {
+		let rects = quadPointsToRects(quadPoints)
+			.filter(rect => (
+				rect.length === 4
+				&& rect.every(Number.isFinite)
+				&& rect[2] > rect[0]
+				&& rect[3] > rect[1]
+			));
+		if (rects.length) {
+			return rects;
+		}
+	}
+	return [rect];
+}
 
 export async function getLinksFromAnnotations(pdfDocument, page) {
 	let links = [];
 	let annotations = await page._parsedAnnotations;
 	for (let annotation of annotations) {
 		annotation = annotation.data;
-		let { url, dest, rect } = annotation;
+		let { url, dest, rect, quadPoints } = annotation;
 		if ((!url && !dest) || !rect) {
 			continue;
 		}
-		let link = { src: { pageIndex: page.pageIndex, rect } };
+		let rects = getAnnotationSourceRects(rect, quadPoints);
+		let link = { src: { pageIndex: page.pageIndex, rect, rects } };
 		if (annotation.url) {
 			link.url = url;
 		} else if (annotation.dest) {
@@ -27,49 +47,111 @@ export async function getLinksFromAnnotations(pdfDocument, page) {
 	return links;
 }
 
-function getUnderlyingTextRange(bt, {pageIndex, rect }) {
-	// Find continuous sequence of characters that intersect with the link rect
-	let offsetStart = null;
-	let offsetEnd = null;
+function rectContainsCenter(rect, charRect) {
+	let [x, y] = getRectCenter(charRect);
+	return rect[0] <= x && x <= rect[2] && rect[1] <= y && y <= rect[3];
+}
 
+function rectOverlapsGlyph(rect, charRect) {
+	let width = charRect[2] - charRect[0];
+	let height = charRect[3] - charRect[1];
+	let glyphArea = width * height;
+	if (glyphArea <= 0) {
+		return false;
+	}
+	let intersectionWidth = Math.max(0, Math.min(rect[2], charRect[2]) - Math.max(rect[0], charRect[0]));
+	let intersectionHeight = Math.max(0, Math.min(rect[3], charRect[3]) - Math.max(rect[1], charRect[1]));
+	return intersectionWidth * intersectionHeight / glyphArea >= MIN_GLYPH_OVERLAP_RATIO;
+}
+
+function hasTextContent(text) {
+	return /[\p{L}\p{N}]/u.test(text);
+}
+
+function hasSymbolicLinkContent(text) {
+	return /[\p{S}*†‡§¶]/u.test(text);
+}
+
+function canBridgeMatchingOffsets(bt, first, second) {
+	for (let offset = first + 1; offset < second; offset++) {
+		if (bt.rects[offset] || !/\s/u.test(bt.text[offset])) {
+			return false;
+		}
+	}
+	return true;
+}
+
+function getMatchingOffsetRuns(bt, offsets) {
+	let runs = [];
+	for (let offset of offsets) {
+		let run = runs.at(-1);
+		if (!run || !canBridgeMatchingOffsets(bt, run.offsetEnd, offset)) {
+			runs.push({ offsetStart: offset, offsetEnd: offset });
+		}
+		else {
+			run.offsetEnd = offset;
+		}
+	}
+	return runs;
+}
+
+function getMatchingOffsets(bt, pageIndex, rects, intersects) {
+	let offsets = [];
 	for (let i = 0; i < bt.text.length; i++) {
 		let charRect = bt.rects[i];
-		let charPageIndex = bt.pageIndexes[i];
-
-		// Skip if no rect info or different page
-		if (!charRect || charPageIndex !== pageIndex) {
-			// If we had started a sequence, break it (non-continuous)
-			if (offsetStart !== null) {
-				offsetStart = null;
-				offsetEnd = null;
-			}
+		if (!charRect || bt.pageIndexes[i] !== pageIndex) {
 			continue;
 		}
+		if (rects.some(rect => intersects(rect, charRect))) {
+			offsets.push(i);
+		}
+	}
+	return offsets;
+}
 
-		// Check if character center is within link rect
-		let [x, y] = getRectCenter(charRect);
-		if (rect[0] <= x && x <= rect[2] && rect[1] <= y && y <= rect[3]) {
-			if (offsetStart !== null) {
-				// Check continuity - if not continuous, reset
-				if (i !== offsetEnd + 1) {
-					offsetStart = null;
-					offsetEnd = null;
-					break;
-				}
-			} else {
-				offsetStart = i;
-			}
-			offsetEnd = i;
+export function getUnderlyingTextRanges(bt, { pageIndex, rect, rects }) {
+	let sourceRects = rects?.length ? rects : [rect];
+	let offsets = getMatchingOffsets(bt, pageIndex, sourceRects, rectContainsCenter);
+	let matchedText = offsets.map(offset => bt.text[offset]).join('');
+	let allowSymbolicContent = true;
+
+	// Very small annotations can intersect a glyph without containing its center.
+	// Prefer the more permissive overlap rule only when it finds real text.
+	if (!hasTextContent(matchedText) && !hasSymbolicLinkContent(matchedText)) {
+		let overlapOffsets = getMatchingOffsets(bt, pageIndex, sourceRects, rectOverlapsGlyph);
+		let overlapText = overlapOffsets.map(offset => bt.text[offset]).join('');
+		if (hasTextContent(overlapText)) {
+			offsets = overlapOffsets;
+			allowSymbolicContent = false;
 		}
 	}
 
-	// Extract text if we found a valid range
-	let text = '';
-	if (offsetStart !== null && offsetEnd !== null) {
-		text = bt.text.substring(offsetStart, offsetEnd + 1);
-	}
+	return getMatchingOffsetRuns(bt, offsets)
+		.map(({ offsetStart, offsetEnd }) => {
+			while (offsetStart <= offsetEnd && /\s/u.test(bt.text[offsetStart])) {
+				offsetStart++;
+			}
+			while (offsetEnd >= offsetStart && /\s/u.test(bt.text[offsetEnd])) {
+				offsetEnd--;
+			}
 
-	return { offsetStart, offsetEnd, text };
+			let text = bt.text.substring(offsetStart, offsetEnd + 1);
+			if (
+				!hasTextContent(text)
+				&& !(allowSymbolicContent && hasSymbolicLinkContent(text))
+			) {
+				return null;
+			}
+			return { offsetStart, offsetEnd, text };
+		})
+		.filter(Boolean);
+}
+
+export function getUnderlyingTextRange(bt, source) {
+	let ranges = getUnderlyingTextRanges(bt, source);
+	return ranges.length === 1
+		? ranges[0]
+		: { offsetStart: null, offsetEnd: null, text: '' };
 }
 
 function getDestinationRange(sourceText, dest, pageEntries, destinationRangeCache) {
@@ -152,13 +234,39 @@ function resolveDestinationLinks(items, pageIndex, pageEntries, structureIndex, 
 	}
 
 	let resolveItems = (destItems, destEntries) => {
+		let itemGroups = new Map();
 		for (let item of destItems) {
-			let destRange = getDestinationRange(item.text, item.processedLink.dest, destEntries, destinationRangeCache);
-			if (destRange) {
-				item.processedLink.dest = destRange;
+			if (!itemGroups.has(item.sourceLink)) {
+				itemGroups.set(item.sourceLink, []);
 			}
-			else {
-				delete item.processedLink.dest;
+			itemGroups.get(item.sourceLink).push(item);
+		}
+
+		for (let items of itemGroups.values()) {
+			let destinationsByBlock = new Map();
+			for (let item of items) {
+				let destRange = getDestinationRange(
+					item.text,
+					item.processedLink.dest,
+					destEntries,
+					destinationRangeCache
+				);
+				if (destRange) {
+					destinationsByBlock.set(destRange.blockRef.join(','), destRange);
+				}
+			}
+
+			let destRange = destinationsByBlock.size === 1
+				? destinationsByBlock.values().next().value
+				: null;
+			for (let item of items) {
+				if (destRange) {
+					item.processedLink.dest = { ...destRange, blockRef: [...destRange.blockRef] };
+					item.processedLink.destinationResolution = 'source-text';
+				}
+				else {
+					delete item.processedLink.dest;
+				}
 			}
 		}
 	};
@@ -199,30 +307,28 @@ export function getAnnotLinkRefs(structure, linkMap, structureIndex = createStru
 			let pageItems = [];
 
 			for (let link of links) {
-				let { rect } = link.src;
+				let { rect, rects } = link.src;
 
 				for (let entry of pageBlockTextEntries) {
 					let { blockRef, blockRefKey, bt, pageRect } = entry;
-					if (!pageRect || !rectsIntersect(pageRect, rect)) {
+					let sourceRects = rects?.length ? rects : [rect];
+					if (!pageRect || !sourceRects.some(sourceRect => rectsIntersect(pageRect, sourceRect))) {
 						continue;
 					}
 
-					// Find the text range that intersects with this link
-					let { offsetStart, offsetEnd, text } = getUnderlyingTextRange(bt, { pageIndex, rect });
-
-					// Skip blocks that don't intersect with the source rect
-					if (offsetStart === null || offsetEnd === null) {
-						continue;
+					// Find the text ranges that intersect with this link
+					let ranges = getUnderlyingTextRanges(bt, { pageIndex, rect, rects });
+					for (let { offsetStart, offsetEnd, text } of ranges) {
+						pageItems.push({
+							blockRef,
+							blockRefKey,
+							offsetStart,
+							offsetEnd,
+							text,
+							sourceLink: link,
+							processedLink: { ...link },
+						});
 					}
-
-					pageItems.push({
-						blockRef,
-						blockRefKey,
-						offsetStart,
-						offsetEnd,
-						text,
-						processedLink: { ...link },
-					});
 				}
 			}
 

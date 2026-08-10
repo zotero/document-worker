@@ -1118,8 +1118,26 @@ function isContainedSameDestinationOverlap(ref, source, references) {
 		&& !sameRange(source, ref.src);
 }
 
+function isContainedDestinationGuess(ref, source) {
+	let guessedSource = ref.src;
+	if (typeof guessedSource?.text === 'string') {
+		let leading = guessedSource.text.match(/^[^\p{L}\p{N}]*/u)?.[0].length || 0;
+		let trailing = guessedSource.text.match(/[^\p{L}\p{N}]*$/u)?.[0].length || 0;
+		guessedSource = {
+			...guessedSource,
+			offsetStart: guessedSource.offsetStart + leading,
+			offsetEnd: guessedSource.offsetEnd - trailing,
+		};
+	}
+	return ref.destinationResolution === 'source-text'
+		&& sourceContains(source, guessedSource);
+}
+
 function hasBlockingSourceOverlap(refsList, source, references) {
 	return getOverlappingRefs(refsList, source).some(ref => {
+		if (isContainedDestinationGuess(ref, source)) {
+			return false;
+		}
 		if (sameRange(source, ref.src) && matchesAnyReferenceDest(ref, references)) {
 			return false;
 		}
@@ -1134,7 +1152,8 @@ function replaceContainedSameDestinationOverlaps(refsList, source, references) {
 		return;
 	}
 	const filtered = group.filter(ref =>
-		!isContainedSameDestinationOverlap(ref, source, references));
+		!isContainedSameDestinationOverlap(ref, source, references)
+		&& !isContainedDestinationGuess(ref, source));
 	if (filtered.length) {
 		refsList.set(key, filtered);
 	}
@@ -1169,7 +1188,7 @@ function hasLocalProseEvidence(reference, mention, localRefsByBlock) {
 	return sources.some(source => source.offsetEnd < mention.src.offsetStart);
 }
 
-function addRef(refsList, source, reference) {
+function addRef(refsList, source, reference, metadata = null) {
 	if (!source?.blockRef || !reference?.src?.blockRef || sameBlock(source, reference.src)) {
 		return;
 	}
@@ -1187,7 +1206,7 @@ function addRef(refsList, source, reference) {
 	)) {
 		return;
 	}
-	group.push({ src: source, dest: reference.src, type: 'citation' });
+	group.push({ src: source, dest: reference.src, type: 'citation', ...metadata });
 }
 
 function numberFromText(text) {
@@ -1211,7 +1230,10 @@ function addEmbeddedLinkRefs(refsList, annotLinkRefs, referenceIndex) {
 				reference = entries.find(entry => entry.run.ref[0] === link.dest.blockRef[0]) || null;
 			}
 			if (reference) {
-				addRef(refsList, link.src, reference);
+				let metadata = link.destinationResolution
+					? { destinationResolution: link.destinationResolution }
+					: null;
+				addRef(refsList, link.src, reference, metadata);
 			}
 		}
 	}
