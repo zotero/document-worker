@@ -347,12 +347,19 @@ export function addRefs(existingRefs, newRefs) {
 		let existingLinks = existingRefs.get(blockRefKey);
 		for (let newLink of newLinks) {
 			let { offsetStart, offsetEnd } = newLink.src;
-			// Check if this range intersects with any existing link
+			let newLinkIsExternal = Boolean(newLink.url && !newLink.dest?.blockRef);
+			// External targets and internal refs are independent SDT attributes, so
+			// only overlapping links in the same channel compete with each other.
 			let intersects = false;
 			if (existingLinks) {
 				for (let existingLink of existingLinks) {
 					let { offsetStart: existingStart, offsetEnd: existingEnd } = existingLink.src;
-					if (offsetStart <= existingEnd && existingStart <= offsetEnd) {
+					let existingLinkIsExternal = Boolean(existingLink.url && !existingLink.dest?.blockRef);
+					if (
+						newLinkIsExternal === existingLinkIsExternal
+						&& offsetStart <= existingEnd
+						&& existingStart <= offsetEnd
+					) {
 						intersects = true;
 						break;
 					}
