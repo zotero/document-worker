@@ -18,44 +18,82 @@ function getNodeText(node) {
 function getListMarker(text) {
 	const normalized = text.trimStart();
 	if (!normalized) {
-		return { family: 'none', kind: 'none', value: null };
+		return { family: 'none', kind: 'none', value: null, sequenceValue: null, syntax: null };
 	}
 
 	if (/^[•‣◦▪▫●○◆◇■□*+\-–—]\s+/u.test(normalized)) {
-		return { family: 'bullet', kind: 'bullet', value: null };
+		return { family: 'bullet', kind: 'bullet', value: null, sequenceValue: null, syntax: null };
 	}
 
-	let match = normalized.match(/^\[\s*(\d{1,4})\s*\](?:[.:])?\s+/u);
+	let match = normalized.match(/^\[\s*(\d{1,4})\s*\]([.:])?\s+/u);
 	if (match) {
-		return { family: 'ordered', kind: 'bracket-number', value: Number(match[1]) };
+		const value = Number(match[1]);
+		return {
+			family: 'ordered',
+			kind: 'bracket-number',
+			value,
+			sequenceValue: value,
+			syntax: `[n]${match[2] || ''}`,
+		};
 	}
 
 	match = normalized.match(/^\[\s*([A-Za-z])\s*\](?:[.:])?\s+/u);
 	if (match) {
-		return { family: 'ordered', kind: 'bracket-letter', value: match[1].toLowerCase() };
+		return {
+			family: 'ordered',
+			kind: 'bracket-letter',
+			value: match[1].toLowerCase(),
+			sequenceValue: null,
+			syntax: null,
+		};
 	}
 
 	match = normalized.match(/^\(\s*(\d{1,4})\s*\)\s+/u);
 	if (match) {
-		return { family: 'ordered', kind: 'paren-number', value: Number(match[1]) };
+		const value = Number(match[1]);
+		return {
+			family: 'ordered',
+			kind: 'paren-number',
+			value,
+			sequenceValue: value,
+			syntax: '(n)',
+		};
 	}
 
 	match = normalized.match(/^\(\s*([A-Za-z])\s*\)\s+/u);
 	if (match) {
-		return { family: 'ordered', kind: 'paren-letter', value: match[1].toLowerCase() };
+		return {
+			family: 'ordered',
+			kind: 'paren-letter',
+			value: match[1].toLowerCase(),
+			sequenceValue: null,
+			syntax: null,
+		};
 	}
 
-	match = normalized.match(/^(\d+(?:\.\d+)*)(?:[.)\]:：])\s+/u);
+	match = normalized.match(/^(\d+(?:\.\d+)*)([.)\]:：])\s+/u);
 	if (match) {
-		return { family: 'ordered', kind: 'delimited-number', value: Number(match[1].split('.')[0]) };
+		return {
+			family: 'ordered',
+			kind: 'delimited-number',
+			value: Number(match[1].split('.')[0]),
+			sequenceValue: match[1].includes('.') ? null : Number(match[1]),
+			syntax: `n${match[2]}`,
+		};
 	}
 
 	match = normalized.match(/^(\d{1,3})\s+/u);
 	if (match) {
-		return { family: 'ordered', kind: 'bare-number', value: Number(match[1]) };
+		return {
+			family: 'ordered',
+			kind: 'bare-number',
+			value: Number(match[1]),
+			sequenceValue: null,
+			syntax: null,
+		};
 	}
 
-	return { family: 'none', kind: 'none', value: null };
+	return { family: 'none', kind: 'none', value: null, sequenceValue: null, syntax: null };
 }
 
 function isValidRect(rect) {
@@ -161,6 +199,15 @@ function hasCompatibleSiblingMarker(first, second) {
 	return true;
 }
 
+function hasSimilarMarkerScale(first, second) {
+	const firstSize = first.firstCharFontSize || 0;
+	const secondSize = second.firstCharFontSize || 0;
+	if (!firstSize || !secondSize) {
+		return true;
+	}
+	return Math.abs(firstSize - secondSize) <= Math.max(1, Math.max(firstSize, secondSize) * 0.25);
+}
+
 export function getListItemProfile(block) {
 	const metrics = block?._metrics || null;
 	const text = getNodeText(block);
@@ -195,6 +242,44 @@ export function getListItemSiblingRelation(firstBlock, secondBlock) {
 		return null;
 	}
 	return { type: 'sibling', first, second };
+}
+
+// A deliberately narrow cross-page sibling relation. It is intended for
+// joining logical runs while their page-local list containers remain intact.
+export function getCrossPageListItemSiblingRelation(firstBlock, secondBlock, options = {}) {
+	const first = getListItemProfile(firstBlock);
+	const second = getListItemProfile(secondBlock);
+
+	if (!hasCompatibleFlow(first, second)) {
+		return null;
+	}
+	if (
+		first.marker.family !== 'ordered'
+		|| second.marker.family !== 'ordered'
+		|| first.marker.kind !== second.marker.kind
+		|| first.marker.syntax !== second.marker.syntax
+		|| !Number.isInteger(first.marker.sequenceValue)
+		|| second.marker.sequenceValue !== first.marker.sequenceValue + 1
+	) {
+		return null;
+	}
+	if (
+		first.pageIndex == null
+		|| second.pageIndex !== first.pageIndex + 1
+		|| !canCrossPagePartLink(options.structure, first.metrics, second.metrics)
+	) {
+		return null;
+	}
+	if (
+		!isValidRect(first.rect)
+		|| !isValidRect(second.rect)
+		|| !sameRail(first, second)
+		|| !hasSimilarMarkerScale(first, second)
+	) {
+		return null;
+	}
+
+	return { type: 'cross-page-sibling', first, second };
 }
 
 export function getListItemContinuationRelation(firstBlock, secondBlock, options = {}) {

@@ -566,7 +566,7 @@ export function getCandidates(
 	for (let entry of structureIndex.blockEntries()) {
 		let blockRef = entry.ref;
 		let block = entry.block;
-		if (block.type === 'preformatted') continue;
+		if (block.type === 'preformatted' || block.type === 'list' || block.reference) continue;
 		structureIndex.withBlockText(blockRef, (bt) => {
 			for (let i = 0; i < bt.text.length; i++) {
 				if (bt.attrs[i]?.style?.monospace) continue;

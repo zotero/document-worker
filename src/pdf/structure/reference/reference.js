@@ -1,5 +1,7 @@
 import { getReferenceSourceEvidence } from './evidence.js';
 import { getLogicalBlockText } from '../../../../structured-document-text/src/parts.js';
+import { isTransparentBetweenParts } from '../flow-policy.js';
+import { getCrossPageListItemSiblingRelation } from '../list-relations.js';
 
 
 const REFERENCE_LIST_DETECTION = {
@@ -101,6 +103,85 @@ function getItemId(text) {
 	return null;
 }
 
+function getNodeByRef(structure, ref) {
+	let node = { content: structure?.content };
+	for (const index of ref || []) {
+		if (!Number.isInteger(index) || !Array.isArray(node?.content)) {
+			return null;
+		}
+		node = node.content[index];
+		if (!node || typeof node !== 'object') {
+			return null;
+		}
+	}
+	return node;
+}
+
+function hasOnlyTransparentBlocksBetween(structure, firstIndex, secondIndex) {
+	for (let i = firstIndex + 1; i < secondIndex; i++) {
+		if (!isTransparentBetweenParts(structure.content[i])) {
+			return false;
+		}
+	}
+	return true;
+}
+
+function canJoinReferenceListRuns(structure, first, second, firstListRef = first?.ref) {
+	const firstIndex = firstListRef?.[0];
+	const secondIndex = second?.ref?.[0];
+	if (
+		firstListRef?.length !== 1
+		|| second?.ref?.length !== 1
+		|| !Number.isInteger(firstIndex)
+		|| !Number.isInteger(secondIndex)
+		|| secondIndex <= firstIndex
+		|| !hasOnlyTransparentBlocksBetween(structure, firstIndex, secondIndex)
+	) {
+		return false;
+	}
+
+	const firstList = getNodeByRef(structure, firstListRef);
+	const secondList = getNodeByRef(structure, second.ref);
+	if (
+		firstList?.type !== 'list'
+		|| secondList?.type !== 'list'
+		|| !Array.isArray(firstList.content)
+		|| !Array.isArray(secondList.content)
+		|| firstList.content.length === 0
+		|| secondList.content.length === 0
+	) {
+		return false;
+	}
+
+	return !!getCrossPageListItemSiblingRelation(
+		firstList.content.at(-1),
+		secondList.content[0],
+		{ structure }
+	);
+}
+
+function joinContinuedReferenceListRuns(structure, candidates) {
+	const joined = [];
+	const lastListRefs = new Map();
+	for (const candidate of candidates) {
+		const previous = joined.at(-1);
+		if (!previous || !canJoinReferenceListRuns(
+			structure,
+			previous,
+			candidate,
+			lastListRefs.get(previous)
+		)) {
+			joined.push(candidate);
+			lastListRefs.set(candidate, candidate.ref);
+			continue;
+		}
+		previous.blockRefs.push(...candidate.blockRefs);
+		previous.references.push(...candidate.references);
+		lastListRefs.set(previous, candidate.ref);
+	}
+	return joined;
+}
+
 export function getReferenceLists(structure, regularWordsSet) {
 	const candidates = [];
 	let prevBlock = null;
@@ -187,5 +268,5 @@ export function getReferenceLists(structure, regularWordsSet) {
 
 	addParagraphReferenceList(candidates, paragraphCandidate);
 
-	return candidates;
+	return joinContinuedReferenceListRuns(structure, candidates);
 }
