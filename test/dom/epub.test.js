@@ -6,11 +6,10 @@ import { dirname, resolve } from 'path';
 import { getEpubStructure, getEpubFulltext } from '../../src/dom/epub/index';
 import stringify from 'json-stringify-pretty-compact';
 import { SDT_PROCESSOR_VERSIONS, SDT_SCHEMA_VERSION } from '../../src/versions.js';
-import { readFixtureSourceHash } from '../helpers/fixtures.js';
+import { readFixtureSourceHash, toStructureGolden } from '../helpers/fixtures.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const epubsDir = resolve(__dirname, '..', 'fixtures', 'epub');
-const NORMALIZED_DATE_CREATED = '2000-01-01T00:00:00.000Z';
 
 function loadEpub(filename) {
 	let buf = fs.readFileSync(resolve(epubsDir, filename));
@@ -391,17 +390,15 @@ describe('EPUB structure snapshots', { timeout: 30000 }, () => {
 
 		it(file, () => {
 			let result = extractEpubStructure(file);
-
-			result.metadata.dateCreated = NORMALIZED_DATE_CREATED;
-
-			let json = stringify(result, { indent: '\t', maxLength: 100 });
+			let golden = toStructureGolden(result, 'epub');
+			let json = stringify(golden, { indent: '\t', maxLength: 100 });
 
 			if (process.env.UPDATE_FIXTURES) {
 				fs.writeFileSync(snapshotPath, json + '\n', 'utf8');
 			}
 			else {
 				let expected = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
-				assert.deepEqual(result, expected);
+				assert.deepEqual(golden, expected);
 			}
 		});
 	}

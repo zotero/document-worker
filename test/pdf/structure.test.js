@@ -6,12 +6,11 @@ import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { getStructure } from '../../src/pdf/index.js';
 import stringify from 'json-stringify-pretty-compact';
-import { readFixtureSourceHash } from '../helpers/fixtures.js';
+import { readFixtureSourceHash, toStructureGolden } from '../helpers/fixtures.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const buildDir = resolve(__dirname, '..', '..', 'build');
 const pdfsDir = resolve(__dirname, '..', 'fixtures', 'pdf', 'full');
-const NORMALIZED_DATE_CREATED = '2000-01-01T00:00:00.000Z';
 
 function dataProvider(path) {
 	return fs.readFileSync(resolve(buildDir, path));
@@ -34,9 +33,8 @@ describe('getStructure snapshots', { timeout: 120000 }, () => {
 				sourceHash: readFixtureSourceHash('pdf', 'full', pdfFile),
 			});
 
-			result.metadata.dateCreated = NORMALIZED_DATE_CREATED;
-
-			let json = stringify(result, { indent: '\t', maxLength: 100 });
+			let golden = toStructureGolden(result, 'pdf');
+			let json = stringify(golden, { indent: '\t', maxLength: 100 });
 
 			if (process.env.UPDATE_FIXTURES) {
 				fs.writeFileSync(snapshotPath, json + '\n', 'utf8');
@@ -44,7 +42,7 @@ describe('getStructure snapshots', { timeout: 120000 }, () => {
 			}
 			else {
 				let expected = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
-				assert.deepEqual(result, expected);
+				assert.deepEqual(golden, expected);
 			}
 		});
 	}

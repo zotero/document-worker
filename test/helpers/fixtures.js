@@ -1,7 +1,14 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
+import assert from 'node:assert/strict';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+	SDT_PROCESSOR_VERSIONS,
+	SDT_SCHEMA_VERSION,
+} from '../../src/versions.js';
+
+const NORMALIZED_DATE_CREATED = '2000-01-01T00:00:00.000Z';
 
 export const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 export const fixturesRoot = resolve(repoRoot, 'test', 'fixtures');
@@ -21,6 +28,28 @@ export function readFixtureArrayBuffer(...parts) {
 
 export function readFixtureSourceHash(...parts) {
 	return crypto.createHash('md5').update(readFixture(...parts)).digest('hex');
+}
+
+export function toStructureGolden(structure, processorType) {
+	assert.equal(structure.schemaVersion, SDT_SCHEMA_VERSION);
+	assert.equal(structure.metadata?.processor?.type, processorType);
+	assert.equal(
+		structure.metadata.processor.version,
+		SDT_PROCESSOR_VERSIONS[processorType]
+	);
+
+	// Processor versions invalidate caches but do not change the semantic golden.
+	let processor = { ...structure.metadata.processor };
+	delete processor.version;
+
+	return {
+		...structure,
+		metadata: {
+			...structure.metadata,
+			processor,
+			dateCreated: NORMALIZED_DATE_CREATED,
+		},
+	};
 }
 
 export function sampleZoteroAnnotations() {
