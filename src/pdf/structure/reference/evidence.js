@@ -58,6 +58,16 @@ function hasSourceLocatorAfterYear(text, yearEnd) {
 	return SOURCE_LOCATOR_RE.test(text.slice(yearEnd));
 }
 
+function hasBibliographicPrefixBeforeYear(text, yearStart) {
+	const beforeYear = text.slice(0, yearStart);
+	return countWords(beforeYear) >= 4 && countBibliographicPunctuation(beforeYear) >= 2;
+}
+
+function hasSourceLocatorBeforeYear(text, yearStart) {
+	return SOURCE_LOCATOR_RE.test(text.slice(0, yearStart))
+		&& hasBibliographicPrefixBeforeYear(text, yearStart);
+}
+
 function isInsideDelimitedGroup(text, offset) {
 	const before = text.slice(0, offset);
 	return before.lastIndexOf('(') > before.lastIndexOf(')')
@@ -68,8 +78,7 @@ function hasTerminalYearSourceShape(text, yearStart) {
 	if (isInsideDelimitedGroup(text, yearStart)) {
 		return false;
 	}
-	const beforeYear = text.slice(0, yearStart);
-	return countWords(beforeYear) >= 4 && countBibliographicPunctuation(beforeYear) >= 2;
+	return hasBibliographicPrefixBeforeYear(text, yearStart);
 }
 
 function hasBibliographicIdentifierContext(text) {
@@ -89,7 +98,7 @@ export function getReferenceSourceEvidence(text, { leadMaxWords = 12 } = {}) {
 	const hasBibliographicIdentifier = hasBibliographicIdentifierContext(normalized);
 	const hasLabel = !!getLeadingLabel(normalized);
 	let hasLeadYear = false;
-	let hasSourceLocator = SOURCE_LOCATOR_RE.test(normalized);
+	let hasSourceLocator = false;
 	let hasTitleTail = false;
 	let hasTerminalYearShape = false;
 
@@ -97,7 +106,8 @@ export function getReferenceSourceEvidence(text, { leadMaxWords = 12 } = {}) {
 		if (hasLabel || countWords(normalized.slice(0, year.start)) <= leadMaxWords) {
 			hasLeadYear = true;
 		}
-		hasSourceLocator ||= hasSourceLocatorAfterYear(normalized, year.end);
+		hasSourceLocator ||= hasSourceLocatorAfterYear(normalized, year.end)
+			|| hasSourceLocatorBeforeYear(normalized, year.start);
 		hasTitleTail ||= hasTitleTailAfterYear(normalized, year.end);
 		hasTerminalYearShape ||= year.end >= normalized.length - 2
 			&& hasTerminalYearSourceShape(normalized, year.start);
