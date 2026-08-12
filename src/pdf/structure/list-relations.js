@@ -273,7 +273,6 @@ export function getCrossPageListItemSiblingRelation(firstBlock, secondBlock, opt
 	if (
 		!isValidRect(first.rect)
 		|| !isValidRect(second.rect)
-		|| !sameRail(first, second)
 		|| !hasSimilarMarkerScale(first, second)
 	) {
 		return null;

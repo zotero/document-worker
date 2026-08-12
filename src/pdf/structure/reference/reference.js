@@ -221,7 +221,7 @@ export function getReferenceLists(structure, regularWordsSet) {
 				candidate.references.push({ id, text, src: { blockRef: [i, j] } });
 			}
 
-			if (candidate.references.length > 0 && isListValid(candidate)) {
+			if (candidate.references.length > 0) {
 				candidates.push(candidate);
 			}
 
@@ -268,5 +268,5 @@ export function getReferenceLists(structure, regularWordsSet) {
 
 	addParagraphReferenceList(candidates, paragraphCandidate);
 
-	return joinContinuedReferenceListRuns(structure, candidates);
+	return joinContinuedReferenceListRuns(structure, candidates).filter(isListValid);
 }
