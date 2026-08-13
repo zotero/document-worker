@@ -1,4 +1,5 @@
 import { getBlockPlainText } from '../../../../structured-document-text/src/pdf/index.js';
+import { contentsLocatorMatchesPageLabel } from '../contents.js';
 import { titles as REFERENCE_TITLES } from '../reference/titles.js';
 import { getClosestDistance, resolveDestination } from '../util.js';
 
@@ -482,6 +483,55 @@ function groupItemsByPage(items) {
 		result.get(item._pageIndex).push(item);
 	}
 	return result;
+}
+
+function findContentsBlockMatch(row, pageBlocks) {
+	const rowKey = row.titleKey || getComparableTitleKey(row.title);
+	if (!rowKey) return null;
+	const matches = [];
+	for (let start = 0; start < pageBlocks.length; start++) {
+		if (pageBlocks[start].type !== 'heading') continue;
+		let title = '';
+		for (let end = start; end < pageBlocks.length; end++) {
+			const block = pageBlocks[end];
+			if (block.type !== 'heading' && block.type !== 'paragraph') break;
+			title = title ? `${title} ${block.title}` : block.title;
+			const key = getComparableTitleKey(title);
+			if (key === rowKey) {
+				matches.push({ title, block: pageBlocks[start] });
+				break;
+			}
+			if (!key || !rowKey.startsWith(key)) break;
+		}
+	}
+	return matches.length === 1 ? matches[0] : null;
+}
+
+function buildPrintedContentsOutline(allBlocksByPage, navigationRegions, pageLabels) {
+	const items = [];
+	const usedBlockIndices = new Set();
+	for (const region of navigationRegions) {
+		if (region.source !== 'heading-concentration') continue;
+		for (const row of region.rows || []) {
+			if (
+				!Number.isInteger(row.targetPage)
+				|| !contentsLocatorMatchesPageLabel(row.locatorKey, pageLabels?.[row.targetPage])
+			) {
+				continue;
+			}
+			const match = findContentsBlockMatch(
+				row,
+				allBlocksByPage.get(row.targetPage) || [],
+			);
+			if (!match || usedBlockIndices.has(match.block._blockIndex)) continue;
+			usedBlockIndices.add(match.block._blockIndex);
+			items.push({
+				title: match.title,
+				ref: [match.block._blockIndex],
+			});
+		}
+	}
+	return items.sort((a, b) => a.ref[0] - b.ref[0]);
 }
 
 function markAlignedContentsHeadings(headingItems, navigationRegions) {
@@ -1312,12 +1362,22 @@ export async function getOutline(blocks, titleRef, pdfDocument, nativeOutline = 
 	// Phase 4: Build combined list
 	const combined = headingItems.slice();
 	const usedBlockIndices = new Set(combined.map(item => item._blockIndex));
+	const navigationRegions = options.navigationRegions || [];
+	if (
+		!nativeMatches.length
+		&& navigationRegions.some(region => region.source === 'heading-concentration')
+	) {
+		return buildPrintedContentsOutline(
+			allBlocksByPage,
+			navigationRegions,
+			options.pageLabels,
+		);
+	}
 
 	// Phase 4b: Recover inline headings
 	const confirmedStyles = new Set(combined.map(item => item._styleKey).filter(Boolean));
 	const recoveredItems = recoverInlineHeadings(allBlocksByPage, confirmedStyles, usedBlockIndices);
 	combined.push(...recoveredItems);
-	const navigationRegions = options.navigationRegions || [];
 	if (!navigationRegions.length) {
 		return buildGeneratedOutline(combined, titleRef, nativeMatchedItems, nativeMatches);
 	}

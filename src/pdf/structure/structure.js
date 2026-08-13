@@ -3,7 +3,7 @@ import { getNativeOutline, getOutline } from './outline/outline.js';
 import { getLines } from './model/block-seg/input.js';
 import {
 	createContentsHeadingIndex,
-	detectContentsRegion,
+	detectContentsRegions,
 	getContentsEvidence,
 	normalizeContentsBlocks,
 } from './contents.js';
@@ -43,6 +43,7 @@ const DEGRADED_EXTRACTION_FALLBACK_REASONS = new Set([
 // Match PDF.js's fallback for an invalid MediaBox.
 const DEFAULT_PAGE_VIEW_RECT = [0, 0, 612, 792];
 const VALID_PAGE_ROTATIONS = new Set([0, 90, 180, 270]);
+const MAX_HEADING_COMPOSITION_FRAGMENTS = 4;
 
 function hasDegradedExtractionFallbacks(layoutFallbacks) {
 	return layoutFallbacks?.some(fallback => DEGRADED_EXTRACTION_FALLBACK_REASONS.has(fallback.reason));
@@ -292,8 +293,23 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	}
 
 	function collectInferredHeadings(context) {
-		for (const block of context.blocks || []) {
-			if (block.type !== 'title') continue;
+		let fragments = [];
+		function flush() {
+			if (!fragments.length) return;
+			for (let start = 0; start < fragments.length; start++) {
+				let title = '';
+				for (
+					let end = start;
+					end < Math.min(fragments.length, start + MAX_HEADING_COMPOSITION_FRAGMENTS);
+					end++
+				) {
+					title = `${title} ${fragments[end].title}`.trim();
+					inferredHeadings.push({ title, _pageIndex: context.i });
+				}
+			}
+			fragments = [];
+		}
+		function getTitle(block) {
 			const title = Array.isArray(block.lines)
 				? block.lines.map(lineId => context.lines[lineId]?.text || '').join(' ').trim()
 				: context.chars
@@ -301,10 +317,33 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 					.map(char => char?.c || '')
 					.join('')
 					.trim();
-			if (title) {
-				inferredHeadings.push({ title, _pageIndex: context.i });
-			}
+			return title;
 		}
+		function continuesHeading(previous, block) {
+			const a = previous.block?.bbox;
+			const b = block?.bbox;
+			if (!Array.isArray(a) || !Array.isArray(b)) return false;
+			const horizontalOverlap = Math.min(a[2], b[2]) - Math.max(a[0], b[0]);
+			const verticalGap = Math.max(0, Math.max(a[1], b[1]) - Math.min(a[3], b[3]));
+			const height = Math.max(a[3] - a[1], b[3] - b[1]);
+			return horizontalOverlap > 0 && verticalGap <= height;
+		}
+		for (const block of context.blocks || []) {
+			if (block.type !== 'title') {
+				flush();
+				continue;
+			}
+			const title = getTitle(block);
+			if (!title) {
+				flush();
+				continue;
+			}
+			if (fragments.length && !continuesHeading(fragments.at(-1), block)) {
+				flush();
+			}
+			fragments.push({ block, title });
+		}
+		flush();
 	}
 
 	async function inferBlockListsWithFallback(inferenceInputs, inferenceVals) {
@@ -412,17 +451,20 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 	// Confirm printed navigation only after inference has seen the whole PDF.
 	const headingIndex = createContentsHeadingIndex(inferredHeadings);
-	for (const context of contentsContexts) {
-		const evidence = getContentsEvidence(
+	const contentsRegionsByPage = new Map(detectContentsRegions(contentsContexts.map(context => ({
+		pageIndex: context.i,
+		lines: context.lines,
+		pageRect: context.viewRect,
+		links: context.links,
+		evidence: getContentsEvidence(
 			context.lines,
 			context.links,
 			headingIndex,
 			context.i,
-		);
-		const contentsRegion = detectContentsRegion(context.lines, context.viewRect, {
-			evidence,
-			links: context.links,
-		});
+		),
+	}))).map(({ pageIndex, region }) => [pageIndex, region]));
+	for (const context of contentsContexts) {
+		const contentsRegion = contentsRegionsByPage.get(context.i);
 		if (!contentsRegion) continue;
 		contentsNavigationRegions.push({
 			pageIndex: context.i,
@@ -516,6 +558,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 		nativeOutline,
 		{
 			navigationRegions: contentsNavigationRegions,
+			pageLabels: structure.catalog.pages.map(page => page.label),
 		},
 	);
 	if (outline.length) {

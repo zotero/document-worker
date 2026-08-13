@@ -42,6 +42,25 @@ function getTitleKey(text) {
 	return key.length >= MIN_TITLE_LENGTH ? key : null;
 }
 
+function getTrailingLocatorKey(text) {
+	const token = String(text || '').trim().split(/\s+/).at(-1);
+	return token ? compactText(token) : '';
+}
+
+function getMatchedLocatorKey(text, titleKey) {
+	const textKey = compactText(text);
+	const locatorKey = getTrailingLocatorKey(text);
+	return locatorKey
+		&& textKey.length > titleKey.length
+		&& textKey.endsWith(locatorKey)
+		? locatorKey
+		: '';
+}
+
+export function contentsLocatorMatchesPageLabel(locatorKey, pageLabel) {
+	return Boolean(locatorKey) && locatorKey === compactText(pageLabel);
+}
+
 function getLineId(line, fallback) {
 	return Number.isInteger(line?.id) ? line.id : fallback;
 }
@@ -270,6 +289,7 @@ export function getContentsEvidence(lines, links, headingIndex, pageIndex) {
 			title: heading.title,
 			titleKey: heading.key,
 			targetPage: heading.targetPage,
+			locatorKey: getMatchedLocatorKey(combinedText, heading.key),
 			linkDestinations: getLinesLinkedDestinations(matchedLines, links),
 		});
 		index += matchedLines.length - 1;
@@ -307,14 +327,12 @@ function findVisualHeading(rows, lines, pageRect) {
 	return null;
 }
 
-/** Confirm a navigation span from a dense, ordered repetition of body headings. */
-export function detectContentsRegion(lines, pageRect, options = {}) {
+function getContentsPageState(lines, pageRect, options = {}) {
 	if (!Array.isArray(lines) || !isValidRect(pageRect)) return null;
 	const matches = (options.evidence?.matches || [])
 		.slice()
 		.sort((a, b) => a.startOffset - b.startOffset);
-	if (matches.length < MIN_MATCHED_HEADINGS) return null;
-	if (orderedFraction(matches.map(match => match.targetPage)) < MIN_ORDERED_FRACTION) return null;
+	if (!matches.length) return null;
 
 	const firstOffset = matches[0].startOffset;
 	const lastOffset = matches.at(-1).endOffset;
@@ -325,7 +343,32 @@ export function detectContentsRegion(lines, pageRect, options = {}) {
 		&& getLineEndOffset(line, index) <= lastOffset
 	));
 	const matchedLineIds = new Set(matches.flatMap(match => match.lineIds));
-	if (matchedLineIds.size / Math.max(1, spanLines.length) < MIN_MATCH_DENSITY) return null;
+	return {
+		lines,
+		pageRect,
+		links: options.links,
+		pageIndex: options.pageIndex,
+		matches,
+		spanLines,
+		matchedLineIds,
+	};
+}
+
+function isConfirmedContentsRun(states) {
+	const matches = states.flatMap(state => state.matches);
+	if (matches.length < MIN_MATCHED_HEADINGS) return false;
+	if (orderedFraction(matches.map(match => match.targetPage)) < MIN_ORDERED_FRACTION) return false;
+	const matchedLineCount = states.reduce((count, state) => count + state.matchedLineIds.size, 0);
+	const spanLineCount = states.reduce((count, state) => count + state.spanLines.length, 0);
+	return matchedLineCount / Math.max(1, spanLineCount) >= MIN_MATCH_DENSITY;
+}
+
+function hasContentsPageDensity(state) {
+	return state.matchedLineIds.size / Math.max(1, state.spanLines.length) >= MIN_MATCH_DENSITY;
+}
+
+function buildContentsRegion(state) {
+	const { lines, pageRect, links, matches, spanLines, matchedLineIds } = state;
 
 	const matchesByLine = new Map(matches.map(match => [match.lineIds[0], match]));
 	const rows = spanLines.flatMap((line) => {
@@ -336,8 +379,10 @@ export function detectContentsRegion(lines, pageRect, options = {}) {
 			lineIds: match?.lineIds || [lineId],
 			title: match?.title || String(line.text || '').trim(),
 			titleKey: match?.titleKey || getTitleKey(line.text),
+			...(Number.isInteger(match?.targetPage) && { targetPage: match.targetPage }),
+			...(match?.locatorKey && { locatorKey: match.locatorKey }),
 			linkDestinations: match?.linkDestinations
-				|| getLinkedDestinations(line, options.links),
+				|| getLinkedDestinations(line, links),
 		}];
 	});
 	const heading = findVisualHeading(rows.map(row => {
@@ -354,6 +399,64 @@ export function detectContentsRegion(lines, pageRect, options = {}) {
 		rows,
 		source: 'heading-concentration',
 	};
+}
+
+/** Confirm a navigation span from a dense, ordered repetition of body headings. */
+export function detectContentsRegion(lines, pageRect, options = {}) {
+	const state = getContentsPageState(lines, pageRect, options);
+	return state && isConfirmedContentsRun([state])
+		? buildContentsRegion(state)
+		: null;
+}
+
+/** Confirm adjacent pages as one printed navigation object. */
+export function detectContentsRegions(pages) {
+	const regions = [];
+	let run = [];
+	function flush() {
+		if (run.length && isConfirmedContentsRun(run)) {
+			for (const state of run) {
+				regions.push({ pageIndex: state.pageIndex, region: buildContentsRegion(state) });
+			}
+		}
+		run = [];
+	}
+	for (const page of pages || []) {
+		let state = getContentsPageState(page.lines, page.pageRect, {
+			evidence: page.evidence,
+			links: page.links,
+			pageIndex: page.pageIndex,
+		});
+		// Do not let an adjacent page with one incidental repeated heading hitchhike
+		// on a confirmed multi-page navigation object.
+		if (
+			state
+			&& (
+				state.matches.length < Math.ceil(MIN_MATCHED_HEADINGS / 2)
+				|| (
+					state.matches.length < MIN_MATCHED_HEADINGS
+					&& !hasContentsPageDensity(state)
+				)
+			)
+		) {
+			state = null;
+		}
+		if (
+			!state
+			|| (
+				run.length
+				&& (
+					state.pageIndex !== run.at(-1).pageIndex + 1
+					|| state.matches[0].targetPage < run.at(-1).matches.at(-1).targetPage
+				)
+			)
+		) {
+			flush();
+		}
+		if (state) run.push(state);
+	}
+	flush();
+	return regions;
 }
 
 function createBlockFromLineIds(source, lineIds, lines) {
