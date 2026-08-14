@@ -153,11 +153,34 @@ function canJoinReferenceListRuns(structure, first, second, firstListRef = first
 		return false;
 	}
 
-	return !!getCrossPageListItemSiblingRelation(
-		firstList.content.at(-1),
-		secondList.content[0],
+	const firstLastIndex = firstList.content.length - 1;
+	const firstLastRef = [...firstListRef, firstLastIndex];
+	const firstLast = firstList.content[firstLastIndex];
+	let secondFirstIndex = 0;
+	let continuationBlockRef = null;
+	const secondFirst = secondList.content[secondFirstIndex];
+	if (
+		Array.isArray(firstLast?.nextPart)
+		&& Array.isArray(secondFirst?.previousPart)
+		&& firstLast.nextPart.length === 2
+		&& firstLast.nextPart[0] === second.ref[0]
+		&& firstLast.nextPart[1] === secondFirstIndex
+		&& secondFirst.previousPart.length === firstLastRef.length
+		&& secondFirst.previousPart.every((value, index) => value === firstLastRef[index])
+	) {
+		continuationBlockRef = [second.ref[0], secondFirstIndex];
+		secondFirstIndex++;
+	}
+
+	if (!getCrossPageListItemSiblingRelation(
+		firstLast,
+		secondList.content[secondFirstIndex],
 		{ structure }
-	);
+	)) {
+		return false;
+	}
+
+	return { continuationBlockRef };
 }
 
 function joinContinuedReferenceListRuns(structure, candidates) {
@@ -165,15 +188,22 @@ function joinContinuedReferenceListRuns(structure, candidates) {
 	const lastListRefs = new Map();
 	for (const candidate of candidates) {
 		const previous = joined.at(-1);
-		if (!previous || !canJoinReferenceListRuns(
+		const relation = previous && canJoinReferenceListRuns(
 			structure,
 			previous,
 			candidate,
 			lastListRefs.get(previous)
-		)) {
+		);
+		if (!relation) {
 			joined.push(candidate);
 			lastListRefs.set(candidate, candidate.ref);
 			continue;
+		}
+		if (relation.continuationBlockRef) {
+			const previousReference = previous.references.at(-1);
+			previousReference.continuationBlockRefs ||= [];
+			previousReference.continuationBlockRefs.push(relation.continuationBlockRef);
+			previous.blockRefs.push(relation.continuationBlockRef);
 		}
 		previous.blockRefs.push(...candidate.blockRefs);
 		previous.references.push(...candidate.references);

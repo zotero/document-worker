@@ -48,6 +48,39 @@ describe('getReferenceLists', () => {
 		assert.deepEqual(lists[0].references[0].src.blockRef, [0, 0]);
 	});
 
+	it('joins cross-page reference lists after a page-leading item continuation', () => {
+		const first = numberedReferenceList(0, [1, 2, 3]);
+		first.content[2].nextPart = [2, 0];
+		first.content[2].content = [{ text: '[3] Cedar, C. Split source-' }];
+		const second = numberedReferenceList(1, [4, 5]);
+		second.content.unshift({
+			type: 'listitem',
+			previousPart: [0, 2],
+			_metrics: {
+				pageIndex: 1,
+				rect: [68, 700, 500, 720],
+				firstChar: 'c',
+				firstCharFontSize: 10,
+			},
+			content: [{ text: 'continuation. Journal 3: 30-39 (2023).' }],
+		});
+		const structure = {
+			catalog: { pages: [{}, {}] },
+			content: [
+				first,
+				{ type: 'paragraph', flowClass: 'excluded', content: [{ text: 'Page 1' }] },
+				second,
+			],
+		};
+
+		const lists = getReferenceLists(structure, new Set());
+
+		assert.equal(lists.length, 1);
+		assert.deepEqual(lists[0].references.map(reference => reference.id), ['1', '2', '3', '4', '5']);
+		assert.deepEqual(lists[0].references[2].continuationBlockRefs, [[2, 0]]);
+		assert.deepEqual(lists[0].blockRefs, [[2, 0]]);
+	});
+
 	it('keeps the correct title ref when excluded blocks sit before the reference list', () => {
 		const structure = {
 			content: [
@@ -78,6 +111,20 @@ describe('getReferenceLists', () => {
 	});
 
 	it('does not join cross-page lists when conservative continuation evidence fails', () => {
+		const skippedAfterContinuation = numberedReferenceList(1, [5, 6]);
+		skippedAfterContinuation.content.unshift({
+			type: 'listitem',
+			previousPart: [0, 1],
+			_metrics: {
+				pageIndex: 1,
+				rect: [68, 700, 500, 720],
+				firstChar: 'c',
+				firstCharFontSize: 10,
+			},
+			content: [{ text: 'continuation.' }],
+		});
+		const firstWithContinuation = numberedReferenceList(0, [1, 2]);
+		firstWithContinuation.content[1].nextPart = [2, 0];
 		const cases = [
 			{
 				name: 'skipped number',
@@ -105,6 +152,12 @@ describe('getReferenceLists', () => {
 				second: numberedReferenceList(1, [3, 4]),
 				between: [{ type: 'paragraph', flowClass: 'excluded', content: [{ text: 'Page 1' }] }],
 				degraded: true,
+			},
+			{
+				name: 'skipped number after a page-leading continuation',
+				first: firstWithContinuation,
+				second: skippedAfterContinuation,
+				between: [{ type: 'paragraph', flowClass: 'excluded', content: [{ text: 'Page 1' }] }],
 			},
 		];
 
