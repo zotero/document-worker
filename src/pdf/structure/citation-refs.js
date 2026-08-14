@@ -10,6 +10,7 @@ import { extractMatchableSourceIdentifiers } from './reference/source-identifier
 const NUMBER_DELIMITED_RE = /([\[(])\s*([0-9][0-9,\s\-–]*)\s*([\])])/g;
 const WORD_RE = /[\p{L}\p{M}\p{N}]+(?:['’-][\p{L}\p{M}\p{N}]+)*/gu;
 const IDENTITY_GROUP_MAX_CHARS = 180;
+const AUTHOR_YEAR_MENTION_MAX_CHARS = 64;
 const IDENTITY_GROUP_RE = new RegExp(`([\\[(])([^()[\\]\\n]{1,${IDENTITY_GROUP_MAX_CHARS}})([\\])])`, 'g');
 const IDENTITY_CONTEXT_WORDS = new Set(['cf', 'compare', 'eg', 'fig', 'figure', 'see', 'table']);
 const IDENTITY_CONNECTORS = new Set([
@@ -570,9 +571,11 @@ function getAuthorYearMention(text, words, yearWord, referenceIndex) {
 		return null;
 	}
 	const terminalAuthorTokens = getTerminalAuthorTokens(text, authorTokens, yearWord.start);
+	const offsetStart = (terminalAuthorTokens[0] || authorTokens[0]).start;
 	return {
-		offsetStart: (terminalAuthorTokens[0] || authorTokens[0]).start,
+		offsetStart,
 		offsetEnd: yearWord.end,
+		sourceWithinExtent: yearWord.end - offsetStart + 1 <= AUTHOR_YEAR_MENTION_MAX_CHARS,
 		tokens: authorTokens.map(token => token.value),
 		terminalTokens: terminalAuthorTokens.map(token => token.value),
 	};
@@ -606,7 +609,11 @@ function addAuthorYearWindows(windows, bt, blockRef, referenceIndex, sourceStren
 				value: getAuthorYearValue(authorToken, parsedYear.year, parsedYear.suffix),
 				authorToken,
 			})),
-			{ sourceStrength, terminalAuthorTokens: mention.terminalTokens },
+			{
+				sourceStrength,
+				terminalAuthorTokens: mention.terminalTokens,
+				sourceWithinExtent: mention.sourceWithinExtent,
+			},
 		);
 	}
 }
@@ -1172,6 +1179,9 @@ export function resolveMention(mention, referenceIndex, context = null) {
 }
 
 export function isMentionReferenceAllowed(mention, reference, context = null) {
+	if (mention.channel === 'author-year' && mention.sourceWithinExtent === false) {
+		return false;
+	}
 	const runNumericStyle = context?.runNumericStyles?.get(reference.run);
 	if (!isNumericChannel(mention.channel)) {
 		return !isNumericChannel(runNumericStyle);
