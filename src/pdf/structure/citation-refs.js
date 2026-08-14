@@ -1172,8 +1172,9 @@ export function resolveMention(mention, referenceIndex, context = null) {
 }
 
 export function isMentionReferenceAllowed(mention, reference, context = null) {
+	const runNumericStyle = context?.runNumericStyles?.get(reference.run);
 	if (!isNumericChannel(mention.channel)) {
-		return true;
+		return !isNumericChannel(runNumericStyle);
 	}
 	if (mention.sourceStrength !== 'strong') {
 		return false;

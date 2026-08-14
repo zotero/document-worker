@@ -39,6 +39,8 @@ canvas.drawString(54, 735, "Synthetic channel-flow sources")
 canvas.setFont("Times-Roman", 10)
 canvas.drawString(54, 708, "The baseline method follows earlier work [1-3].")
 canvas.drawString(54, 690, "Later measurements use the extended sources [4-6].")
+canvas.drawString(54, 672, "Quiet vortices in a model channel (2019) describes the general topic.")
+canvas.drawString(54, 654, "Wake control with imaginary sensors is ordinary prose here.")
 canvas.setFont("Times-Bold", 12)
 canvas.drawString(54, 116, "REFERENCES")
 y = 100
