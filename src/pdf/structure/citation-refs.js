@@ -134,6 +134,75 @@ function previousNonSpace(text, index) {
 	return null;
 }
 
+function nonSpaceIndex(text, index, step) {
+	for (let i = index + step; i >= 0 && i < text.length; i += step) {
+		if (!/\s/.test(text[i])) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+function rectCenter(rect, axis) {
+	return (rect[axis] + rect[axis + 2]) / 2;
+}
+
+function visuallyAttachedPrecedingDigit(bt, start) {
+	const adjacentIndex = nonSpaceIndex(bt.text, start, -1);
+	if (adjacentIndex < 0) {
+		return false;
+	}
+	const referenceIndex = nonSpaceIndex(bt.text, adjacentIndex, -1);
+	if (referenceIndex < 0) {
+		return false;
+	}
+
+	const runRect = bt.rects[start];
+	const adjacentRect = bt.rects[adjacentIndex];
+	const referenceRect = bt.rects[referenceIndex];
+	const pageIndex = bt.pageIndexes[start];
+	if (
+		!runRect || !adjacentRect || !referenceRect
+		|| pageIndex === null
+		|| bt.pageIndexes[adjacentIndex] !== pageIndex
+		|| bt.pageIndexes[referenceIndex] !== pageIndex
+	) {
+		return false;
+	}
+
+	const dx = rectCenter(adjacentRect, 0) - rectCenter(referenceRect, 0);
+	const dy = rectCenter(adjacentRect, 1) - rectCenter(referenceRect, 1);
+	if (!Number.isFinite(dx) || !Number.isFinite(dy) || Math.abs(dx) === Math.abs(dy)) {
+		return false;
+	}
+	const axis = Math.abs(dx) > Math.abs(dy) ? 0 : 1;
+	const direction = axis === 0 ? Math.sign(dx) : Math.sign(dy);
+	if (!direction) {
+		return false;
+	}
+
+	const crossAxis = axis === 0 ? 1 : 0;
+	const crossGap = Math.max(
+		runRect[crossAxis] - adjacentRect[crossAxis + 2],
+		adjacentRect[crossAxis] - runRect[crossAxis + 2],
+		0
+	);
+	const maximumCrossGap = Math.min(
+		runRect[crossAxis + 2] - runRect[crossAxis],
+		adjacentRect[crossAxis + 2] - adjacentRect[crossAxis]
+	);
+	if (!Number.isFinite(crossGap) || !Number.isFinite(maximumCrossGap) || crossGap > maximumCrossGap) {
+		return false;
+	}
+
+	const beforeRect = adjacentRect;
+	const afterRect = runRect;
+	const gap = direction > 0
+		? afterRect[axis] - beforeRect[axis + 2]
+		: beforeRect[axis] - afterRect[axis + 2];
+	return Number.isFinite(gap) && gap <= 0;
+}
+
 function nextNonSpace(text, index) {
 	for (let i = index + 1; i < text.length; i++) {
 		if (!/\s/.test(text[i])) {
@@ -160,7 +229,8 @@ function hasStructuralNumericMarker(text, start) {
 	return previousWord ? STRUCTURAL_NUMERIC_CONTEXT_WORDS.has(previousWord) : false;
 }
 
-function getNumericMentionContext(text, start, end, kind, baseStrength) {
+function getNumericMentionContext(bt, start, end, kind, baseStrength) {
+	const { text } = bt;
 	if (baseStrength !== 'strong') {
 		return NUMERIC_CONTEXT.WEAK;
 	}
@@ -172,6 +242,23 @@ function getNumericMentionContext(text, start, end, kind, baseStrength) {
 	}
 	if (start === 0 || isDenseNumericMetadataLine(text)) {
 		return NUMERIC_CONTEXT.WEAK;
+	}
+	const immediatePrev = text[start - 1];
+	const immediateNext = text[end + 1];
+	if (/\p{L}/u.test(immediateNext || '')) {
+		return NUMERIC_CONTEXT.WEAK;
+	}
+	if (/\d/.test(immediatePrev || '')) {
+		return visuallyAttachedPrecedingDigit(bt, start)
+			? NUMERIC_CONTEXT.BLOCKED
+			: NUMERIC_CONTEXT.WEAK;
+	}
+	const previousIndex = nonSpaceIndex(text, start, -1);
+	if (
+		/\d/.test(text[previousIndex] || '')
+		&& visuallyAttachedPrecedingDigit(bt, start)
+	) {
+		return NUMERIC_CONTEXT.BLOCKED;
 	}
 	const prev = previousNonSpace(text, start);
 	const next = nextNonSpace(text, end);
@@ -212,7 +299,7 @@ function addDelimitedNumberWindows(windows, bt, blockRef, sourceStrength) {
 			continue;
 		}
 		const numericContext = getNumericMentionContext(
-			bt.text,
+			bt,
 			match.index,
 			match.index + match[0].length - 1,
 			open === '[' ? 'brackets' : 'parentheses',
@@ -251,7 +338,7 @@ function addSuperscriptNumberWindows(windows, bt, blockRef, sourceStrength) {
 		i--;
 		const numbers = numbersFromText(text);
 		const numericContext = getNumericMentionContext(
-			bt.text,
+			bt,
 			start,
 			i,
 			'superscript',
