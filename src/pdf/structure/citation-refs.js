@@ -577,6 +577,7 @@ function getAuthorYearMention(text, words, yearWord, referenceIndex) {
 		offsetEnd: yearWord.end,
 		sourceWithinExtent: yearWord.end - offsetStart + 1 <= AUTHOR_YEAR_MENTION_MAX_CHARS,
 		tokens: authorTokens.map(token => token.value),
+		tokenSpans: authorTokens.map(({ value, start }) => ({ value, start })),
 		terminalTokens: terminalAuthorTokens.map(token => token.value),
 	};
 }
@@ -611,6 +612,7 @@ function addAuthorYearWindows(windows, bt, blockRef, referenceIndex, sourceStren
 			})),
 			{
 				sourceStrength,
+				authorTokenSpans: mention.tokenSpans,
 				terminalAuthorTokens: mention.terminalTokens,
 				sourceWithinExtent: mention.sourceWithinExtent,
 			},
@@ -886,6 +888,7 @@ function getAuthorCandidates(mention, referenceIndex, authorIdentity = null) {
 					reference,
 					tokens: new Set(),
 					tokenPositions: new Map(),
+					tokenUnits: new Map(),
 					positions: new Set(),
 					minPosition: Number.MAX_SAFE_INTEGER,
 					maxPosition: -1,
@@ -894,6 +897,7 @@ function getAuthorCandidates(mention, referenceIndex, authorIdentity = null) {
 			}
 			candidate.tokens.add(authorToken);
 			candidate.tokenPositions.set(authorToken, position);
+			candidate.tokenUnits.set(authorToken, reference.authorTokenUnits?.get(authorToken) ?? position);
 			candidate.positions.add(position);
 			candidate.minPosition = Math.min(candidate.minPosition, position);
 			candidate.maxPosition = Math.max(candidate.maxPosition, position);
@@ -944,6 +948,17 @@ function getCandidateAuthorPosition(candidate, authorTokens) {
 		}
 	}
 	return position;
+}
+
+function getCandidateAuthorSpread(candidate, authorTokens) {
+	let unit = -1;
+	for (const token of authorTokens) {
+		const tokenUnit = candidate.tokenUnits?.get(token);
+		if (Number.isInteger(tokenUnit)) {
+			unit = Math.max(unit, tokenUnit);
+		}
+	}
+	return unit;
 }
 
 function getIdentityCandidates(
@@ -1011,12 +1026,20 @@ function chooseAuthorCandidate(mention, referenceIndex, authorIdentity = null) {
 			const bestPosition = Math.min(
 				...sharedCandidates.map(candidate => getCandidateAuthorPosition(candidate, authorTokens))
 			);
-			return chooseCandidate(
-				sharedCandidates.filter(candidate =>
-					getCandidateAuthorPosition(candidate, authorTokens) === bestPosition
-				),
-				mention
+			let pool = sharedCandidates.filter(candidate =>
+				getCandidateAuthorPosition(candidate, authorTokens) === bestPosition
 			);
+			// A citation naming N authors refers to a work by exactly those
+			// authors, so prefer the entry where the cited names span the
+			// fewest author units ("Izza and Marques-Silva" over "Izza,
+			// Ignatiev, and Marques-Silva")
+			const bestSpread = Math.min(
+				...pool.map(candidate => getCandidateAuthorSpread(candidate, authorTokens))
+			);
+			pool = pool.filter(candidate =>
+				getCandidateAuthorSpread(candidate, authorTokens) === bestSpread
+			);
+			return chooseCandidate(pool, mention);
 		}
 	}
 	const bestPosition = Math.min(...candidates.map(candidate => candidate.minPosition));
@@ -1286,6 +1309,22 @@ function hasLocalProseEvidence(reference, mention, localRefsByBlock) {
 	return sources.some(source => source.offsetEnd < mention.src.offsetStart);
 }
 
+function tightenAuthorYearSource(mention, references) {
+	// The mention extent starts at the first word matching any known author
+	// token; clamp it to the first token that belongs to a reference the
+	// mention actually resolved to, so prose lead-ins ("see also X 2009")
+	// never survive into the citation extent
+	if (mention.channel !== 'author-year' || !Array.isArray(mention.authorTokenSpans)) {
+		return mention.src;
+	}
+	const span = mention.authorTokenSpans.find(span =>
+		references.some(reference => reference.authorTokens?.includes(span.value)));
+	if (!span || span.start <= mention.src.offsetStart) {
+		return mention.src;
+	}
+	return { ...mention.src, offsetStart: span.start };
+}
+
 function addRef(refsList, source, reference, metadata = null) {
 	if (!source?.blockRef || !reference?.src?.blockRef || sameBlock(source, reference.src)) {
 		return;
@@ -1371,10 +1410,14 @@ export function getCitationRefs(
 			}
 			references.push(reference);
 		}
-		if (!references.length || hasBlockingSourceOverlap(refsList, mention.src, references)) {
+		if (!references.length) {
 			continue;
 		}
-		replaceContainedSameDestinationOverlaps(refsList, mention.src, references);
+		const source = tightenAuthorYearSource(mention, references);
+		if (hasBlockingSourceOverlap(refsList, source, references)) {
+			continue;
+		}
+		replaceContainedSameDestinationOverlaps(refsList, source, references);
 		for (const reference of references) {
 			if (mention.kind === 'prose-identity') {
 				const sourceKey = blockKey(mention.src.blockRef);
@@ -1389,7 +1432,7 @@ export function getCitationRefs(
 				}
 				proseRefs.add(destKey);
 			}
-			addRef(refsList, mention.src, reference);
+			addRef(refsList, source, reference);
 		}
 	}
 

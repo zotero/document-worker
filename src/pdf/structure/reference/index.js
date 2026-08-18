@@ -52,7 +52,9 @@ function getAuthorPrefix(text, tokens, yearIndex) {
 	for (const match of beforeYear.matchAll(/\.\s+/g)) {
 		const authorTokens = tokenizeReferenceText(beforeYear.slice(0, match.index));
 		const lastToken = authorTokens.at(-1)?.text || '';
-		if (authorTokens.length > 1 || lastToken.length > 1) {
+		// A period after a single-letter token is an author initial
+		// ("Crank, J. P., & Caldero…"), not the end of the author section
+		if (lastToken.length > 1) {
 			return beforeYear.slice(0, match.index);
 		}
 	}
@@ -85,27 +87,100 @@ function isConnectorAuthorToken(prefix, token, value) {
 	return after.startsWith(',');
 }
 
-function getAuthorTokens(text, tokens, yearIndex, regularWordsSet) {
-	const prefix = getAuthorPrefix(text, tokens, yearIndex);
-	const values = [];
-	const positions = new Map();
-	const seen = new Set();
-	for (const token of tokenizeReferenceText(prefix)) {
+function isProseAuthorPrefix(prefixTokens, regularWordsSet) {
+	// Bibliography author prefixes contain only names, initials, and
+	// connectors; a lowercase regular word signals a prose sentence
+	// (e.g., a note entry like "Also worth considering is X (1973)")
+	for (const token of prefixTokens) {
 		const value = normalizeAuthorToken(token.text);
 		if (
-			!value
-			|| (AUTHOR_TOKEN_CONNECTORS.has(value) && !isConnectorAuthorToken(prefix, token, value))
-			|| (regularWordsSet?.has(value) && token.text[0] === token.text[0].toLowerCase())
+			value
+			&& !AUTHOR_TOKEN_CONNECTORS.has(value)
+			&& regularWordsSet?.has(value)
+			&& startsLowercase(token.text)
 		) {
+			return true;
+		}
+	}
+	return false;
+}
+
+const PROSE_LEAD_MIN_SUCCESSORS = 3;
+
+function getProseLeadWords(referenceLists, regularWordsSet) {
+	// A regular word that opens many entries, each followed by a different
+	// word, is a citation lead-in ("See Cook…", "See Hazlett…"), not a
+	// surname: one author's entries repeat the same few successors
+	const successors = new Map();
+	for (const referenceList of referenceLists) {
+		for (const reference of referenceList.references) {
+			const tokens = tokenizeReferenceText(stripLeadingLabel(reference.text || ''));
+			const first = tokens[0] && normalizeAuthorToken(tokens[0].text);
+			const second = tokens[1] && normalizeAuthorToken(tokens[1].text);
+			if (first && second && regularWordsSet?.has(first)) {
+				let values = successors.get(first);
+				if (!values) {
+					values = new Set();
+					successors.set(first, values);
+				}
+				values.add(second);
+			}
+		}
+	}
+	const leadWords = new Set();
+	for (const [word, values] of successors) {
+		if (values.size >= PROSE_LEAD_MIN_SUCCESSORS) {
+			leadWords.add(word);
+		}
+	}
+	return leadWords;
+}
+
+function getAuthorTokens(text, tokens, yearIndex, regularWordsSet, proseLeadWords) {
+	const prefix = getAuthorPrefix(text, tokens, yearIndex);
+	const prefixTokens = tokenizeReferenceText(prefix);
+	const prose = isProseAuthorPrefix(prefixTokens, regularWordsSet);
+	const values = [];
+	const positions = new Map();
+	const units = new Map();
+	const seen = new Set();
+	let position = 0;
+	let unit = -1;
+	let prevKept = null;
+	for (const token of prefixTokens) {
+		const value = normalizeAuthorToken(token.text);
+		if (!value || (AUTHOR_TOKEN_CONNECTORS.has(value) && !isConnectorAuthorToken(prefix, token, value))) {
 			continue;
+		}
+		// Lead-in words and regular words in prose contexts are never author
+		// tokens, but still occupy a position slot so that authors reached
+		// through prose rank behind lead authors of clean entries
+		if (
+			proseLeadWords?.has(value)
+			|| (regularWordsSet?.has(value) && (prose || startsLowercase(token.text)))
+		) {
+			position++;
+			prevKept = null;
+			continue;
+		}
+		// A token directly after "<surname>, " is that author's given name
+		// and stays in the surname's unit ("Hill, Christopher and Schechter,
+		// Joshua" spans two author units)
+		const separator = prevKept
+			? prefix.slice(prevKept.offset + prevKept.text.length, token.offset)
+			: null;
+		if (separator === null || !/^\s*,\s*$/.test(separator)) {
+			unit++;
 		}
 		if (!seen.has(value)) {
 			seen.add(value);
-			positions.set(value, values.length);
+			positions.set(value, position++);
+			units.set(value, unit);
 			values.push(value);
 		}
+		prevKept = token;
 	}
-	return { values, positions };
+	return { values, positions, units };
 }
 
 function getIdentifiers(text) {
@@ -139,18 +214,19 @@ function getBlockRefKey(blockRef) {
 	return Array.isArray(blockRef) ? blockRef.join(',') : '';
 }
 
-export function parseReference(reference, regularWordsSet = new Set()) {
+export function parseReference(reference, regularWordsSet = new Set(), proseLeadWords = null) {
 	const text = reference.text || '';
 	const textWithoutLabel = stripLeadingLabel(text);
 	const tokens = tokenizeReferenceText(textWithoutLabel);
 	const year = findYear(tokens);
-	const authorTokens = getAuthorTokens(textWithoutLabel, tokens, year?.index, regularWordsSet);
+	const authorTokens = getAuthorTokens(textWithoutLabel, tokens, year?.index, regularWordsSet, proseLeadWords);
 
 	reference.label = reference.id || null;
 	reference.year = year?.year || null;
 	reference.suffix = year?.suffix || null;
 	reference.authorTokens = authorTokens.values;
 	reference.authorTokenPositions = authorTokens.positions;
+	reference.authorTokenUnits = authorTokens.units;
 	reference.keys = [];
 
 	if (reference.label) {
@@ -185,13 +261,14 @@ export function getReferenceIndex(referenceLists, regularWordsSet = new Set()) {
 		entryByBlock: new Map(),
 	};
 
+	const proseLeadWords = getProseLeadWords(referenceLists, regularWordsSet);
 	for (const referenceList of referenceLists) {
 		index.referenceBlocks.add(getBlockRefKey(referenceList.ref));
 		for (const blockRef of referenceList.blockRefs || []) {
 			index.referenceBlocks.add(getBlockRefKey(blockRef));
 		}
 		for (const reference of referenceList.references) {
-			parseReference(reference, regularWordsSet);
+			parseReference(reference, regularWordsSet, proseLeadWords);
 			reference.run = referenceList;
 			index.entries.push(reference);
 			index.referenceBlocks.add(getBlockRefKey(reference.src.blockRef));
