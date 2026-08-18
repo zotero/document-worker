@@ -1119,6 +1119,146 @@ function selectRunNumericStyles(referenceIndex, channelStats) {
 	return runNumericStyles;
 }
 
+const NOTE_LABEL_MAX = 999;
+
+function getNoteGroups(referenceIndex, runNumericStyles) {
+	// Partition numerically labeled note entries into groups wherever the
+	// printed numbering restarts ("1. …" after "13. …" begins a new
+	// chapter's notes); a group may span consecutive list blocks
+	const groups = [];
+	let group = null;
+	let prevLabel = null;
+	for (const reference of referenceIndex.entries) {
+		const label = parseInt(reference.label, 10);
+		if (!Number.isInteger(label) || String(label) !== reference.label || label > NOTE_LABEL_MAX) {
+			continue;
+		}
+		if (!group || (prevLabel !== null && label <= prevLabel)) {
+			group = { labels: new Map(), superscript: false };
+			groups.push(group);
+		}
+		if (!group.labels.has(reference.label)) {
+			group.labels.set(reference.label, reference);
+		}
+		// Nearest-run resolution only reaches the first note groups, so
+		// later groups can lack superscript evidence; one superscript or
+		// unstyled member run qualifies its whole group, while groups
+		// claimed entirely by another numeric channel (e.g. a numbered
+		// bibliography) stay out
+		const style = runNumericStyles.get(reference.run);
+		if (style === 'numeric-superscript' || style === null) {
+			group.superscript = true;
+		}
+		prevLabel = label;
+	}
+	return groups.filter(group => group.superscript).map(group => group.labels);
+}
+
+function getNoteMarkers(mentionWindows) {
+	const markers = [];
+	for (const mention of mentionWindows) {
+		if (mention.channel !== 'numeric-superscript') {
+			continue;
+		}
+		for (const key of mention.keys) {
+			if (key.type === 'number') {
+				markers.push({ mention, value: key.value });
+			}
+		}
+	}
+	markers.sort((a, b) =>
+		a.mention.src.blockRef[0] - b.mention.src.blockRef[0]
+		|| a.mention.src.offsetStart - b.mention.src.offsetStart);
+	return markers;
+}
+
+function countGroupMatches(markers, group) {
+	const seen = new Set();
+	for (const marker of markers) {
+		if (group.has(marker.value)) {
+			seen.add(marker.value);
+		}
+	}
+	return seen.size;
+}
+
+export function createNoteAssignments(mentionWindows, referenceIndex, runNumericStyles) {
+	// Note markers and notes appear in the same order, so when numbering
+	// restarts per chapter, the correct linking is the order-preserving
+	// one-to-one matching between the marker stream and the note groups —
+	// not the nearest run, which sends every chapter's markers to the
+	// first group of a back-of-book notes section
+	const groups = getNoteGroups(referenceIndex, runNumericStyles);
+	if (groups.length < 2) {
+		return null;
+	}
+	const markers = getNoteMarkers(mentionWindows);
+	if (!markers.length) {
+		return null;
+	}
+	const m = markers.length;
+	// prev[i]: max distinct notes matched assigning the first i markers to
+	// the groups handled so far; each round relaxes forward from every
+	// split point j with a running distinct-count for the g-th segment
+	let prev = new Int32Array(m + 1).fill(-1);
+	prev[0] = 0;
+	const splits = [];
+	for (const group of groups) {
+		const row = new Int32Array(m + 1).fill(-1);
+		const split = new Int32Array(m + 1);
+		for (let j = 0; j <= m; j++) {
+			if (prev[j] < 0) {
+				continue;
+			}
+			let score = prev[j];
+			if (score > row[j]) {
+				row[j] = score;
+				split[j] = j;
+			}
+			const seen = new Set();
+			for (let i = j; i < m; i++) {
+				if (group.has(markers[i].value) && !seen.has(markers[i].value)) {
+					seen.add(markers[i].value);
+					score++;
+				}
+				if (score > row[i + 1]) {
+					row[i + 1] = score;
+					split[i + 1] = j;
+				}
+			}
+		}
+		splits.push(split);
+		prev = row;
+	}
+	// Only trust the alignment when it beats treating all markers as
+	// citations of one single group (i.e. the numbering genuinely restarts
+	// and the markers bear that out)
+	const bestScore = prev[m];
+	const singleBest = Math.max(...groups.map(group => countGroupMatches(markers, group)));
+	if (bestScore <= singleBest) {
+		return null;
+	}
+	const assignments = new Map();
+	let end = m;
+	for (let g = groups.length - 1; g >= 0; g--) {
+		const start = splits[g][end];
+		for (let i = start; i < end; i++) {
+			const reference = groups[g].get(markers[i].value);
+			if (!reference) {
+				continue;
+			}
+			let byValue = assignments.get(markers[i].mention);
+			if (!byValue) {
+				byValue = new Map();
+				assignments.set(markers[i].mention, byValue);
+			}
+			byValue.set(markers[i].value, reference);
+		}
+		end = start;
+	}
+	return assignments;
+}
+
 export function createCitationResolutionContext(mentionWindows, referenceIndex) {
 	const authorIdentity = new Map();
 	for (const mention of mentionWindows) {
@@ -1152,6 +1292,22 @@ export function createCitationResolutionContext(mentionWindows, referenceIndex) 
 		);
 	}
 	context.runNumericStyles = selectRunNumericStyles(referenceIndex, channelStats);
+	context.noteAssignments = createNoteAssignments(
+		mentionWindows,
+		referenceIndex,
+		context.runNumericStyles
+	);
+	if (context.noteAssignments) {
+		// The alignment itself is the superscript evidence for note runs
+		// that nearest-run resolution never reached
+		for (const byValue of context.noteAssignments.values()) {
+			for (const reference of byValue.values()) {
+				if (context.runNumericStyles.get(reference.run) === null) {
+					context.runNumericStyles.set(reference.run, 'numeric-superscript');
+				}
+			}
+		}
+	}
 	return context;
 }
 
@@ -1188,8 +1344,8 @@ export function resolveMention(mention, referenceIndex, context = null) {
 			continue;
 		}
 		for (const key of keys) {
-			const entries = getEntriesForKey(referenceIndex, key);
-			const reference = chooseReference(entries, mention);
+			const reference = context?.noteAssignments?.get(mention)?.get(key.value)
+				|| chooseReference(getEntriesForKey(referenceIndex, key), mention);
 			if (reference && !resolved.includes(reference)) {
 				resolved.push(reference);
 			}
@@ -1204,6 +1360,15 @@ export function resolveMention(mention, referenceIndex, context = null) {
 export function isMentionReferenceAllowed(mention, reference, context = null) {
 	if (mention.channel === 'author-year' && mention.sourceWithinExtent === false) {
 		return false;
+	}
+	// A reference bound by the note alignment carries stronger evidence
+	// than per-run channel statistics
+	if (context?.noteAssignments?.get(mention)) {
+		for (const assigned of context.noteAssignments.get(mention).values()) {
+			if (assigned === reference) {
+				return true;
+			}
+		}
 	}
 	const runNumericStyle = context?.runNumericStyles?.get(reference.run);
 	if (!isNumericChannel(mention.channel)) {
