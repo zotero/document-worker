@@ -141,11 +141,15 @@ function parseDelimitedRange(bt, openIndex, openCharVal, closeCharVal, type, ref
 					}
 				}
 
+				// Equation labels are printed in parentheses ("(3)"), so only
+				// parenthesized in-text numbers can reference them — bracketed
+				// numbers are citations even when an equation number coincides
 				const mathRelations = [];
-				for (const n of numbers) {
-					const key = n;
-					if (mathBlocks && mathBlocks.has(key)) {
-						mathRelations.push(mathBlocks.get(key));
+				if (type === 'parentheses') {
+					for (const n of numbers) {
+						if (mathBlocks && mathBlocks.has(n)) {
+							mathRelations.push(mathBlocks.get(n));
+						}
 					}
 				}
 
