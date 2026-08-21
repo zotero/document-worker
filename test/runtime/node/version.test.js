@@ -16,10 +16,10 @@ import {
 describe('version constants', () => {
 	it('uses the expected current versions', () => {
 		assert.equal(SDT_PACK_VERSION, 1);
-		assert.equal(SDT_SCHEMA_VERSION, '1.1.0');
+		assert.equal(SDT_SCHEMA_VERSION, '1.2.0');
 		assert.deepEqual(SDT_PROCESSOR_VERSIONS, {
-			pdf: 11,
-			epub: 1,
+			pdf: 12,
+			epub: 2,
 			snapshot: 1,
 		});
 	});

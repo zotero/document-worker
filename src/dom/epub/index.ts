@@ -276,7 +276,7 @@ function convertOutlineItem(
 	pages: PageInfo[],
 	content: ContentBlockNode[],
 ): OutlineItem | null {
-	let outlineItem: OutlineItem = { title: item.title };
+	let outlineItem: OutlineItem = { title: item.title, source: 'native' };
 
 	if (item.href) {
 		let [filePart, fragment] = splitHref(item.href);

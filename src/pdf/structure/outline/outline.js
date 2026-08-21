@@ -267,13 +267,16 @@ export async function getNativeOutline(pdfDocument) {
 		const result = [];
 		for (const item of list) {
 			const newItem = {
-				title: item.title || '',
+				// Native titles can contain stray control characters (e.g. \r)
+				title: (item.title || '').replace(/\s+/gu, ' ').trim(),
 				items: [],
 			};
 			if (item.dest) {
 				const position = await resolveDestination(pdfDocument, item.dest);
 				if (position) {
 					newItem.location = { position };
+				} else {
+					newItem.brokenDest = true;
 				}
 			} else if (item.unsafeUrl) {
 				newItem.url = item.unsafeUrl;
@@ -309,6 +312,7 @@ export function flattenNativeOutline(items, depth = 0, parent = null, out = [], 
 			_orderIndex: orderIndex,
 			_location: item.location,
 			_url: item.url,
+			_brokenDest: item.brokenDest === true,
 			_parent: parent,
 			_children: [],
 		};
@@ -1298,20 +1302,46 @@ function cloneOutlineItems(items, index) {
 			title: item.title,
 			...(Array.isArray(item.ref) && { ref: item.ref.slice() }),
 			...(item.target && { target: { ...item.target } }),
+			...(item.source && { source: item.source }),
 			...(children.length && { children }),
 		};
+		if (Number.isFinite(item._flowIndex)) {
+			clone._flowIndex = item._flowIndex;
+		}
 		const key = getRefKey(clone);
 		if (key) index.set(key, clone);
 		return clone;
 	});
 }
 
+// Order key of an outline item in top-level block space. Items without any
+// position (dest-less containers, URL entries) return null and inherit the
+// preceding sibling's key, so insertions can never split them from it.
+function getOutlineInsertKey(item) {
+	if (Array.isArray(item.ref) && Number.isInteger(item.ref[0])) {
+		return item.ref[0];
+	}
+	if (Number.isFinite(item._flowIndex)) {
+		return item._flowIndex;
+	}
+	return null;
+}
+
 function insertOutlineItem(items, item) {
 	const blockIndex = item.ref?.[0] ?? Number.POSITIVE_INFINITY;
-	const index = items.findIndex(candidate => (
-		(candidate.ref?.[0] ?? Number.POSITIVE_INFINITY) > blockIndex
-	));
-	items.splice(index === -1 ? items.length : index, 0, item);
+	let insertIndex = items.length;
+	let lastKey = Number.NEGATIVE_INFINITY;
+	for (let i = 0; i < items.length; i++) {
+		const key = getOutlineInsertKey(items[i]);
+		if (key !== null) {
+			lastKey = key;
+		}
+		if (lastKey > blockIndex) {
+			insertIndex = i;
+			break;
+		}
+	}
+	items.splice(insertIndex, 0, item);
 }
 
 function mergeOutlineAdditions(baseline, enriched, allowedBlockIndices) {
@@ -1345,6 +1375,423 @@ function mergeOutlineAdditions(baseline, enriched, allowedBlockIndices) {
 	return result;
 }
 
+// Types that a page can place out of reading order (floats), so they must not
+// take part in mapping a destination point to a position in block order.
+const OUT_OF_FLOW_BLOCK_TYPES = new Set(['note', 'caption', 'table', 'image', 'math']);
+
+// Maximum point-to-block distance for a geometric-only snap (rung 3).
+const OUTLINE_GEOMETRIC_SNAP_DISTANCE = 24;
+
+// Minimum edit-distance similarity for transferring a detected heading's
+// block to a native entry (rung 2). Tolerates OCR-garbled text.
+const OUTLINE_TITLE_SIMILARITY = 0.75;
+
+// Containment ratios (shorter key length / longer key length) for the text
+// match rung: lenient against heading blocks, strict against other blocks so
+// a short title cannot match inside an ordinary paragraph.
+const HEADING_TITLE_CONTAINMENT = 1 / 3;
+const BLOCK_TITLE_CONTAINMENT = 0.8;
+
+function titleKeysMatch(keyA, keyB, minRatio) {
+	if (!keyA || !keyB) return false;
+	if (keyA === keyB) return true;
+	const shorter = keyA.length <= keyB.length ? keyA : keyB;
+	const longer = keyA.length <= keyB.length ? keyB : keyA;
+	if (!longer.includes(shorter)) return false;
+	return shorter.length / longer.length >= minRatio;
+}
+
+function titleKeySimilarity(keyA, keyB) {
+	if (!keyA || !keyB) return 0;
+	if (keyA === keyB) return 1;
+	const maxLength = Math.max(keyA.length, keyB.length);
+	if (maxLength > 200) return 0;
+	let previous = new Array(keyB.length + 1);
+	for (let j = 0; j <= keyB.length; j++) previous[j] = j;
+	for (let i = 1; i <= keyA.length; i++) {
+		const current = [i];
+		for (let j = 1; j <= keyB.length; j++) {
+			current[j] = Math.min(
+				previous[j] + 1,
+				current[j - 1] + 1,
+				previous[j - 1] + (keyA[i - 1] === keyB[j - 1] ? 0 : 1),
+			);
+		}
+		previous = current;
+	}
+	return 1 - previous[keyB.length] / maxLength;
+}
+
+function buildFlowData(allBlocksByPage, blockCount) {
+	const flowBlocksByPage = new Map();
+	const pageStartEntries = [];
+	for (const [pageIndex, pageBlocks] of allBlocksByPage) {
+		let minIndex = Number.POSITIVE_INFINITY;
+		const flowBlocks = [];
+		for (const block of pageBlocks) {
+			minIndex = Math.min(minIndex, block._blockIndex);
+			if (OUT_OF_FLOW_BLOCK_TYPES.has(block.type)) continue;
+			if (!block._rect) continue;
+			flowBlocks.push(block);
+		}
+		flowBlocks.sort((a, b) => a._blockIndex - b._blockIndex);
+		flowBlocksByPage.set(pageIndex, flowBlocks);
+		if (Number.isFinite(minIndex)) {
+			pageStartEntries.push([pageIndex, minIndex]);
+		}
+	}
+	pageStartEntries.sort((a, b) => a[0] - b[0]);
+	function getPageStartIndex(pageIndex) {
+		const entry = pageStartEntries.find(([page]) => page >= pageIndex);
+		return entry ? entry[1] : blockCount;
+	}
+	return { flowBlocksByPage, getPageStartIndex };
+}
+
+// Map a destination point to a fractional position in top-level block order.
+// A point inside a block maps to the block itself; anything else maps just
+// before the geometrically nearest in-flow block on the page.
+function computeFlowPosition(pageIndex, pointRect, flowData) {
+	const flowBlocks = flowData.flowBlocksByPage.get(pageIndex) || [];
+	let nearestBlock = null;
+	let nearestDistance = Number.POSITIVE_INFINITY;
+	if (pointRect) {
+		for (const block of flowBlocks) {
+			const distance = getClosestDistance(pointRect, block._rect);
+			if (distance < nearestDistance) {
+				nearestDistance = distance;
+				nearestBlock = block;
+			}
+		}
+	}
+	if (!nearestBlock) {
+		return {
+			flowIndex: flowData.getPageStartIndex(pageIndex) - 0.5,
+			nearestBlock: null,
+			nearestDistance: Number.POSITIVE_INFINITY,
+		};
+	}
+	return {
+		flowIndex: nearestDistance === 0
+			? nearestBlock._blockIndex
+			: nearestBlock._blockIndex - 0.5,
+		nearestBlock,
+		nearestDistance,
+	};
+}
+
+// An authored outline is used as the skeleton only when it provides real,
+// working structure. All criteria are structural, so they hold for any
+// language and script.
+function isUsableNativeOutline(nativeNodes, pageCount) {
+	const positionedPages = [];
+	let brokenCount = 0;
+	for (const node of nativeNodes) {
+		if (!node.title) continue;
+		if (Number.isFinite(node._pageIndex)) {
+			positionedPages.push(node._pageIndex);
+		} else if (node._brokenDest) {
+			brokenCount++;
+		}
+	}
+	if (positionedPages.length < 2) return false;
+	if (positionedPages.length / (positionedPages.length + brokenCount) < 0.5) return false;
+	if (pageCount >= 10) {
+		const span = Math.max(...positionedPages) - Math.min(...positionedPages) + 1;
+		if (span / pageCount < 0.1) return false;
+	}
+	return true;
+}
+
+// In-flow blocks from a native entry's flow position to the end of the next
+// page, in flow order. The window starts one block early: a destination that
+// lands between two blocks is ambiguous by one position in either direction.
+// The window is not bounded by the next native entry because destination
+// points can legitimately land one block before their heading. Exact claims
+// are reserved globally before greedy snapping so weaker fallbacks cannot
+// steal those matches.
+function collectSnapWindowBlocks(node, flowData, usedBlockIndexes) {
+	const result = [];
+	for (const pageIndex of [node._pageIndex, node._pageIndex + 1]) {
+		for (const block of flowData.flowBlocksByPage.get(pageIndex) || []) {
+			if (block._blockIndex < node._flowIndex - 1) continue;
+			if (block._contentsNavigationHeading) continue;
+			if (usedBlockIndexes.has(block._blockIndex)) continue;
+			result.push(block);
+		}
+	}
+	return result;
+}
+
+function getExactClaimOwners(nativeNodes, flowData) {
+	const owners = new Map();
+	for (const node of nativeNodes) {
+		const titleKey = getComparableTitleKey(node.title);
+		if (!titleKey) continue;
+		for (const block of collectSnapWindowBlocks(node, flowData, new Set())) {
+			if (getComparableTitleKey(block.title) !== titleKey) continue;
+			const distance = Math.abs(block._blockIndex - node._flowIndex);
+			const current = owners.get(block._blockIndex);
+			if (!current || distance < current.distance) {
+				owners.set(block._blockIndex, { node, distance });
+			}
+		}
+	}
+	return new Map([...owners].map(([blockIndex, claim]) => [blockIndex, claim.node]));
+}
+
+// Anchor native entries to blocks, most reliable evidence first:
+// 1. title text found in a window block (exact matches before containment),
+// 2. transfer from the first detected heading in the window (edit-distance
+//    tolerant, so OCR-garbled headings still anchor),
+// 3. a heading block directly at the destination point,
+// 4. otherwise the entry keeps only its destination as a target.
+function snapNativeNodes(nativeNodes, flowData) {
+	const positioned = [];
+	for (const node of nativeNodes) {
+		if (!Number.isFinite(node._pageIndex)) continue;
+		const flow = computeFlowPosition(node._pageIndex, node._rect, flowData);
+		node._flowIndex = flow.flowIndex;
+		node._nearestBlock = flow.nearestBlock;
+		node._nearestDistance = flow.nearestDistance;
+		positioned.push(node);
+	}
+	const sortedFlowIndexes = positioned.map(node => node._flowIndex).sort((a, b) => a - b);
+	const exactClaimOwners = getExactClaimOwners(positioned, flowData);
+	const usedBlockIndexes = new Set();
+	for (const node of positioned) {
+		const titleKey = getComparableTitleKey(node.title);
+		const canClaim = block => (
+			!exactClaimOwners.has(block._blockIndex)
+				|| exactClaimOwners.get(block._blockIndex) === node
+		);
+		const windowBlocks = collectSnapWindowBlocks(node, flowData, usedBlockIndexes)
+			.filter(canClaim);
+		let exactHeadingMatch = null;
+		let exactBlockMatch = null;
+		let headingMatch = null;
+		let blockMatch = null;
+		if (titleKey) {
+			for (const block of windowBlocks) {
+				const blockKey = getComparableTitleKey(block.title);
+				const exact = titleKey === blockKey;
+				if (block.type === 'heading') {
+					if (exact) {
+						exactHeadingMatch = block;
+						break;
+					}
+					if (!headingMatch && titleKeysMatch(titleKey, blockKey, HEADING_TITLE_CONTAINMENT)) {
+						headingMatch = block;
+					}
+				} else if (exact) {
+					exactBlockMatch ||= block;
+				} else if (!blockMatch && titleKeysMatch(titleKey, blockKey, BLOCK_TITLE_CONTAINMENT)) {
+					blockMatch = block;
+				}
+			}
+		}
+		let snapped = exactHeadingMatch || exactBlockMatch || headingMatch || blockMatch;
+		if (!snapped && titleKey) {
+			// Transfer considers only the first heading at/after the
+			// destination within the entry's own gap: fuzzy matching must not
+			// claim a heading a following entry has a stronger claim to
+			// (titles differing only by a numeral are edit-distance-similar)
+			const transferBound = sortedFlowIndexes.find(flowIndex => flowIndex > node._flowIndex)
+				?? Number.POSITIVE_INFINITY;
+			const firstHeading = windowBlocks.find(block => (
+				block._blockIndex >= node._flowIndex
+				&& block._blockIndex < transferBound
+				&& block.type === 'heading'
+			));
+			if (firstHeading
+					&& titleKeySimilarity(titleKey, getComparableTitleKey(firstHeading.title)) >= OUTLINE_TITLE_SIMILARITY) {
+				snapped = firstHeading;
+			}
+		}
+		if (!snapped
+				&& node._nearestBlock
+				&& canClaim(node._nearestBlock)
+				&& node._nearestBlock.type === 'heading'
+				&& !node._nearestBlock._contentsNavigationHeading
+				&& !usedBlockIndexes.has(node._nearestBlock._blockIndex)
+				&& node._nearestDistance <= OUTLINE_GEOMETRIC_SNAP_DISTANCE) {
+			snapped = node._nearestBlock;
+		}
+		if (snapped) {
+			node._snapBlock = snapped;
+			usedBlockIndexes.add(snapped._blockIndex);
+		}
+	}
+	return usedBlockIndexes;
+}
+
+// Project the native tree verbatim: titles, order and nesting are preserved,
+// anchored entries get a ref, the rest keep their destination or URL.
+function projectNativeSkeleton(nodes) {
+	const items = [];
+	for (const node of nodes) {
+		const children = projectNativeSkeleton(node._children);
+		if (!node.title) {
+			items.push(...children);
+			continue;
+		}
+		const item = { title: node.title || '', source: 'native' };
+		if (node._snapBlock) {
+			item.ref = [node._snapBlock._blockIndex];
+		} else if (Number.isFinite(node._pageIndex)) {
+			const position = { pageIndex: node._pageIndex };
+			if (Array.isArray(node._rect)) {
+				position.rect = node._rect;
+			}
+			item.target = { position };
+		} else if (node._url) {
+			item.target = { url: node._url };
+		}
+		if (Number.isFinite(node._flowIndex)) {
+			item._flowIndex = node._flowIndex;
+		}
+		if (children.length) {
+			item.children = children;
+		}
+		items.push(item);
+	}
+	return items;
+}
+
+function stripOutlineWorkingProps(items) {
+	for (const item of items || []) {
+		delete item._flowIndex;
+		stripOutlineWorkingProps(item.children);
+	}
+	return items;
+}
+
+function getBlockStyleKey(block) {
+	return computeItemStyle({
+		title: block.title,
+		_fontName: block._fontName,
+		_fontSize: block._fontSize,
+	})._styleKey;
+}
+
+// Enrichment entries live in the gap between the native entries around them:
+// an inserted entry must not leap over a native entry to reach its parent
+// (e.g. a "2.1 ..." heading adopted by an unrelated "2. ..." entry from an
+// earlier chapter). The exception is a top-level insert styled like the
+// author's own top-level headings, such as an appendix missing from the
+// authored outline.
+function enforceGapLineage(items, enrichStyleKeys, rootNativeStyleKeys) {
+	const nodes = flattenOutlineNodes(items);
+	const nativeKeyed = [];
+	for (const node of nodes) {
+		if (node.source !== 'native') continue;
+		const key = getOutlineInsertKey(node);
+		if (key !== null) {
+			nativeKeyed.push({ node, key });
+		}
+	}
+	nativeKeyed.sort((a, b) => a.key - b.key);
+	const additions = nodes
+		.filter(node => !node.source && Array.isArray(node.ref))
+		.sort((a, b) => a.ref[0] - b.ref[0]);
+	for (const item of additions) {
+		const blockIndex = item.ref[0];
+		let gapOwner = null;
+		let gapOwnerKey = null;
+		for (const entry of nativeKeyed) {
+			if (entry.key > blockIndex) break;
+			gapOwner = entry.node;
+			gapOwnerKey = entry.key;
+		}
+		if (!gapOwner || gapOwner === item._parentItem || isAncestorOf(item, gapOwner)) {
+			continue;
+		}
+		const parent = item._parentItem || null;
+		const parentKey = parent ? getOutlineInsertKey(parent) : Number.NEGATIVE_INFINITY;
+		if (parentKey !== null && parentKey >= gapOwnerKey) {
+			continue;
+		}
+		if (!parent && rootNativeStyleKeys.has(enrichStyleKeys.get(blockIndex))) {
+			continue;
+		}
+		removeFromCurrentParent(items, item);
+		gapOwner.children = Array.isArray(gapOwner.children) ? gapOwner.children : [];
+		insertOutlineItem(gapOwner.children, item);
+		item._parentItem = gapOwner;
+	}
+	clearParentLinks(items);
+	return items;
+}
+
+// Authored entries that point to a URL stay functional even when the native
+// tree is not used as the skeleton: they make no position claim, so they are
+// appended after the detected outline in declared order.
+function appendNativeUrlItems(outline, nativeNodes) {
+	const urlItems = [];
+	for (const node of nativeNodes) {
+		if (!node._url || !node.title) continue;
+		urlItems.push({
+			title: node.title,
+			target: { url: node._url },
+			source: 'native',
+		});
+	}
+	return urlItems.length ? [...outline, ...urlItems] : outline;
+}
+
+function buildNativeFirstOutline(nativeNodes, blocks, allBlocksByPage, headingItems, titleRef) {
+	const flowData = buildFlowData(allBlocksByPage, blocks.length);
+	const snappedBlockIndexes = snapNativeNodes(nativeNodes, flowData);
+	const baseline = projectNativeSkeleton(nativeNodes.filter(node => !node._parent));
+
+	// A hierarchical authored outline speaks for itself: the author already
+	// chose its granularity, so detection has nothing to add below it. Only
+	// a flat authored outline (a bare chapter or section list) is enriched.
+	if (nativeNodes.some(node => node._parent)) {
+		return stripOutlineWorkingProps(baseline);
+	}
+
+	const enrichItems = headingItems.filter(item => !snappedBlockIndexes.has(item._blockIndex));
+	const usedBlockIndices = new Set([
+		...headingItems.map(item => item._blockIndex),
+		...snappedBlockIndexes,
+	]);
+	const confirmedStyles = new Set(headingItems.map(item => item._styleKey).filter(Boolean));
+	enrichItems.push(...recoverInlineHeadings(allBlocksByPage, confirmedStyles, usedBlockIndices));
+	if (!enrichItems.length) {
+		return stripOutlineWorkingProps(baseline);
+	}
+
+	const rootNativeStyleKeys = new Set();
+	for (const node of nativeNodes) {
+		if (node._snapBlock && !node._parent) {
+			rootNativeStyleKeys.add(getBlockStyleKey(node._snapBlock));
+		}
+	}
+
+	const nativeMatches = [];
+	for (const node of nativeNodes) {
+		if (node._snapBlock) {
+			nativeMatches.push({ native: node, block: node._snapBlock });
+		}
+	}
+	const nativeMatchedItems = buildNativeMatchedItems(nativeMatches);
+	const enriched = buildGeneratedOutline(
+		[...enrichItems, ...nativeMatchedItems],
+		titleRef,
+		nativeMatchedItems,
+		nativeMatches,
+	);
+	const merged = mergeOutlineAdditions(
+		baseline,
+		enriched,
+		new Set(enrichItems.map(item => item._blockIndex)),
+	);
+	const enrichStyleKeys = new Map(enrichItems.map(item => [item._blockIndex, item._styleKey]));
+	enforceGapLineage(merged, enrichStyleKeys, rootNativeStyleKeys);
+	return stripOutlineWorkingProps(merged);
+}
+
 export async function getOutline(blocks, titleRef, pdfDocument, nativeOutline = null, options = {}) {
 	// Phase 1: Build allBlocksByPage
 	const allBlocksByPage = buildAllBlocksByPage(blocks);
@@ -1352,12 +1799,21 @@ export async function getOutline(blocks, titleRef, pdfDocument, nativeOutline = 
 	// Phase 2: Native outline -> match to blocks
 	nativeOutline ||= await getNativeOutline(pdfDocument);
 	const nativeNodes = flattenNativeOutline(nativeOutline);
-	const nativeMatches = matchNativeToBlocks(nativeNodes, allBlocksByPage);
-	const nativeMatchedItems = buildNativeMatchedItems(nativeMatches);
 
 	// Phase 3: Extract heading items
 	const headingItems = extractHeadingItems(blocks);
-	if (!headingItems.length) return [];
+
+	// A usable authored outline becomes the skeleton verbatim and detection
+	// only fills the gaps between its entries
+	const pageCount = Array.isArray(options.pageLabels) ? options.pageLabels.length : 0;
+	if (isUsableNativeOutline(nativeNodes, pageCount)) {
+		return buildNativeFirstOutline(nativeNodes, blocks, allBlocksByPage, headingItems, titleRef);
+	}
+
+	const nativeMatches = matchNativeToBlocks(nativeNodes, allBlocksByPage);
+	const nativeMatchedItems = buildNativeMatchedItems(nativeMatches);
+
+	if (!headingItems.length) return appendNativeUrlItems([], nativeNodes);
 
 	// Phase 4: Build combined list
 	const combined = headingItems.slice();
@@ -1367,11 +1823,11 @@ export async function getOutline(blocks, titleRef, pdfDocument, nativeOutline = 
 		!nativeMatches.length
 		&& navigationRegions.some(region => region.source === 'heading-concentration')
 	) {
-		return buildPrintedContentsOutline(
+		return appendNativeUrlItems(buildPrintedContentsOutline(
 			allBlocksByPage,
 			navigationRegions,
 			options.pageLabels,
-		);
+		), nativeNodes);
 	}
 
 	// Phase 4b: Recover inline headings
@@ -1379,7 +1835,10 @@ export async function getOutline(blocks, titleRef, pdfDocument, nativeOutline = 
 	const recoveredItems = recoverInlineHeadings(allBlocksByPage, confirmedStyles, usedBlockIndices);
 	combined.push(...recoveredItems);
 	if (!navigationRegions.length) {
-		return buildGeneratedOutline(combined, titleRef, nativeMatchedItems, nativeMatches);
+		return appendNativeUrlItems(
+			buildGeneratedOutline(combined, titleRef, nativeMatchedItems, nativeMatches),
+			nativeNodes,
+		);
 	}
 	const baselineItems = combined.map(item => ({ ...item }));
 	const baselineNativeMatchedItems = nativeMatchedItems.filter(item => (
@@ -1409,7 +1868,10 @@ export async function getOutline(blocks, titleRef, pdfDocument, nativeOutline = 
 		baselineNativeMatchedItems,
 		baselineNativeMatches,
 	);
-	if (!enrichmentBlockIndices.size) return baseline;
+	if (!enrichmentBlockIndices.size) return appendNativeUrlItems(baseline, nativeNodes);
 	const enriched = buildGeneratedOutline(combined, titleRef, nativeMatchedItems, nativeMatches);
-	return mergeOutlineAdditions(baseline, enriched, enrichmentBlockIndices);
+	return appendNativeUrlItems(
+		mergeOutlineAdditions(baseline, enriched, enrichmentBlockIndices),
+		nativeNodes,
+	);
 }

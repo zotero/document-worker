@@ -7,7 +7,7 @@ export {
 // Zotero compares these exactly to decide whether an existing SDT cache
 // should be regenerated.
 export const SDT_PROCESSOR_VERSIONS = Object.freeze({
-	pdf: 11,
-	epub: 1,
+	pdf: 12,
+	epub: 2,
 	snapshot: 1,
 });
