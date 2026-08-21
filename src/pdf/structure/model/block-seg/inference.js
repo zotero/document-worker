@@ -18,6 +18,7 @@ const BLOCKER_INFLATE = 1.5;
 const MIN_SIGHT_OVERLAP = 0.5;
 const DISTANCE_EPSILON = 1e-6;
 const OBJECT_IMAGE_SUBTYPES = new Set(['image', 'inline-image', 'xobject']);
+const RASTER_IMAGE_SUBTYPES = new Set(['image', 'inline-image']);
 const STANDALONE_IMAGE_MIN_WIDTH_RATIO = 0.15;
 const STANDALONE_IMAGE_MIN_HEIGHT_RATIO = 0.08;
 const STANDALONE_IMAGE_MIN_AREA_RATIO = 0.015;
@@ -513,46 +514,54 @@ function rasterObjectsCanShareSubstrate(first, second, maxGap) {
 
 function getPageSubstrateObjectIndexes(objectContext, pageRect) {
 	if (!isValidRect(pageRect)) {
-		return new Set();
+		return { objectIndexes: new Set(), hasPageRaster: false };
 	}
 	const pageArea = validRectArea(pageRect);
 	if (pageArea <= 0) {
-		return new Set();
+		return { objectIndexes: new Set(), hasPageRaster: false };
 	}
 
-	const rasterObjects = objectContext.validObjects
+	const imageObjects = objectContext.validObjects
 		.filter(object => OBJECT_IMAGE_SUBTYPES.has(object.subtype))
 		.sort((a, b) => a.bbox[0] - b.bbox[0] || a.index - b.index);
-	const { find, union } = createDisjointSet(rasterObjects.length);
+	const { find, union } = createDisjointSet(imageObjects.length);
 	const pageWidth = pageRect[2] - pageRect[0];
 	const pageHeight = pageRect[3] - pageRect[1];
 	const maxGap = Math.max(OBJECT_COMPONENT_GAP, Math.min(pageWidth, pageHeight) * PAGE_SUBSTRATE_MAX_TILE_GAP_RATIO);
-	for (let i = 0; i < rasterObjects.length; i++) {
-		for (let j = i + 1; j < rasterObjects.length; j++) {
-			if (rasterObjects[j].bbox[0] > rasterObjects[i].bbox[2] + maxGap) {
+	for (let i = 0; i < imageObjects.length; i++) {
+		for (let j = i + 1; j < imageObjects.length; j++) {
+			if (imageObjects[j].bbox[0] > imageObjects[i].bbox[2] + maxGap) {
 				break;
 			}
-			if (rasterObjectsCanShareSubstrate(rasterObjects[i], rasterObjects[j], maxGap)) {
+			if (rasterObjectsCanShareSubstrate(imageObjects[i], imageObjects[j], maxGap)) {
 				union(i, j);
 			}
 		}
 	}
 
 	const groups = new Map();
-	for (let i = 0; i < rasterObjects.length; i++) {
+	for (let i = 0; i < imageObjects.length; i++) {
 		const root = find(i);
 		if (!groups.has(root)) {
 			groups.set(root, []);
 		}
-		groups.get(root).push(rasterObjects[i]);
+		groups.get(root).push(imageObjects[i]);
 	}
 
 	const objectIndexes = new Set();
+	let hasPageRaster = false;
 	for (const objects of groups.values()) {
 		const coverage = getRectUnionArea(objects.map(object => object.bbox), pageRect) / pageArea;
 		if (coverage < PAGE_SUBSTRATE_MIN_COVERAGE) {
 			continue;
 		}
+		const rasterCoverage = getRectUnionArea(
+			objects
+				.filter(object => RASTER_IMAGE_SUBTYPES.has(object.subtype))
+				.map(object => object.bbox),
+			pageRect,
+		) / pageArea;
+		hasPageRaster ||= rasterCoverage >= PAGE_SUBSTRATE_MIN_COVERAGE;
 		for (const object of objects) {
 			objectIndexes.add(object.index);
 		}
@@ -572,7 +581,7 @@ function getPageSubstrateObjectIndexes(objectContext, pageRect) {
 		objectIndexes.add(object.index);
 	}
 
-	return objectIndexes;
+	return { objectIndexes, hasPageRaster };
 }
 
 function excludeSubstrateObjects(objectContext, substrateObjectIndexes) {
@@ -586,9 +595,13 @@ function excludeSubstrateObjects(objectContext, substrateObjectIndexes) {
 
 function buildGraphicObjectContexts(objectLines, pageRect) {
 	const sourceObjectContext = buildObjectRefinementContext(objectLines);
-	const substrateObjectIndexes = getPageSubstrateObjectIndexes(sourceObjectContext, pageRect);
+	const {
+		objectIndexes: substrateObjectIndexes,
+		hasPageRaster,
+	} = getPageSubstrateObjectIndexes(sourceObjectContext, pageRect);
 	return {
 		sourceObjectContext,
+		hasPageRaster,
 		independentObjectContext: excludeSubstrateObjects(
 			sourceObjectContext,
 			substrateObjectIndexes,
@@ -2818,9 +2831,9 @@ export function enforceStandaloneGraphicQuality(
 	return result;
 }
 
-function finalizePageBlocks(blocks, prepared, pageRect) {
+function finalizePageBlocks(blocks, prepared, pageRect, objectContexts = null) {
 	const { textLines, objectLines, formScenes } = prepared;
-	const objectContexts = buildGraphicObjectContexts(objectLines, pageRect);
+	objectContexts ||= buildGraphicObjectContexts(objectLines, pageRect);
 	blocks = refineGraphicBlocks(blocks, textLines, objectLines, pageRect, objectContexts);
 	blocks = compactExcessiveImageBlocks(blocks, textLines, pageRect);
 	blocks = enforceStandaloneGraphicQuality(
@@ -2861,8 +2874,10 @@ function getCachedClassifierRuntime(runtimeCache, onnxRuntimeProvider, modelProv
 async function inferPage(pageDataItem, onnxRuntimeProvider, modelProvider, val = {}, runtimeCache = null) {
 	const prepared = prepareBlockSegPageInput(pageDataItem);
 	const { textLines, objectLines, lineFeatures, objectFeatures } = prepared;
+	const objectContexts = buildGraphicObjectContexts(objectLines, pageDataItem?.viewBox);
+	val.hasRasterTextLayer = Boolean(pageDataItem?.chars?.length && objectContexts.hasPageRaster);
 	if (!lineFeatures.length) {
-		return finalizePageBlocks([], prepared, pageDataItem?.viewBox);
+		return finalizePageBlocks([], prepared, pageDataItem?.viewBox, objectContexts);
 	}
 	if (lineFeatures.length > MAX_INFERENCE_LINES_PER_PAGE) {
 		const fallbackBlocks = buildRecordedParagraphFallback(pageDataItem, val, 'too_many_lines', {
@@ -2870,7 +2885,7 @@ async function inferPage(pageDataItem, onnxRuntimeProvider, modelProvider, val =
 			objectCount: objectFeatures.length,
 			limit: MAX_INFERENCE_LINES_PER_PAGE,
 		});
-		return finalizePageBlocks(fallbackBlocks, prepared, pageDataItem?.viewBox);
+		return finalizePageBlocks(fallbackBlocks, prepared, pageDataItem?.viewBox, objectContexts);
 	}
 
 	const clusterRuntime = await getCachedClusterRuntime(runtimeCache, onnxRuntimeProvider, modelProvider);
@@ -2886,7 +2901,7 @@ async function inferPage(pageDataItem, onnxRuntimeProvider, modelProvider, val =
 	});
 	const predictions = await classifierRuntime.run(features);
 	blocks = applyBlockClassifierPredictions(blocks, predictions);
-	return finalizePageBlocks(blocks, prepared, pageDataItem?.viewBox);
+	return finalizePageBlocks(blocks, prepared, pageDataItem?.viewBox, objectContexts);
 }
 
 export async function inference(pageDataList, onnxRuntimeProvider, modelProvider, val) {

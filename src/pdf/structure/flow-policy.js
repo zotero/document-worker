@@ -74,6 +74,25 @@ export function normalizeTopLevelFlowClasses(structure) {
 	return structure;
 }
 
+export function suppressAuxiliaryFlowOnRasterTextPages(structure, rasterTextPageIndexes) {
+	if (!structure || !Array.isArray(structure.content) || !(rasterTextPageIndexes instanceof Set)) {
+		return structure;
+	}
+
+	for (const block of structure.content) {
+		if (block?.flowClass !== 'auxiliary') {
+			continue;
+		}
+		const pageIndexes = [...new Set((block.anchor?.pageRects || [])
+			.map(rect => rect?.[0])
+			.filter(Number.isInteger))];
+		if (pageIndexes.length && pageIndexes.every(pageIndex => rasterTextPageIndexes.has(pageIndex))) {
+			delete block.flowClass;
+		}
+	}
+	return structure;
+}
+
 function isDegradedExtractionPage(structure, pageIndex) {
 	return Number.isInteger(pageIndex)
 		&& structure?.catalog?.pages?.[pageIndex]?.extractionDegraded === true;

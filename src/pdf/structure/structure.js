@@ -25,7 +25,12 @@ import {
 import { wrapListItems } from './list-utils.js';
 import { addRefs, getParsedLinkRefs, getAnnotLinkRefs, getLinksFromAnnotations } from './link.js';
 import { cleanupBlockMetrics, cleanupTextNodeStyles, getHeadingMetrics, getParagraphMetrics, markListItemParts, markParagraphParts } from './block-cleanup.js';
-import { normalizePdfRawBlockFlow, normalizeTopLevelFlowClasses, setNormalizedFlowClass } from './flow-policy.js';
+import {
+	normalizePdfRawBlockFlow,
+	normalizeTopLevelFlowClasses,
+	setNormalizedFlowClass,
+	suppressAuxiliaryFlowOnRasterTextPages,
+} from './flow-policy.js';
 import { createBlockAnchor, ensureBlockPageRects } from './util.js';
 import { createStructureIndex } from './structure-index.js';
 import { createTableNode } from './table/output.js';
@@ -152,6 +157,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	let inferredHeadings = [];
 	let contentsContexts = [];
 	const contentsNavigationRegions = [];
+	const rasterTextPageIndexes = new Set();
 	let pagesProcessed = 0;
 	reportPageProgress(onProgress, 0, pageCount);
 	function getPageContentOffset(pageIndex) {
@@ -421,6 +427,9 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 				let context = contexts[inferenceContextIndexes[j]];
 				let val = inferenceVals[j];
 				context.blocks = blockLists[j];
+				if (val.hasRasterTextLayer) {
+					rasterTextPageIndexes.add(context.i);
+				}
 				for (let block of context.blocks) {
 					normalizePdfRawBlockFlow(block);
 				}
@@ -571,6 +580,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	cleanupBlockMetrics(structure);
 	cleanupTextNodeStyles(structure);
 	ensureBlockPageRects(structure);
+	suppressAuxiliaryFlowOnRasterTextPages(structure, rasterTextPageIndexes);
 
 	return structure;
 }

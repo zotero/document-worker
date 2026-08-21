@@ -18,7 +18,7 @@ describe('version constants', () => {
 		assert.equal(SDT_PACK_VERSION, 1);
 		assert.equal(SDT_SCHEMA_VERSION, '1.2.0');
 		assert.deepEqual(SDT_PROCESSOR_VERSIONS, {
-			pdf: 12,
+			pdf: 13,
 			epub: 2,
 			snapshot: 1,
 		});
