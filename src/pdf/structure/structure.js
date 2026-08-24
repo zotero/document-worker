@@ -18,12 +18,18 @@ import { getSupportedReferenceLists } from './reference/support.js';
 import { addPageLabels } from './page-label.js';
 import { applyRefs, getRefsList } from './apply-refs.js';
 import { getCitationRefs } from './citation-refs.js';
+import { getFootnoteRefs } from './footnote-refs.js';
 import {
 	charsToTextNodes,
 	charsToPreformattedTextNodes,
 } from '../../../structured-document-text/src/pdf/index.js';
 import { wrapListItems } from './list-utils.js';
-import { addRefs, getParsedLinkRefs, getAnnotLinkRefs, getLinksFromAnnotations } from './link.js';
+import {
+	addRefs,
+	getAnnotLinkRefs,
+	getLinksFromAnnotations,
+	getParsedLinkRefs,
+} from './link.js';
 import { cleanupBlockMetrics, cleanupTextNodeStyles, getHeadingMetrics, getParagraphMetrics, markListItemParts, markParagraphParts } from './block-cleanup.js';
 import {
 	normalizePdfRawBlockFlow,
@@ -519,7 +525,6 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 
 	let annotLinkRefs = getAnnotLinkRefs(structure, linkMap, structureIndex);
 	let parsedLinkRefs = getParsedLinkRefs(structure, structureIndex);
-
 	let candidateReferenceLists = getReferenceLists(structure, regularWordsSet);
 	let candidateReferenceIndex = getReferenceIndex(candidateReferenceLists, regularWordsSet);
 	let referenceLists = getSupportedReferenceLists(structure, candidateReferenceIndex, structureIndex);
@@ -554,6 +559,7 @@ export async function getFullStructure(pdfDocument, onnxRuntimeProvider, modelPr
 	addRefs(annotLinkRefs, parsedLinkRefs);
 	addRefs(citationRefs, mainRefs);
 	addRefs(citationRefs, annotLinkRefs);
+	addRefs(citationRefs, getFootnoteRefs(structure, citationRefs, structureIndex));
 
 	applyRefs(structure, citationRefs);
 
