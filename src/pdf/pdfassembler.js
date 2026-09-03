@@ -29,17 +29,10 @@ import { Dict, Name, Ref } from '../../pdf.js/src/core/primitives.js';
 
 import { BaseStream } from '../../pdf.js/src/core/base_stream.js';
 import { Ascii85Stream } from '../../pdf.js/src/core/ascii_85_stream.js';
-import { AsciiHexStream } from '../../pdf.js/src/core/ascii_hex_stream.js';
-import { CCITTFaxStream } from '../../pdf.js/src/core/ccitt_stream.js';
 import { FlateStream } from '../../pdf.js/src/core/flate_stream.js';
-import { Jbig2Stream } from '../../pdf.js/src/core/jbig2_stream.js';
-import { JpegStream } from '../../pdf.js/src/core/jpeg_stream.js';
-import { JpxStream } from '../../pdf.js/src/core/jpx_stream.js';
 import { LZWStream } from '../../pdf.js/src/core/lzw_stream.js';
-import { NullStream, Stream } from '../../pdf.js/src/core/stream.js';
 import { PredictorStream } from '../../pdf.js/src/core/predictor_stream.js';
 import { RunLengthStream } from '../../pdf.js/src/core/run_length_stream.js';
-import { DecodeStream } from '../../pdf.js/src/core/decode_stream.js';
 import { DecryptStream } from '../../pdf.js/src/core/decrypt_stream.js';
 
 import { XRefParseException } from '../../pdf.js/src/core/core_utils.js';
@@ -109,6 +102,45 @@ function getDictRawEntries(dict) {
 		return dict.getRawEntries();
 	}
 	return null;
+}
+
+const streamsToDecode = [
+	FlateStream,
+	PredictorStream,
+	DecryptStream,
+	Ascii85Stream,
+	RunLengthStream,
+	LZWStream,
+];
+
+// Filters from PDF.js Parser.filter()
+const standardFilters = [
+	'LZWDecode', 'DCTDecode', 'JPXDecode', 'ASCII85Decode', 'ASCIIHexDecode',
+	'CCITTFaxDecode', 'RunLengthDecode', 'JBIG2Decode',
+	'LZW', 'DCT', 'JPX', 'A85', 'AHx', 'CCF', 'RL',
+];
+
+function shouldDecodeStream(node, objectNode) {
+	let filter = objectNode['/Filter'];
+	return objectNode['/Subtype'] !== '/Image'
+		&& streamsToDecode.some(StreamType => node instanceof StreamType)
+		&& (
+			!filter
+			|| typeof filter === 'string'
+			|| (
+				Array.isArray(filter)
+				&& filter.every(value => standardFilters.some(name => value.includes(name)))
+			)
+		);
+}
+
+function getOriginalStreamBytes(node) {
+	let source = node.getOriginalStream();
+	if (!(source instanceof BaseStream)) {
+		throw new Error('Unable to resolve original PDF stream');
+	}
+	source.reset();
+	return source.getBytes();
 }
 
 export class PDFAssembler {
@@ -311,7 +343,6 @@ export class PDFAssembler {
 		}
 		else if (typeof node === 'object' && node !== null) {
 			const objectNode = Object.create(null);
-			let source = null;
 			let nodeDict = node.dict instanceof Dict ? node.dict : node instanceof Dict ? node : null;
 			let nodeEntries = getDictRawEntries(nodeDict);
 			if (nodeEntries) {
@@ -320,48 +351,20 @@ export class PDFAssembler {
 					objectNode[`/${key}`] = this.resolveNodeRefs(value, `/${key}`, objectNode, hasContents);
 				}
 			}
-			if (node instanceof DecodeStream || node instanceof Stream) {
-				const streamsToDecode = [FlateStream, PredictorStream, DecryptStream, Ascii85Stream, RunLengthStream, LZWStream];
-				// Filters from PDF.js Parser.filter()
-				const standardFilters = [
-					'LZWDecode', 'DCTDecode', 'JPXDecode', 'ASCII85Decode', 'ASCIIHexDecode', 'CCITTFaxDecode', 'RunLengthDecode', 'JBIG2Decode',
-					'LZW', 'DCT', 'JPX', 'A85', 'AHx', 'CCF', 'RL'
-				];
-				if (objectNode['/Subtype'] !== '/Image'
-					&& streamsToDecode.some(streamToDecode => node instanceof streamToDecode)
-					// Decode stream if all filters are standard
-					&& (
-						!objectNode['/Filter']
-						|| typeof objectNode['/Filter'] === 'string'
-						|| (
-							Array.isArray(objectNode['/Filter'])
-							// At this point everything is flattened therefore we're just looking for a filter string, we can't use .name property here
-							&& objectNode['/Filter'].every(f => standardFilters.some(sf => f.includes(sf)))
-						)
-					)
-				) {
+			if (node instanceof BaseStream) {
+				if (shouldDecodeStream(node, objectNode)) {
 					objectNode.stream = node.getBytes();
 					delete objectNode['/Filter'];
+					delete objectNode['/DecodeParms'];
+					delete objectNode['/DP'];
 				}
-				if (!objectNode.stream) {
-					for (const checkSource of [
-						node, node.stream, node.stream && node.stream.str,
-						node.str, node.str && node.str.str
-					]) {
-						if (checkSource instanceof Stream || checkSource instanceof DecryptStream) {
-							source = checkSource;
-							break;
-						}
-					}
-					if (source) {
-						source.reset();
-						objectNode.stream = source.getBytes();
-					}
+				else {
+					objectNode.stream = getOriginalStreamBytes(node);
 				}
 			}
-			if (objectNode.stream) {
+			if (objectNode.stream !== undefined) {
 				if (contents || objectNode['/Subtype'] === '/XML' ||
-					(objectNode.stream && objectNode.stream.every(byte => byte < 128))) {
+					objectNode.stream.every(byte => byte < 128)) {
 					objectNode.stream = bytesToString(objectNode.stream);
 				}
 				delete objectNode['/Length'];
