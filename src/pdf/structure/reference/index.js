@@ -251,6 +251,7 @@ export function parseReference(reference, regularWordsSet = new Set(), proseLead
 export function getReferenceIndex(referenceLists, regularWordsSet = new Set()) {
 	const index = {
 		runs: referenceLists,
+		runRoots: new Set(),
 		entries: [],
 		number: new Map(),
 		authorYear: new Map(),
@@ -263,6 +264,11 @@ export function getReferenceIndex(referenceLists, regularWordsSet = new Set()) {
 
 	const proseLeadWords = getProseLeadWords(referenceLists, regularWordsSet);
 	for (const referenceList of referenceLists) {
+		// A whole reference run covers every descendant of its root block.
+		// NaN must remain excluded: the previous strict comparison never matched it.
+		if (referenceList.ref[0] === referenceList.ref[0]) {
+			index.runRoots.add(referenceList.ref[0]);
+		}
 		index.referenceBlocks.add(getBlockRefKey(referenceList.ref));
 		for (const blockRef of referenceList.blockRefs || []) {
 			index.referenceBlocks.add(getBlockRefKey(blockRef));
@@ -294,12 +300,8 @@ export function isReferenceBlock(referenceIndex, blockRef) {
 	if (!Array.isArray(blockRef)) {
 		return false;
 	}
-	for (const run of referenceIndex.runs) {
-		if (blockRef[0] === run.ref[0]) {
-			return true;
-		}
-	}
-	return referenceIndex.referenceBlocks.has(getBlockRefKey(blockRef));
+	return referenceIndex.runRoots.has(blockRef[0])
+		|| referenceIndex.referenceBlocks.has(getBlockRefKey(blockRef));
 }
 
 export function getReferenceForBlock(referenceIndex, blockRef) {
