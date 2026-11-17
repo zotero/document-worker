@@ -102,6 +102,9 @@ async function annotationToRaw(annotation, fontEmbedder) {
 	annotation = JSON.parse(JSON.stringify(annotation));
 	let containerRect;
 	if (annotation.position.rects) {
+		if (!annotation.position.rects.length) {
+			return null;
+		}
 		annotation.position.rects = annotation.position.rects.map(r => r.map(n => Math.round(n * 1000) / 1000));
 		containerRect = annotation.position.rects[0].slice();
 		for (let rect of annotation.position.rects) {
@@ -112,7 +115,12 @@ async function annotationToRaw(annotation, fontEmbedder) {
 		}
 	}
 	else if (annotation.position.paths) {
-		annotation.position.paths = annotation.position.paths.map(r => r.map(n => Math.round(n * 1000) / 1000));
+		annotation.position.paths = annotation.position.paths
+			.filter(path => path.length >= 2)
+			.map(r => r.map(n => Math.round(n * 1000) / 1000));
+		if (!annotation.position.paths.length) {
+			return null;
+		}
 		let x = annotation.position.paths[0][0];
 		let y = annotation.position.paths[0][1];
 		containerRect = [x, y, x, y];

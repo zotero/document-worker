@@ -30,6 +30,7 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import crypto from 'crypto';
 import * as pdfWorker from '../../src/pdf/index.js';
+import { PDFAssembler } from '../../src/pdf/pdfassembler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -281,6 +282,122 @@ describe('PDF Worker', function () {
 		assert.ok(imported);
 		assert.equal(imported.authorName, authorName);
 		assert.deepEqual(imported.tags, tags);
+	});
+
+	it('should write remaining annotations when a highlight has no rects', async function () {
+		let buf = fs.readFileSync(path.join(pdfFixturesDir, 'full', '1.pdf'));
+		let annotations = [
+			{
+				id: 'VALID001',
+				type: 'highlight',
+				color: '#ffd400',
+				position: {
+					pageIndex: 0,
+					rects: [[231.284, 402.126, 293.107, 410.142]]
+				},
+				authorName: '',
+				comment: 'Highlight before an empty one',
+				dateModified: '2026-11-12T12:31:21Z',
+				tags: []
+			},
+			{
+				id: 'EMPTY001',
+				type: 'highlight',
+				color: '#ffd400',
+				position: {
+					rects: [],
+					pageIndex: 0
+				},
+				authorName: '',
+				comment: '',
+				dateModified: '2026-11-12T12:32:00Z',
+				tags: []
+			},
+			{
+				id: 'VALID002',
+				type: 'highlight',
+				color: '#ffd400',
+				position: {
+					pageIndex: 0,
+					rects: [[54, 392.164, 293.107, 400.18]]
+				},
+				authorName: '',
+				comment: 'Highlight after an empty one',
+				dateModified: '2026-11-12T12:33:00Z',
+				tags: []
+			}
+		];
+		let originalAnnotations = structuredClone(annotations);
+		let written = await pdfWorker.writeAnnotations(buf, annotations);
+
+		let result = await pdfWorker.importAnnotations(written, []);
+		for (let annotation of [annotations[0], annotations[2]]) {
+			let imported = result.imported.find(item => item.comment === annotation.comment);
+			assert.ok(imported, `Missing annotation ${annotation.id}`);
+			assert.deepEqual(imported.position, annotation.position);
+		}
+		assert.deepEqual(annotations, originalAnnotations);
+	});
+
+	for (let { name, paths } of [
+		{ name: 'no paths', paths: [] },
+		{ name: 'an empty path', paths: [[]] },
+		{ name: 'an incomplete point', paths: [[10]] }
+	]) {
+		it(`should skip ink with ${name} and write the next annotation`, async function () {
+			let buf = fs.readFileSync(path.join(pdfFixturesDir, 'full', '1.pdf'));
+			let annotations = [paths, [[10, 10, 20, 20]]].map((paths, index) => ({
+				id: index === 0 ? 'EMPTYINK' : 'VALIDINK',
+				type: 'ink',
+				color: '#ffd400',
+				position: { pageIndex: 0, width: 2, paths },
+				authorName: '',
+				comment: '',
+				dateModified: '2026-11-12T12:31:21Z',
+				tags: []
+			}));
+			let originalAnnotations = structuredClone(annotations);
+			let written = await pdfWorker.writeAnnotations(buf, annotations);
+
+			let pdf = new PDFAssembler();
+			await pdf.init(written);
+			let structure = await pdf.getPDFStructure();
+			let ink = structure['/Root']['/Pages']['/Kids'][0]['/Annots']
+				.filter(annotation => annotation['/Subtype'] === '/Ink');
+
+			assert.equal(ink.length, 1);
+			assert.equal(ink[0]['/Zotero:Key'], '(VALIDINK)');
+			assert.deepEqual(ink[0]['/InkList'], [[10, 10, 20, 20]]);
+			assert.deepEqual(ink[0]['/Rect'], [8, 8, 22, 22]);
+			assert.deepEqual(annotations, originalAnnotations);
+		});
+	}
+
+	it('should preserve valid ink paths when mixed with empty and incomplete paths', async function () {
+		let buf = fs.readFileSync(path.join(pdfFixturesDir, 'full', '1.pdf'));
+		let validPaths = [[10, 10, 20, 20], [30, 30], [40, 40, 50, 50]];
+		let annotations = [{
+			id: 'MIXEDINK',
+			type: 'ink',
+			color: '#ffd400',
+			position: {
+				pageIndex: 0,
+				width: 2,
+				paths: [[], validPaths[0], [10], validPaths[1], validPaths[2], []]
+			},
+			authorName: '',
+			comment: '',
+			dateModified: '2026-11-12T12:31:21Z',
+			tags: []
+		}];
+		let originalAnnotations = structuredClone(annotations);
+		let written = await pdfWorker.writeAnnotations(buf, annotations);
+		let result = await pdfWorker.importAnnotations(written, []);
+		let ink = result.imported.filter(annotation => annotation.type === 'ink');
+
+		assert.equal(ink.length, 1);
+		assert.deepEqual(ink[0].position, { pageIndex: 0, width: 2, paths: validPaths });
+		assert.deepEqual(annotations, originalAnnotations);
 	});
 
 	it('should import Mendeley annotations', async function () {
