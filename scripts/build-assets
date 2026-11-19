@@ -3,13 +3,13 @@
 
 set -euo pipefail
 
-rm -rf build/wasm build/onnx build/block-seg build/table-grid
+rm -rf build/cmaps build/standard_fonts build/wasm build/onnx build/block-seg build/table-grid
 
 # pdf.js assets
 mkdir -p build/cmaps
-rsync -a --delete --exclude='.*' pdf.js/external/bcmaps/ build/cmaps/
+cp -R pdf.js/external/bcmaps/* build/cmaps/
 mkdir -p build/standard_fonts
-rsync -a --delete --exclude='.*' pdf.js/external/standard_fonts/ build/standard_fonts/
+cp -R pdf.js/external/standard_fonts/* build/standard_fonts/
 mkdir -p build/wasm
 cp pdf.js/external/openjpeg/openjpeg.wasm build/wasm/
 cp pdf.js/external/jbig2/jbig2.wasm build/wasm/
